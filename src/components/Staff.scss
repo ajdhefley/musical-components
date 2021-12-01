@@ -1,0 +1,21 @@
+$staff-border-size: 1px;
+$staff-border: $staff-border-size solid #000;
+$staff-height: 20px;
+
+div.staff {
+    width: 100%;
+    border-left: $staff-border;
+    border-right: $staff-border;
+    position: relative;
+}
+
+div.staff-space {
+    width: 100%;
+    height: $staff-height - $staff-border-size;
+    box-shadow: 0px -1px 3px -2px #000, 0px 1px 3px -2px #000;
+    border-top: $staff-border;
+
+    &:last-child {
+        border-bottom: $staff-border;
+    }
+}

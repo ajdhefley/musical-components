@@ -1,0 +1,53 @@
+.note {
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+
+    &.standard {
+        background-image: url('../../images/note_standard.svg');
+    }
+
+    &.whole {
+        background-image: url('../../images/note_whole.svg');
+    }
+}
+
+.notestem-32nd {
+    background-image: url('../../images/32_up.svg');
+
+    &.down {
+        background-image: url('../../images/32_down.svg');
+    }
+}
+
+.notestem-16th {
+    background-image: url('../../images/16_up.svg');
+
+    &.down {
+        background-image: url('../../images/16_down.svg');
+    }
+}
+
+.notestem-8th {
+    background-image: url('../../images/8_up.svg');
+
+    &.down {
+        background-image: url('../../images/8_down.svg');
+    }
+}
+
+.notestem-quarter {
+    background-image: url('../../images/4_up.svg');
+
+    &.down {
+        background-image: url('../../images/4_down.svg');
+    }
+}
+
+.notestem-half {
+    background-image: url('../../images/2_up.svg');
+
+    &.down {
+        background-image: url('../../images/2_down.svg');
+    }
+}
