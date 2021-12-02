@@ -1,0 +1,29 @@
+.rest {
+    background-repeat: no-repeat;
+    background-position: top;
+    position: absolute;
+
+    &.rest-whole {
+        background-image: url('../images/rest-1.svg');
+    }
+
+    &.rest-half {
+        background-image: url('../images/rest-2.svg');
+    }
+
+    &.rest-quarter {
+        background-image: url('../images/rest-4.svg');
+    }
+
+    &.rest-8th {
+        background-image: url('../images/rest-8.svg');
+    }
+
+    &.rest-16th {
+        background-image: url('../images/rest-16.svg');
+    }
+
+    &.rest-32nd {
+        background-image: url('../images/rest-16.svg');
+    }
+}
