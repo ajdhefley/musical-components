@@ -20,22 +20,19 @@ interface State {
 
 export class Staff extends React.Component<Props, State> {
     private getComponentFromNote = (note: NoteModel) => {
-        const leftPosition = note.getPositionLeft();
-        const bottomPosition = note.getPositionBottom(this.props.clef);
-
         switch (note.type) {
             case '32nd':
-                return <ThirtySecondNote model={note} left={leftPosition} bottom={bottomPosition} />
+                return <ThirtySecondNote model={note} clef={this.props.clef} />
             case '16th':
-                return <SixteenthNote model={note} left={leftPosition} bottom={bottomPosition} />
+                return <SixteenthNote model={note} clef={this.props.clef} />
             case '8th':
-                return <EighthNote model={note} left={leftPosition} bottom={bottomPosition} />
+                return <EighthNote model={note} clef={this.props.clef} />
             case 'quarter':
-                return <QuarterNote model={note} left={leftPosition} bottom={bottomPosition} />
+                return <QuarterNote model={note} clef={this.props.clef} />
             case 'half':
-                return <HalfNote model={note} left={leftPosition} bottom={bottomPosition} />
+                return <HalfNote model={note} clef={this.props.clef} />
             case 'whole':
-                return <WholeNote model={note} left={leftPosition} bottom={bottomPosition} />
+                return <WholeNote model={note} clef={this.props.clef} />
         }
     }
 
@@ -53,13 +50,11 @@ export class Staff extends React.Component<Props, State> {
 
     componentDidMount() {
         const notes = new Array<NoteModel>();
-        notes.push(new NoteModel('8th', 'E', 3, 1.0));
-        notes.push(new NoteModel('8th', 'F', 3, 1.5));
-        notes.push(new NoteModel('8th', 'G', 3, 2.0));
-        notes.push(new NoteModel('8th', 'A', 3, 2.5));
-        notes.push(new NoteModel('8th', 'B', 3, 3.0));
-        notes.push(new NoteModel('8th', 'C', 4, 3.5));
-        notes.push(new NoteModel('8th', 'D', 4, 4.0));
+        notes.push(new NoteModel('half', 'E', 3, 1.0));
+        notes.push(new NoteModel('8th', 'F', 3, 3.0));
+        notes.push(new NoteModel('16th', 'F', 3, 3.5));
+        notes.push(new NoteModel('32nd', 'G', 3, 4.0));
+        notes.push(new NoteModel('8th', 'D', 4, 4.5));
         this.setState({ notes });
     }
 

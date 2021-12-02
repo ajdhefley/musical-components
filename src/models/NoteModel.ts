@@ -1,10 +1,10 @@
-import { StaffModel } from '.';
-import { ClefType, NoteType, OctaveType, PitchType, Pitches } from '../types';
+import { NoteType, OctaveType, PitchType, Pitches } from '../types';
 
 export class NoteModel {
-    private static readonly TreblePositionC: number = 6;
-    private static readonly BassLocationC: number = 4;
-    private static readonly MiddleOctave: OctaveType = 4;
+    public static readonly NoteSize: number = 30;
+    public static readonly TreblePositionC: number = 6;
+    public static readonly BassLocationC: number = 4;
+    public static readonly MiddleOctave: OctaveType = 4;
 
     constructor(
         public readonly type: NoteType,
@@ -15,34 +15,10 @@ export class NoteModel {
 
     }
 
-    public getPositionLeft() {
-        return this.time * 100;
-    }
-
-    public getPositionBottom(clef: ClefType): number {
-        let cPosition = 0;
-
-        switch (clef) {
-            case 'treble':
-                cPosition = NoteModel.TreblePositionC;
-                break;
-            case 'bass':
-                cPosition = NoteModel.BassLocationC;
-                break;
-        }
-
-        const noteHeight = StaffModel.StaffSpaceHeight / 2;
-
-        const cIndex = cPosition - 1;
-        const basePosition = cIndex * noteHeight;
-
-        const pitchIndex = Pitches.indexOf(this.pitch);
-        const pitchPosition = pitchIndex * noteHeight;
-
-        const octaveDiff = this.octave - NoteModel.MiddleOctave;
-        const octaveDiffPosition = octaveDiff * noteHeight * Pitches.length;
-        
-        return basePosition + pitchPosition + octaveDiffPosition;
+    public getOctavePosition(): number {
+        const octaveNotes = (this.octave - 1) * Pitches.length;
+        const offsetNotes = Pitches.indexOf(this.pitch);
+        return octaveNotes + offsetNotes;
     }
 
     public toString() {

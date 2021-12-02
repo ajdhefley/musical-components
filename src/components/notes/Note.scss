@@ -3,51 +3,55 @@
     background-position: center;
     position: absolute;
 
-    &.standard {
-        background-image: url('../../images/note_standard.svg');
+    &.note-whole {
+        background-image: url('../../images/note-whole.svg');
     }
 
-    &.whole {
-        background-image: url('../../images/note_whole.svg');
+    &.note-half {
+        background-image: url('../../images/note-half.svg');
     }
-}
 
-.notestem-32nd {
-    background-image: url('../../images/32_up.svg');
-
-    &.down {
-        background-image: url('../../images/32_down.svg');
+    &.note-32nd, &.note-16th, &.note-8th, &.note-quarter {
+        background-image: url('../../images/note.svg');
     }
 }
 
-.notestem-16th {
-    background-image: url('../../images/16_up.svg');
+.stem {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-image: url('../../images/note-stem.svg');
 
     &.down {
-        background-image: url('../../images/16_down.svg');
+        background-position: left center;
     }
 }
 
-.notestem-8th {
-    background-image: url('../../images/8_up.svg');
+.stem-flag {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: right center;
 
     &.down {
-        background-image: url('../../images/8_down.svg');
+        background-position: left center;
+        transform: scaleY(-1);
     }
 }
 
-.notestem-quarter {
-    background-image: url('../../images/4_up.svg');
-
-    &.down {
-        background-image: url('../../images/4_down.svg');
+.note-32nd {
+    .stem-flag {
+        background-image: url('../../images/flag-32.svg');
     }
 }
 
-.notestem-half {
-    background-image: url('../../images/2_up.svg');
+.note-16th {
+    .stem-flag {
+        background-image: url('../../images/flag-16.svg');
+    }
+}
 
-    &.down {
-        background-image: url('../../images/2_down.svg');
+.note-8th {
+    .stem-flag {
+        background-image: url('../../images/flag-8.svg');
     }
 }
