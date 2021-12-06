@@ -2,15 +2,20 @@ import React from 'react';
 
 import './Note.scss';
 import { ClefType, Octaves, Pitches } from '../types';
-import { NoteModel, StaffModel } from '../models';
-import Staff from './Staff';
+import { NoteModel } from '../models';
 
 interface Props {
     model: NoteModel;
     clef: ClefType;
+    left: number;
+    bottom: number;
 }
 
-export class Note extends React.Component<Props> {
+interface State {
+    active: boolean;
+}
+
+export class Note extends React.Component<Props, State> {
     public static readonly Size: number = 30;
 
     protected get stemDown(): boolean {
@@ -18,7 +23,10 @@ export class Note extends React.Component<Props> {
     }
 
     private getNoteClass = () => {
-        return `note note-${this.props.model.type}`;
+        let cls = `note note-${this.props.model.type}`;
+        if (this.state?.active)
+            cls += ' active';
+        return cls;
     }
     
     private getNoteStyle = () => {
@@ -28,8 +36,8 @@ export class Note extends React.Component<Props> {
             backgroundSize: `${Note.Size}px ${Note.Size}px`,
 
             // Subtracting by half the note size centers it horizontally/vertically
-            left: `${this.getAbsolutePositionLeft() - Note.Size/2}px`,
-            bottom: `${this.getAbsolutePositionBottom() - Note.Size/2}px`, 
+            left: `${this.props.left - Note.Size/2}px`,
+            bottom: `${this.props.bottom - Note.Size/2}px`, 
         };
     }
 
@@ -59,36 +67,6 @@ export class Note extends React.Component<Props> {
         };
     }
 
-    public getAbsolutePositionLeft(): number {
-        return this.props.model.time * 150;
-    }
-
-    public getAbsolutePositionBottom(): number {
-        let cPosition = 0;
-
-        switch (this.props.clef) {
-            case 'treble':
-                cPosition = NoteModel.TreblePositionC;
-                break;
-            case 'bass':
-                cPosition = NoteModel.BassLocationC;
-                break;
-        }
-
-        const noteHeight = Staff.SpaceHeight / 2;
-
-        const cIndex = cPosition - 1;
-        const basePosition = cIndex * noteHeight;
-
-        const pitchIndex = Pitches.indexOf(this.props.model.pitch);
-        const pitchPosition = pitchIndex * noteHeight;
-
-        const octaveDiff = this.props.model.octave - NoteModel.MiddleOctave;
-        const octaveDiffPosition = octaveDiff * noteHeight * Pitches.length;
-        
-        return basePosition + pitchPosition + octaveDiffPosition;
-    }
-
     componentWillMount() {
         if (!this.props.model.getDomain().includes(this.props.model.time)) {
             throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
@@ -98,8 +76,8 @@ export class Note extends React.Component<Props> {
     render() {
         return (
             <div data-note={this.props.model} className={this.getNoteClass()} style={this.getNoteStyle()}>
-                {this.props.model.type != 'whole' && <div className={this.getStemClass()} style={this.getStemStyle()}></div>}
-                {['8th', '16th', '32nd'].includes(this.props.model.type) && <div className={this.getFlagClass()} style={this.getFlagStyle()}></div>}
+                {this.props.model.type !== 'whole' && <div className={this.getStemClass()} style={this.getStemStyle()}></div>}
+                {/* {['8th', '16th', '32nd'].includes(this.props.model.type) && <div className={this.getFlagClass()} style={this.getFlagStyle()}></div>} */}
             </div>
         );
     }

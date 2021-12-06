@@ -1,0 +1,57 @@
+$icon-size: 4em;
+$icon-margin: 0.5em;
+$container-padding: 1em;
+
+.exercise-selection-wrapper {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.exercise-container {
+    cursor: pointer;
+    display: inline-block;
+    padding: $container-padding;
+    width: calc(50% - #{$container-padding*2});
+
+    &:hover {
+        background: #f1f1f1;
+    }
+}
+
+.exercise-icon {
+    width: $icon-size;
+    height: $icon-size;
+    margin-right: $icon-margin;
+    display: inline-block;
+    background: #ccc;
+}
+
+.exercise-text {
+    display: inline-block;
+    width: calc(100% - #{$icon-size + $icon-margin + $container-padding*2});
+}
+
+.exercise-title {
+    letter-spacing: -0.05em;
+    margin-bottom: -0.25em;
+    line-height: 1.75em;
+    font-size: 1.75em;
+    font-family: 'Quicksand', sans-serif;
+}
+
+@media screen and (max-width: 605px) {
+    .exercise-text {
+        //display: block;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    .wrapper {
+        width: 90%;
+    }
+
+    .exercise-container {
+        width: calc(100% - #{$container-padding*2});
+    }
+}

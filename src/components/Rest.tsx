@@ -2,13 +2,14 @@ import React from 'react';
 
 import './Rest.scss';
 import { RestModel } from '../models';
-import Staff from './Staff';
+import Staff from './StaffMeasure';
 
 interface Props {
     model: RestModel;
+    left: number;
 }
 
-export abstract class Rest extends React.Component<Props> {
+export class Rest extends React.Component<Props> {
     public static readonly Size: number = 50;
 
     private getClass = () => {
@@ -22,22 +23,15 @@ export abstract class Rest extends React.Component<Props> {
             backgroundSize: `${Rest.Size}px ${Rest.Size}px`,
 
             // Subtracting by half the note size centers it horizontally/vertically
-            left: `${this.getAbsolutePositionLeft() - Rest.Size/2}px`,
-            bottom: `${this.getAbsolutePositionBottom() - Rest.Size/2 + 2}px`, 
+            left: `${this.props.left - Rest.Size/2}px`,
+            bottom: `${Staff.SpaceHeight*2 - Rest.Size/2 + 2}px` // 4 staff spaces total: center at half the height (x2 instead of x4)
         };
     }
 
-    public getAbsolutePositionLeft(): number {
-        return this.props.model.time * 150;
-    }
-
-    public getAbsolutePositionBottom(): number {
-        let position = Staff.SpaceHeight * 2; // 4 spaces total: center at half the height (x2 instead of x4)
-
-        // if (this.props.model.type == 'half' || this.props.model.type == 'whole')
-        //     position += 5;
-
-        return position;
+    componentWillMount() {
+        if (!this.props.model.getDomain().includes(this.props.model.time)) {
+            throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
+        }
     }
 
     render() {

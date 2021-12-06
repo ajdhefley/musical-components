@@ -1,1 +1,61 @@
+body {
+    margin: 0;
+    font-family: 'Dosis', sans-serif;
+}
 
+a {
+    color: initial;
+}
+
+p.intro-text {
+    opacity: 0;
+    text-align: center;
+    font-size: 1.5em;
+    font-family: 'Dosis', sans-serif;
+    animation-name: intro-text-animation;
+    animation-duration: 500ms;
+    animation-delay: 250ms;
+    animation-fill-mode: forwards;
+}
+
+@keyframes intro-text-animation {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+
+@media screen and (max-width: 605px) {
+    body {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    body {
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 1920px) {
+    body {
+        font-size: 18px;
+    }
+}
+
+
+//////
+
+// body {
+//     background: #1d4159;
+// }
+
+// header {
+//     color: #fff;
+// }
+
+// .exercise-selection-wrapper {
+//     width: 100%;
+//     padding: 0 10%;
+//     margin: 0 auto;
+//     background: #fff;
+//     padding: 1em;
+// }

@@ -3,6 +3,10 @@
     background-position: center;
     position: absolute;
 
+    &.active {
+        filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+    }
+
     &.note-whole {
         background-image: url('../images/note-whole.svg');
     }
