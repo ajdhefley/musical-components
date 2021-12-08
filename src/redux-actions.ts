@@ -1,10 +1,12 @@
+import { ExerciseSelectionModel } from "./models/ExerciseSelectionModel";
+
 export enum AppActionTypes {
     SetExerciseId
 }
 
-export function setExercise(id: number, name: string, description: string) {
+export function setSelectedExercise(exercise: ExerciseSelectionModel) {
     return {
         type: AppActionTypes.SetExerciseId,
-        payload: { id, name, description }
+        payload: { exercise }
     };
 };

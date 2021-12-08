@@ -3,7 +3,7 @@ import exerciseReducer from './redux-reducers';
 
 export const store = configureStore({
     reducer: {
-        currentExercise: exerciseReducer
+        exercises: exerciseReducer
     }
 });
 

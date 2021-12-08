@@ -7,7 +7,11 @@ export class ExerciseNoteOptions extends React.Component {
     render() {
         return (
             <div>
-                {Notes.map((note) => (<span>{note}</span>))}
+                <h3>Exclude Notes</h3>
+                {Notes.map((note) => (<div>
+                    <input type="checkbox" id={`exclude-${note}`} />
+                    <label htmlFor={`exclude-${note}`}>{note}</label>
+                </div>))}
             </div>
         );
     }

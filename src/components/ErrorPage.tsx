@@ -7,7 +7,7 @@ import App from './App';
 export class ErrorPage extends React.Component {
     render() {
         return (
-            <div>
+            <div className="content-wrapper">
                 <p className="introText">An unknown error occured.</p>
                 <Link to={App.Routes.ExerciseSelections}>Go To Exercise Selection</Link>
             </div>

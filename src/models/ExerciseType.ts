@@ -1,4 +1,4 @@
-export enum ExerciseTypes {
+export enum ExerciseType {
     ScaleRecognitionSound = 1,
     ScaleRecognitionSight = 2,
     NoteRecognitionSound = 3,

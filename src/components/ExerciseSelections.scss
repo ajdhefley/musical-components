@@ -1,17 +1,25 @@
+@import "../styles/mixins";
+
 $icon-size: 4em;
 $icon-margin: 0.5em;
 $container-padding: 1em;
-
-.exercise-selection-wrapper {
-    width: 80%;
-    margin: 0 auto;
-}
 
 .exercise-container {
     cursor: pointer;
     display: inline-block;
     padding: $container-padding;
     width: calc(50% - #{$container-padding*2});
+    @include fade-in(250ms, 500ms);
+    @include stagger-animation(12, 50ms, 250ms);
+
+    &:nth-child(even) {
+        @include pull-left();
+    }
+
+    &:nth-child(odd) {
+        @include pull-right();
+    }
+
 
     &:hover {
         background: #f1f1f1;

@@ -1,0 +1,98 @@
+$animation-offset: 200px;
+
+@mixin stagger-animation($num-children, $magnitude: 100ms, $baseDelay: 0ms) {
+    @for $i from 1 through $num-children {
+        &:nth-child(#{$i}) {
+            animation-delay: $i * $magnitude + $baseDelay;
+        }
+    }
+}
+
+
+@mixin fade-in($delay, $duration) {
+    opacity: 0;
+    -webkit-animation-name: fade-in-animation;
+    -moz-animation-name: fade-in-animation;
+    animation-name: fade-in-animation;
+    animation-fill-mode: forwards;
+    animation-duration: $duration;
+    animation-delay: $delay;
+}
+
+@keyframes fade-in-animation {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+
+
+@mixin pull-left() {
+    @extend .pull;
+    -webkit-animation-name: keyframes-left;
+    -moz-animation-name: keyframes-left;
+	left: -$animation-offset;
+}
+
+@keyframes keyframes-left {
+    from {
+		opacity: 0;
+		left: -$animation-offset;
+    }
+    to {
+		opacity: 1;
+        left: 0;
+    }
+}
+
+
+@mixin pull-right() {
+    @extend .pull;
+    -webkit-animation-name: keyframes-right;
+    -moz-animation-name: keyframes-right;
+	right: -$animation-offset;
+}
+
+@keyframes keyframes-right {
+    from {
+		opacity: 0;
+		right: -$animation-offset;
+    }
+    to {
+		opacity: 1;
+        right: 0;
+    }
+}
+
+
+@mixin pull-up() {
+    @extend .pull;
+    -webkit-animation-name: keyframes-up;
+    -moz-animation-name: keyframes-up;
+	bottom: -200px;
+}
+
+@keyframes keyframes-up {
+    from {
+		opacity: 0;
+		bottom: -200px;
+    }
+    to {
+		opacity: 1;
+        bottom: 0;
+    }
+}
+
+
+.pull {
+    animation-delay: 400ms;
+    -o-animation-delay: 400ms;
+    -moz-animation-delay:  400ms;
+    -webkit-animation-delay:  400ms;
+    -webkit-transition-property: -webkit-transform;
+    -webkit-transition-duration: 400ms;
+    -moz-transition-property: -moz-transform;
+    -moz-transition-duration: 400ms;
+    -webkit-animation-duration: 400ms;
+	-moz-animation-duration: 400ms;
+	animation-fill-mode: forwards;
+    position: relative;
+}

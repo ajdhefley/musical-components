@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExerciseModel } from '../models/ExerciseModel';
-import { setExercise } from '../redux-actions';
+import { ExerciseSelectionModel } from '../models/ExerciseSelectionModel';
+import { setSelectedExercise } from '../redux-actions';
 import { useAppDispatch } from '../redux-hooks';
 import App from './App';
 
@@ -8,25 +9,20 @@ import './ExerciseSelections.scss';
 
 const ExerciseSelections = () => {
     const dispatch = useAppDispatch();
+    const [exerciseList, setExerciseList] = useState<ExerciseSelectionModel[]>();
 
-    const exercises: ExerciseModel[] = [
-        new ExerciseModel(1, 'Scale Recognition (Sound)', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(2, 'Scale Recognition (Sight)', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(3, 'Key Recognition (Sound)', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(4, 'Key Recognition (Sight)', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(5, 'Note Recognition (Sound)', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(6, 'Note Recognition (Sight)', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(7, 'Rest Recognition', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(8, '???', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(9, 'Note Input', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-        new ExerciseModel(10, 'Scale Input', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
-    ];
+    useEffect(() => {
+        fetch('http://localhost:8080/exercises/types')
+            .then(response => response.json())
+            .then(exercises => setExerciseList(exercises))
+            .catch(err => console.error(err));
+    }, []);
     
     return (
-        <div className="exercise-selection-wrapper">
+        <div className="content-wrapper">
             <p className="intro-text">Select an exercise below.</p>
-            {exercises.map((exercise) => (
-                <Link className="exercise-container" to={App.Routes.ExerciseOptions} onClick={() => dispatch(setExercise(exercise.id, exercise.name, exercise.description))}>
+            {exerciseList?.map((exercise) => (
+                <Link className="exercise-container" to={App.Routes.ExerciseOptions} onClick={() => dispatch(setSelectedExercise(exercise))}>
                     <div className="exercise-icon"></div>
                     <div className="exercise-text">
                         <div className="exercise-title">{exercise.name}</div>
@@ -36,6 +32,6 @@ const ExerciseSelections = () => {
             ))}
         </div>
     );
-}
+};
 
 export default ExerciseSelections;
