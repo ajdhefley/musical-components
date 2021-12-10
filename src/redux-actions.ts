@@ -1,4 +1,4 @@
-import { ExerciseSelectionModel } from "./models/ExerciseSelectionModel";
+import { ExerciseSelectionModel } from './redux-models';
 
 export enum AppActionTypes {
     SetExerciseId

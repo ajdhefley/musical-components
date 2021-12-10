@@ -7,7 +7,8 @@ import App from './App';
 import ExercisePitchOptions from './ExercisePitchOptions';
 import ExerciseNoteOptions from './ExerciseNoteOptions';
 import ExerciseOctaveOptions from './ExerciseOctaveOptions';
-import { ExerciseSelectionModel } from '../models/ExerciseSelectionModel';
+import ExerciseClefOptions from './ExerciseClefOptions';
+import { ExerciseSelectionModel } from '../redux-models';
 
 const ExerciseOptions = () => {
     const exercises = useAppSelector(state => state.exercises);
@@ -40,6 +41,7 @@ const ExerciseOptions = () => {
             {selectedExercise?.requiresNoteOptions && <ExerciseNoteOptions />}
             {selectedExercise?.requiresOctaveOptions && <ExerciseOctaveOptions />}
             {selectedExercise?.requiresPitchOptions && <ExercisePitchOptions />}
+            {selectedExercise?.requiresClefOptions && <ExerciseClefOptions />}
         </div>
     );
 };

@@ -1,12 +1,11 @@
 import React from 'react';
 
 import './Note.scss';
-import { ClefType, Octaves, Pitches } from '../types';
-import { NoteModel } from '../models';
+import { Octaves, Pitches } from '../types';
+import { NoteDto } from '../dtos/Note.dto';
 
 interface Props {
-    model: NoteModel;
-    clef: ClefType;
+    model: NoteDto;
     left: number;
     bottom: number;
 }
@@ -19,7 +18,10 @@ export class Note extends React.Component<Props, State> {
     public static readonly Size: number = 30;
 
     protected get stemDown(): boolean {
-        return this.props.model.getOctavePosition() >= (Pitches.length * Octaves.length / 2) - 1;
+        const octaveNotes = (this.props.model.octave - 1) * Pitches.length;
+        const offsetNotes = Pitches.indexOf(this.props.model.pitch);
+        const octavePosition = octaveNotes + offsetNotes;
+        return octavePosition >= (Pitches.length * Octaves.length / 2) - 1;
     }
 
     private getNoteClass = () => {
@@ -68,9 +70,10 @@ export class Note extends React.Component<Props, State> {
     }
 
     componentWillMount() {
-        if (!this.props.model.getDomain().includes(this.props.model.time)) {
-            throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
-        }
+        // TODO
+        // if (!this.props.model.getDomain().includes(this.props.model.time)) {
+        //     throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
+        // }
     }
 
     render() {

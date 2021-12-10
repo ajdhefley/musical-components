@@ -6,7 +6,7 @@ import './ExerciseNoteOptions.scss';
 export class ExerciseNoteOptions extends React.Component {
     render() {
         return (
-            <div>
+            <div className="exercise-options-note">
                 <h3>Exclude Notes</h3>
                 {Notes.map((note) => (<div>
                     <input type="checkbox" id={`exclude-${note}`} />

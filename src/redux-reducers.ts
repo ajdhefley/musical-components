@@ -1,6 +1,6 @@
 import { AnyAction } from 'redux';
-import { ExerciseSelectionModel } from './models/ExerciseSelectionModel';
 import { AppActionTypes } from './redux-actions';
+import { ExerciseSelectionModel } from './redux-models';
 
 export interface ExerciseState {
     selectedExercise: ExerciseSelectionModel;

@@ -5,4 +5,5 @@ export class ExerciseSelectionModel {
     requiresNoteOptions: boolean;
     requiresOctaveOptions: boolean;
     requiresPitchOptions: boolean;
+    requiresClefOptions: boolean;
 }

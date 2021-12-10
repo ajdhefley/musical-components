@@ -1,11 +1,11 @@
 import React from 'react';
 
 import './Rest.scss';
-import { RestModel } from '../models';
 import Staff from './StaffMeasure';
+import { RestDto } from '../dtos/Rest.dto';
 
 interface Props {
-    model: RestModel;
+    model: RestDto;
     left: number;
 }
 
@@ -29,9 +29,10 @@ export class Rest extends React.Component<Props> {
     }
 
     componentWillMount() {
-        if (!this.props.model.getDomain().includes(this.props.model.time)) {
-            throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
-        }
+        // TODO
+        // if (!this.props.model.getDomain().includes(this.props.model.time)) {
+        //     throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
+        // }
     }
 
     render() {

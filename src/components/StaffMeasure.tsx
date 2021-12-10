@@ -1,19 +1,18 @@
 import React from 'react';
 
 import './StaffMeasure.scss';
-import { NotationModel, NoteModel, RestModel, TimeSignatureModel } from '../models';
-import { ClefType, NoteType, OctaveType, Pitches, PitchType } from '../types';
 import Note from './Note';
 import Rest from './Rest';
+import { ClefType, OctaveType, Pitches } from '../types';
+import { NotationDto, NoteDto, RestDto } from '../dtos';
 
 interface Props {
     clef: ClefType;
-    timeSignature: TimeSignatureModel;
 }
 
 interface State {
-    notes: Array<NoteModel>;
-    rests: Array<RestModel>;
+    notes: Array<NoteDto>;
+    rests: Array<RestDto>;
 }
 
 export class StaffMeasure extends React.Component<Props, State> {
@@ -21,20 +20,23 @@ export class StaffMeasure extends React.Component<Props, State> {
     public static readonly SpaceHeight: number = 20;
     public static readonly NoteLeftOffset: number = 100;
     public static readonly NoteSpacing: number = 300;
+    public static readonly TreblePositionC: number = 6;
+    public static readonly BassLocationC: number = 4;
+    public static readonly MiddleOctave: OctaveType = 4;
 
-    private getNotationLeftPosition = (notation: NotationModel) => {
+    private getNotationLeftPosition = (notation: NotationDto) => {
         return (Note.Size + StaffMeasure.NoteSpacing) * notation.time;
     }
 
-    private getNoteBottomPosition = (note: NoteModel) => {
+    private getNoteBottomPosition = (note: NoteDto) => {
         let cPosition = 0;
 
         switch (this.props.clef) {
             case 'treble':
-                cPosition = NoteModel.TreblePositionC;
+                cPosition = StaffMeasure.TreblePositionC;
                 break;
             case 'bass':
-                cPosition = NoteModel.BassLocationC;
+                cPosition = StaffMeasure.BassLocationC;
                 break;
         }
 
@@ -46,7 +48,7 @@ export class StaffMeasure extends React.Component<Props, State> {
         const pitchIndex = Pitches.indexOf(note.pitch);
         const pitchPosition = pitchIndex * noteHeight;
 
-        const octaveDiff = note.octave - NoteModel.MiddleOctave;
+        const octaveDiff = note.octave - StaffMeasure.MiddleOctave;
         const octaveDiffPosition = octaveDiff * noteHeight * Pitches.length;
         
         return basePosition + pitchPosition + octaveDiffPosition;
@@ -75,13 +77,13 @@ export class StaffMeasure extends React.Component<Props, State> {
     }
 
     private getRenderedItems = () => {
-        const notes = this.state?.notes.map((note: NoteModel) => {
-            const leftPosition = this.getNotationLeftPosition(note as NotationModel) + StaffMeasure.NoteLeftOffset;
+        const notes = this.state?.notes.map((note: NoteDto) => {
+            const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
             const bottomPosition = this.getNoteBottomPosition(note);
-            return (<Note model={note} clef={this.props.clef} left={leftPosition} bottom={bottomPosition} />);
+            return (<Note model={note} left={leftPosition} bottom={bottomPosition} />);
         });
 
-        const rests = this.state?.rests.map((rest: RestModel) => {
+        const rests = this.state?.rests.map((rest: RestDto) => {
             const leftPosition = this.getNotationLeftPosition(rest) + StaffMeasure.NoteLeftOffset;
             return (<Rest model={rest} left={leftPosition} />);
         });
@@ -89,23 +91,24 @@ export class StaffMeasure extends React.Component<Props, State> {
         return Array().concat(notes, rests);
     }
     
-    private addNotes = async (...notes: NoteModel[]) => {
+    private addNotes = async (...notes: NoteDto[]) => {
         await this.setState({ ...this.state, notes: this.state.notes.concat(notes) });
     }
 
-    private addNoteNext = async (type: NoteType, pitch: PitchType, octave: OctaveType) => {
-        const lastNote = this.state.notes[this.state.notes.length-1];
-        const nextTime = (lastNote?.time ?? 0) + (lastNote?.getDuration().value ?? 0);
-        await this.addNotes(new NoteModel(type, pitch, octave, nextTime));
-    }
+    // TODO
+    // private addNoteNext = async (type: NoteType, pitch: PitchType, octave: OctaveType) => {
+    //     const lastNote = this.state.notes[this.state.notes.length-1];
+    //     const nextTime = (lastNote?.time ?? 0) + (lastNote?.getDuration().value ?? 0);
+    //     await this.addNotes(new NoteModel(type, pitch, octave, nextTime));
+    // }
 
     async componentWillMount() {
-        this.setState({ notes: [], rests: [] }, async () => {
-            await this.addNoteNext('quarter', 'G', 3);
-            await this.addNoteNext('quarter', 'A', 3);
-            await this.addNoteNext('quarter', 'B', 3);
-            await this.addNoteNext('quarter', 'C', 4);
-        });
+        // TODO
+        // this.setState({ notes: [], rests: [] }, async () => {
+        //     for (let note of this.props.model.getNotes()) {
+        //         await this.addNoteNext('quarter', 'G', 3);
+        //     }
+        // });
     }
 
     render() {
