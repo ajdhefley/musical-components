@@ -4,7 +4,7 @@ import './StaffMeasure.scss';
 import Note from './Note';
 import Rest from './Rest';
 import { ClefType, OctaveType, Pitches } from '../types';
-import { NotationDto, NoteDto, RestDto } from '../dtos';
+import { NoteDto, RestDto } from '../dtos';
 
 function StaffMeasure({
     clef,
@@ -25,11 +25,11 @@ function StaffMeasure({
     const [notes, setNotes] = useState<NoteDto[]>();
     const [rests, setRests] = useState<RestDto[]>();
 
-    const getNotationLeftPosition = (notation: NotationDto) => {
-        return (NoteSize + NoteSpacing) * notation.time;
+    const getItemLeftPosition = (time: number) => {
+        return (NoteSize + NoteSpacing) * time;
     }
 
-    const getNoteBottomPosition = (pitch: number, octave: number) => {
+    const getItemBottomPosition = (pitch: number, octave: number) => {
         const noteHeight = SpaceHeight / 2;
 
         let bottomMiddleC = 0;
@@ -43,18 +43,21 @@ function StaffMeasure({
                 break;
         }
 
-        const pitchPosition = (pitch % Pitches.length) * noteHeight;
-        const octavePosition = (octave - MiddleOctave) * Pitches.length * noteHeight;
+        let pitchPosition = (pitch % Pitches.length) * noteHeight;
+        let octavePosition = (octave - MiddleOctave) * Pitches.length * noteHeight;
+
+        if (clef == 'bass')
+            octavePosition -= Pitches.length * noteHeight;
         
         return bottomMiddleC + pitchPosition + octavePosition;
     }
 
     const getStaffWidth = () => {
         const noteWidth = !notes || notes.length === 0 ? 0 : notes
-            .map((note) => getNotationLeftPosition(note))
+            .map((note) => getItemLeftPosition(note.time))
             .reduce((prev, next) => prev + next);
         const restWidth = !rests || rests.length === 0 ? 0 : rests
-            .map((rest) => getNotationLeftPosition(rest))
+            .map((rest) => getItemLeftPosition(rest.time))
             .reduce((prev, next) => prev + next);
         return Math.max(MinMeasureWidth, noteWidth + restWidth + NoteLeftOffset);
     };
@@ -71,32 +74,36 @@ function StaffMeasure({
         };
     }
 
-    const getSharpsFlats = () => {
+    const getClef = () => {
+        return <div className={clef}></div>
+    }
+
+    const getSharpsAndFlats = () => {
         if (sharps) {
             return sharps.map((note, index) => {
                 const leftPosition = index * 15;
-                const bottomPosition = getNoteBottomPosition(note, note > 4 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight/2;
+                const bottomPosition = getItemBottomPosition(note, note > 4 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight;
                 return (<div className="sharp" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
             });
         }
         else if (flats) {
             return flats.map((note, index) => {
                 const leftPosition = index * 15;
-                const bottomPosition = getNoteBottomPosition(note, note > 3 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight/2;
+                const bottomPosition = getItemBottomPosition(note, note > 3 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight/2;
                 return (<div className="flat" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
             });
         }
     }
 
-    const getRenderedItems = () => {
+    const getNotations = () => {
         const renderedNotes = notes?.map((note: NoteDto) => {
-            const leftPosition = getNotationLeftPosition(note as NotationDto) + NoteLeftOffset;
-            const bottomPosition = getNoteBottomPosition(note.pitch, note.octave);
+            const leftPosition = getItemLeftPosition(note.time) + NoteLeftOffset;
+            const bottomPosition = getItemBottomPosition(note.pitch, note.octave);
             return (<Note model={note} left={leftPosition} bottom={bottomPosition} />);
         });
 
         const renderedRests = rests?.map((rest: RestDto) => {
-            const leftPosition = getNotationLeftPosition(rest) + NoteLeftOffset;
+            const leftPosition = getItemLeftPosition(rest.time) + NoteLeftOffset;
             return (<Rest model={rest} left={leftPosition} />);
         });
 
@@ -116,8 +123,15 @@ function StaffMeasure({
 
     return (
         <div className="staff-measure" style={getStaffStyle()}>
-            {getSharpsFlats()}
-            {getRenderedItems()}
+            <div className="clef-container">
+                {getClef()}
+            </div>
+            <div className="key-signature-container">
+                {getSharpsAndFlats()}
+            </div>
+            <div className="notation-container">
+                {getNotations()}
+            </div>
             <div className="staff-space" style={getStaffSpaceStyle()}></div>
             <div className="staff-space" style={getStaffSpaceStyle()}></div>
             <div className="staff-space" style={getStaffSpaceStyle()}></div>

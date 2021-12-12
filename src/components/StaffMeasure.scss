@@ -2,6 +2,12 @@ $staff-border-size: 1px;
 $staff-border: $staff-border-size solid #000;
 $staff-height: 20px;
 $key-signature-notation-size: 40px;
+$clef-width: 50px;
+$clef-treble-height: 120px;
+$clef-bass-height: 100px;
+
+$clef-container-width: 50px;
+$key-signature-container-width: 100px;
 
 div.staff-measure {
     border-left: $staff-border;
@@ -39,4 +45,46 @@ div.staff-space {
     background-position: center;
     background-size: contain;
     background-image: url('../images/flat.svg');
+}
+
+.treble {
+    width: $clef-width;
+    height: $clef-treble-height;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/clef-treble.svg');
+}
+
+.bass {
+    width: $clef-width;
+    height: $clef-bass-height;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/clef-bass.svg');
+}
+
+.clef-container {
+    position: absolute;
+    bottom: 0;
+    width: $clef-container-width;
+    height: 100px;
+}
+
+.key-signature-container {
+    position: absolute;
+    bottom: 0;
+    width: $key-signature-container-width;
+    height: 100px;
+    left: $clef-container-width;
+}
+
+.notation-container {
+    position: absolute;
+    bottom: 0;
+    height: 100px;
+    left: $clef-container-width + $key-signature-container-width;
 }
