@@ -7,7 +7,7 @@ import { setSelectedExercise } from '../redux-actions';
 import { useAppDispatch } from '../redux-hooks';
 import { ExerciseSelectionModel } from '../redux-models';
 
-const ExerciseSelections = () => {
+function ExerciseSelections() {
     const dispatch = useAppDispatch();
     const [exerciseList, setExerciseList] = useState<ExerciseSelectionModel[]>();
 

@@ -59,3 +59,17 @@
         background-image: url('../images/flag-32.svg');
     }
 }
+
+.sharp {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('../images/sharp.svg');
+}
+
+.flat {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('../images/flat.svg');
+}

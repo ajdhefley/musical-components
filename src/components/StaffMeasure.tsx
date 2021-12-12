@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 
 import './StaffMeasure.scss';
 import Note from './Note';
@@ -8,14 +8,16 @@ import { NotationDto, NoteDto, RestDto } from '../dtos';
 
 interface Props {
     clef: ClefType;
+    sharps?: number[];
+    flats?: number[];
 }
 
 interface State {
-    notes: Array<NoteDto>;
-    rests: Array<RestDto>;
+    notes: NoteDto[];
+    rests: RestDto[];
 }
 
-export class StaffMeasure extends React.Component<Props, State> {
+export class StaffMeasure extends Component<Props, State> {
     public static readonly MinMeasureWidth: number = 400;
     public static readonly SpaceHeight: number = 20;
     public static readonly NoteLeftOffset: number = 100;
@@ -76,6 +78,23 @@ export class StaffMeasure extends React.Component<Props, State> {
         };
     }
 
+    private getSharpsFlats = () => {
+        if (this.props.sharps) {
+            return this.props.sharps.map((note) => {
+                const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
+                const bottomPosition = this.getNoteBottomPosition(note);
+                return (<div className="sharp" />);
+            });
+        }
+        else if (this.props.flats) {
+            return this.props.flats.map((note) => {
+                const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
+                const bottomPosition = this.getNoteBottomPosition(note);
+                return (<div className="sharp" />);
+            });
+        }
+    }
+
     private getRenderedItems = () => {
         const notes = this.state?.notes.map((note: NoteDto) => {
             const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
@@ -114,6 +133,7 @@ export class StaffMeasure extends React.Component<Props, State> {
     render() {
         return (
             <div className="staff-measure" style={this.getStaffStyle()}>
+                {this.getSharpsFlats()}
                 {this.getRenderedItems()}
                 <div className="staff-space" style={this.getStaffSpaceStyle()}></div>
                 <div className="staff-space" style={this.getStaffSpaceStyle()}></div>

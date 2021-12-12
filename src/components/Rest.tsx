@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 
 import './Rest.scss';
 import Staff from './StaffMeasure';
@@ -9,7 +9,7 @@ interface Props {
     left: number;
 }
 
-export class Rest extends React.Component<Props> {
+export class Rest extends Component<Props> {
     public static readonly Size: number = 50;
 
     private getClass = () => {

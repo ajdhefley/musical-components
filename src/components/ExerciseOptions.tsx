@@ -1,16 +1,15 @@
+import './ExerciseOptions.scss';
+import App from './App';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../redux-hooks';
-
-import './ExerciseOptions.scss';
-import App from './App';
 import ExercisePitchOptions from './ExercisePitchOptions';
 import ExerciseNoteOptions from './ExerciseNoteOptions';
 import ExerciseOctaveOptions from './ExerciseOctaveOptions';
 import ExerciseClefOptions from './ExerciseClefOptions';
 import { ExerciseSelectionModel } from '../redux-models';
 
-const ExerciseOptions = () => {
+function ExerciseOptions() {
     const exercises = useAppSelector(state => state.exercises);
     const [selectedExercise, setSelectedExercise] = useState<ExerciseSelectionModel>();
 

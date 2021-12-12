@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 
 import './Note.scss';
 import { Octaves, Pitches } from '../types';
@@ -14,7 +14,7 @@ interface State {
     active: boolean;
 }
 
-export class Note extends React.Component<Props, State> {
+export class Note extends Component<Props, State> {
     public static readonly Size: number = 30;
 
     protected get stemDown(): boolean {
