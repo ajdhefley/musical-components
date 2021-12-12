@@ -1,89 +1,80 @@
-import { Component } from 'react';
+import { useState } from 'react';
 
 import './Note.scss';
 import { Octaves, Pitches } from '../types';
 import { NoteDto } from '../dtos/Note.dto';
 
-interface Props {
+function Note({
+    model,
+    left,
+    bottom,
+}: {
     model: NoteDto;
     left: number;
     bottom: number;
-}
+}) {
+    const NoteSize: number = 30;
 
-interface State {
-    active: boolean;
-}
+    const [active, setActive] = useState<boolean>();
 
-export class Note extends Component<Props, State> {
-    public static readonly Size: number = 30;
-
-    protected get stemDown(): boolean {
-        const octaveNotes = (this.props.model.octave - 1) * Pitches.length;
-        const offsetNotes = Pitches.indexOf(this.props.model.pitch);
+    const stemDown = () => {
+        const octaveNotes = (model.octave - 1) * Pitches.length;
+        const offsetNotes = Pitches.indexOf(model.pitch);
         const octavePosition = octaveNotes + offsetNotes;
         return octavePosition >= (Pitches.length * Octaves.length / 2) - 1;
     }
 
-    private getNoteClass = () => {
-        let cls = `note note-${this.props.model.type}`;
+    const getNoteClass = () => {
+        let cls = `note note-${model.type}`;
         if (this.state?.active)
             cls += ' active';
         return cls;
     }
     
-    private getNoteStyle = () => {
+    const getNoteStyle = () => {
         return {
-            width: `${Note.Size}px`,
-            height: `${Note.Size}px`,
-            backgroundSize: `${Note.Size}px ${Note.Size}px`,
+            width: `${NoteSize}px`,
+            height: `${NoteSize}px`,
+            backgroundSize: `${NoteSize}px ${NoteSize}px`,
 
             // Subtracting by half the note size centers it horizontally/vertically
-            left: `${this.props.left - Note.Size/2}px`,
-            bottom: `${this.props.bottom - Note.Size/2}px`, 
+            left: `${left - NoteSize/2}px`,
+            bottom: `${bottom - NoteSize/2}px`, 
         };
     }
 
-    private getStemClass = () => {
+    const getStemClass = () => {
         return 'stem ' + (this.stemDown ? 'down' : 'up');
     }
 
-    private getStemStyle = () => {
+    const getStemStyle = () => {
         return {
-            width: `${Note.Size}px`,
-            height: `${Note.Size * 2.5}px`,
-            top: this.stemDown ? `${Note.Size/2}px` : `${-Note.Size*2}px`,
+            width: `${NoteSize}px`,
+            height: `${NoteSize * 2.5}px`,
+            top: this.stemDown ? `${NoteSize/2}px` : `${-NoteSize*2}px`,
             left: this.stemDown ? '1px' : '0' // hack for now
         };
     }
 
-    private getFlagClass = () => {
+    const getFlagClass = () => {
         return 'stem-flag ' + (this.stemDown ? 'down' : 'up');;
     }
 
-    private getFlagStyle = () => {
+    const getFlagStyle = () => {
         return {
-            width: `${Note.Size}px`,
-            height: `${Note.Size*2}px`,
-            top: this.stemDown ? `${Note.Size}px` : `${-Note.Size*2}px`,
-            left: this.stemDown ? '2px' : `${Note.Size/2}px`
+            width: `${NoteSize}px`,
+            height: `${NoteSize*2}px`,
+            top: this.stemDown ? `${NoteSize}px` : `${-NoteSize*2}px`,
+            left: this.stemDown ? '2px' : `${NoteSize/2}px`
         };
     }
 
-    componentWillMount() {
-        // TODO
-        // if (!this.props.model.getDomain().includes(this.props.model.time)) {
-        //     throw new Error(`${this.props.model.type} note cannot exist at slot ${this.props.model.time}`);
-        // }
-    }
-
-    render() {
-        return (
-            <div data-note={this.props.model} className={this.getNoteClass()} style={this.getNoteStyle()}>
-                {this.props.model.type !== 'whole' && <div className={this.getStemClass()} style={this.getStemStyle()}></div>}
-                {/* {['8th', '16th', '32nd'].includes(this.props.model.type) && <div className={this.getFlagClass()} style={this.getFlagStyle()}></div>} */}
-            </div>
-        );
-    }
+    return (
+        <div data-note={model} className={this.getNoteClass()} style={this.getNoteStyle()}>
+            {model.type !== 'whole' && <div className={this.getStemClass()} style={this.getStemStyle()}></div>}
+            {/* {['8th', '16th', '32nd'].includes(model.type) && <div className={this.getFlagClass()} style={this.getFlagStyle()}></div>} */}
+        </div>
+    );
 }
 
 export default Note;

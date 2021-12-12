@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 
 import './StaffMeasure.scss';
 import Note from './Note';
@@ -6,43 +6,44 @@ import Rest from './Rest';
 import { ClefType, OctaveType, Pitches } from '../types';
 import { NotationDto, NoteDto, RestDto } from '../dtos';
 
-interface Props {
+function StaffMeasure({
+    clef,
+    sharps,
+    flats,
+}: {
     clef: ClefType;
     sharps?: number[];
     flats?: number[];
-}
+}) {
+    const MinMeasureWidth: number = 400;
+    const SpaceHeight: number = 20;
+    const NoteLeftOffset: number = 100;
+    const NoteSpacing: number = 300;
+    const TreblePositionC: number = 6;
+    const BassLocationC: number = 4;
+    const MiddleOctave: OctaveType = 4;
+    const NoteSize: number = 30;
 
-interface State {
-    notes: NoteDto[];
-    rests: RestDto[];
-}
+    const [notes, setNotes] = useState<NoteDto[]>();
+    const [rests, setRests] = useState<RestDto[]>();
 
-export class StaffMeasure extends Component<Props, State> {
-    public static readonly MinMeasureWidth: number = 400;
-    public static readonly SpaceHeight: number = 20;
-    public static readonly NoteLeftOffset: number = 100;
-    public static readonly NoteSpacing: number = 300;
-    public static readonly TreblePositionC: number = 6;
-    public static readonly BassLocationC: number = 4;
-    public static readonly MiddleOctave: OctaveType = 4;
-
-    private getNotationLeftPosition = (notation: NotationDto) => {
-        return (Note.Size + StaffMeasure.NoteSpacing) * notation.time;
+    const getNotationLeftPosition = (notation: NotationDto) => {
+        return (NoteSize + NoteSpacing) * notation.time;
     }
 
-    private getNoteBottomPosition = (note: NoteDto) => {
+    const getNoteBottomPosition = (note: NoteDto) => {
         let cPosition = 0;
 
-        switch (this.props.clef) {
+        switch (clef) {
             case 'treble':
-                cPosition = StaffMeasure.TreblePositionC;
+                cPosition = TreblePositionC;
                 break;
             case 'bass':
-                cPosition = StaffMeasure.BassLocationC;
+                cPosition = BassLocationC;
                 break;
         }
 
-        const noteHeight = StaffMeasure.SpaceHeight / 2;
+        const noteHeight = SpaceHeight / 2;
 
         const cIndex = cPosition - 1;
         const basePosition = cIndex * noteHeight;
@@ -50,98 +51,85 @@ export class StaffMeasure extends Component<Props, State> {
         const pitchIndex = Pitches.indexOf(note.pitch);
         const pitchPosition = pitchIndex * noteHeight;
 
-        const octaveDiff = note.octave - StaffMeasure.MiddleOctave;
+        const octaveDiff = note.octave - MiddleOctave;
         const octaveDiffPosition = octaveDiff * noteHeight * Pitches.length;
         
         return basePosition + pitchPosition + octaveDiffPosition;
     }
 
-    private getStaffWidth = () => {
-        const noteWidth = this.state.notes.length === 0 ? 0 : this.state.notes
-            .map((note) => this.getNotationLeftPosition(note))
+    const getStaffWidth = () => {
+        const noteWidth = notes.length === 0 ? 0 : notes
+            .map((note) => getNotationLeftPosition(note))
             .reduce((prev, next) => prev + next);
-        const restWidth = this.state.rests.length === 0 ? 0 : this.state.rests
-            .map((rest) => this.getNotationLeftPosition(rest))
+        const restWidth = rests.length === 0 ? 0 : rests
+            .map((rest) => getNotationLeftPosition(rest))
             .reduce((prev, next) => prev + next);
-        return Math.max(StaffMeasure.MinMeasureWidth, noteWidth + restWidth + StaffMeasure.NoteLeftOffset);
+        return Math.max(MinMeasureWidth, noteWidth + restWidth + NoteLeftOffset);
     };
 
-    private getStaffStyle = () => {
+    const getStaffStyle = () => {
         return {
-            width: `${this.getStaffWidth()}px`
+            width: `${getStaffWidth()}px`
         };
     }
 
-    private getStaffSpaceStyle = () => {
+    const getStaffSpaceStyle = () => {
         return {
 
         };
     }
 
-    private getSharpsFlats = () => {
-        if (this.props.sharps) {
-            return this.props.sharps.map((note) => {
-                const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
-                const bottomPosition = this.getNoteBottomPosition(note);
+    const getSharpsFlats = () => {
+        if (sharps) {
+            return sharps.map((note) => {
+                const bottomPosition = getNoteBottomPosition(new NoteDto());
                 return (<div className="sharp" />);
             });
         }
-        else if (this.props.flats) {
-            return this.props.flats.map((note) => {
-                const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
-                const bottomPosition = this.getNoteBottomPosition(note);
+        else if (flats) {
+            return flats.map((note) => {
+                const bottomPosition = getNoteBottomPosition(new NoteDto());
                 return (<div className="sharp" />);
             });
         }
     }
 
-    private getRenderedItems = () => {
-        const notes = this.state?.notes.map((note: NoteDto) => {
-            const leftPosition = this.getNotationLeftPosition(note as NotationDto) + StaffMeasure.NoteLeftOffset;
-            const bottomPosition = this.getNoteBottomPosition(note);
+    const getRenderedItems = () => {
+        const renderedNotes = notes.map((note: NoteDto) => {
+            const leftPosition = getNotationLeftPosition(note as NotationDto) + NoteLeftOffset;
+            const bottomPosition = getNoteBottomPosition(note);
             return (<Note model={note} left={leftPosition} bottom={bottomPosition} />);
         });
 
-        const rests = this.state?.rests.map((rest: RestDto) => {
-            const leftPosition = this.getNotationLeftPosition(rest) + StaffMeasure.NoteLeftOffset;
+        const renderedRests = rests.map((rest: RestDto) => {
+            const leftPosition = getNotationLeftPosition(rest) + NoteLeftOffset;
             return (<Rest model={rest} left={leftPosition} />);
         });
 
-        return Array().concat(notes, rests);
+        return Array().concat(renderedNotes, renderedRests);
     }
     
-    private addNotes = async (...notes: NoteDto[]) => {
-        await this.setState({ ...this.state, notes: this.state.notes.concat(notes) });
+    const addNotes = async (...addedNotes: NoteDto[]) => {
+        await setNotes(notes.concat(addedNotes));
     }
 
     // TODO
     // private addNoteNext = async (type: NoteType, pitch: PitchType, octave: OctaveType) => {
-    //     const lastNote = this.state.notes[this.state.notes.length-1];
+    //     const lastNote = notes[notes.length-1];
     //     const nextTime = (lastNote?.time ?? 0) + (lastNote?.getDuration().value ?? 0);
-    //     await this.addNotes(new NoteModel(type, pitch, octave, nextTime));
+    //     await addNotes(new NoteModel(type, pitch, octave, nextTime));
     // }
 
-    async componentWillMount() {
-        // TODO
-        // this.setState({ notes: [], rests: [] }, async () => {
-        //     for (let note of this.props.model.getNotes()) {
-        //         await this.addNoteNext('quarter', 'G', 3);
-        //     }
-        // });
-    }
-
-    render() {
-        return (
-            <div className="staff-measure" style={this.getStaffStyle()}>
-                {this.getSharpsFlats()}
-                {this.getRenderedItems()}
-                <div className="staff-space" style={this.getStaffSpaceStyle()}></div>
-                <div className="staff-space" style={this.getStaffSpaceStyle()}></div>
-                <div className="staff-space" style={this.getStaffSpaceStyle()}></div>
-                <div className="staff-space" style={this.getStaffSpaceStyle()}></div>
-            </div>
-        );
-    }
+    return (
+        <div className="staff-measure" style={getStaffStyle()}>
+            {getSharpsFlats()}
+            {getRenderedItems()}
+            <div className="staff-space" style={getStaffSpaceStyle()}></div>
+            <div className="staff-space" style={getStaffSpaceStyle()}></div>
+            <div className="staff-space" style={getStaffSpaceStyle()}></div>
+            <div className="staff-space" style={getStaffSpaceStyle()}></div>
+        </div>
+    );
 }
 
 export default StaffMeasure;
