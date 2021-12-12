@@ -17,16 +17,15 @@ function Note({
 
     const [active, setActive] = useState<boolean>();
 
-    const stemDown = () => {
+    const stemDown = (() => {
         const octaveNotes = (model.octave - 1) * Pitches.length;
-        const offsetNotes = Pitches.indexOf(model.pitch);
-        const octavePosition = octaveNotes + offsetNotes;
+        const octavePosition = octaveNotes + model.pitch;
         return octavePosition >= (Pitches.length * Octaves.length / 2) - 1;
-    }
+    })();
 
     const getNoteClass = () => {
         let cls = `note note-${model.type}`;
-        if (this.state?.active)
+        if (active)
             cls += ' active';
         return cls;
     }
@@ -44,35 +43,35 @@ function Note({
     }
 
     const getStemClass = () => {
-        return 'stem ' + (this.stemDown ? 'down' : 'up');
+        return 'stem ' + (stemDown ? 'down' : 'up');
     }
 
     const getStemStyle = () => {
         return {
             width: `${NoteSize}px`,
             height: `${NoteSize * 2.5}px`,
-            top: this.stemDown ? `${NoteSize/2}px` : `${-NoteSize*2}px`,
-            left: this.stemDown ? '1px' : '0' // hack for now
+            top: stemDown ? `${NoteSize/2}px` : `${-NoteSize*2}px`,
+            left: stemDown ? '1px' : '0' // hack for now
         };
     }
 
     const getFlagClass = () => {
-        return 'stem-flag ' + (this.stemDown ? 'down' : 'up');;
+        return 'stem-flag ' + (stemDown ? 'down' : 'up');;
     }
 
     const getFlagStyle = () => {
         return {
             width: `${NoteSize}px`,
             height: `${NoteSize*2}px`,
-            top: this.stemDown ? `${NoteSize}px` : `${-NoteSize*2}px`,
-            left: this.stemDown ? '2px' : `${NoteSize/2}px`
+            top: stemDown ? `${NoteSize}px` : `${-NoteSize*2}px`,
+            left: stemDown ? '2px' : `${NoteSize/2}px`
         };
     }
 
     return (
-        <div data-note={model} className={this.getNoteClass()} style={this.getNoteStyle()}>
-            {model.type !== 'whole' && <div className={this.getStemClass()} style={this.getStemStyle()}></div>}
-            {/* {['8th', '16th', '32nd'].includes(model.type) && <div className={this.getFlagClass()} style={this.getFlagStyle()}></div>} */}
+        <div data-note={model} className={getNoteClass()} style={getNoteStyle()}>
+            {model.type !== 'whole' && <div className={getStemClass()} style={getStemStyle()}></div>}
+            {/* {['8th', '16th', '32nd'].includes(model.type) && <div className={getFlagClass()} style={getFlagStyle()}></div>} */}
         </div>
     );
 }

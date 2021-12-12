@@ -1,6 +1,7 @@
 $staff-border-size: 1px;
 $staff-border: $staff-border-size solid #000;
 $staff-height: 20px;
+$key-signature-notation-size: 40px;
 
 div.staff-measure {
     border-left: $staff-border;
@@ -18,4 +19,24 @@ div.staff-space {
     &:last-child {
         border-bottom: $staff-border;
     }
+}
+
+.sharp {
+    width: $key-signature-notation-size;
+    height: $key-signature-notation-size;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/sharp.svg');
+}
+
+.flat {
+    width: $key-signature-notation-size;
+    height: $key-signature-notation-size;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/flat.svg');
 }

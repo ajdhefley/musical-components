@@ -19,8 +19,6 @@ function StaffMeasure({
     const SpaceHeight: number = 20;
     const NoteLeftOffset: number = 100;
     const NoteSpacing: number = 300;
-    const TreblePositionC: number = 6;
-    const BassLocationC: number = 4;
     const MiddleOctave: OctaveType = 4;
     const NoteSize: number = 30;
 
@@ -31,37 +29,31 @@ function StaffMeasure({
         return (NoteSize + NoteSpacing) * notation.time;
     }
 
-    const getNoteBottomPosition = (note: NoteDto) => {
-        let cPosition = 0;
+    const getNoteBottomPosition = (pitch: number, octave: number) => {
+        const noteHeight = SpaceHeight / 2;
+
+        let bottomMiddleC = 0;
 
         switch (clef) {
             case 'treble':
-                cPosition = TreblePositionC;
+                bottomMiddleC = SpaceHeight * 2 + noteHeight;
                 break;
             case 'bass':
-                cPosition = BassLocationC;
+                bottomMiddleC = SpaceHeight * 5;
                 break;
         }
 
-        const noteHeight = SpaceHeight / 2;
-
-        const cIndex = cPosition - 1;
-        const basePosition = cIndex * noteHeight;
-
-        const pitchIndex = Pitches.indexOf(note.pitch);
-        const pitchPosition = pitchIndex * noteHeight;
-
-        const octaveDiff = note.octave - MiddleOctave;
-        const octaveDiffPosition = octaveDiff * noteHeight * Pitches.length;
+        const pitchPosition = (pitch % Pitches.length) * noteHeight;
+        const octavePosition = (octave - MiddleOctave) * Pitches.length * noteHeight;
         
-        return basePosition + pitchPosition + octaveDiffPosition;
+        return bottomMiddleC + pitchPosition + octavePosition;
     }
 
     const getStaffWidth = () => {
-        const noteWidth = notes.length === 0 ? 0 : notes
+        const noteWidth = !notes || notes.length === 0 ? 0 : notes
             .map((note) => getNotationLeftPosition(note))
             .reduce((prev, next) => prev + next);
-        const restWidth = rests.length === 0 ? 0 : rests
+        const restWidth = !rests || rests.length === 0 ? 0 : rests
             .map((rest) => getNotationLeftPosition(rest))
             .reduce((prev, next) => prev + next);
         return Math.max(MinMeasureWidth, noteWidth + restWidth + NoteLeftOffset);
@@ -81,27 +73,29 @@ function StaffMeasure({
 
     const getSharpsFlats = () => {
         if (sharps) {
-            return sharps.map((note) => {
-                const bottomPosition = getNoteBottomPosition(new NoteDto());
-                return (<div className="sharp" />);
+            return sharps.map((note, index) => {
+                const leftPosition = index * 15;
+                const bottomPosition = getNoteBottomPosition(note, note > 4 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight/2;
+                return (<div className="sharp" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
             });
         }
         else if (flats) {
-            return flats.map((note) => {
-                const bottomPosition = getNoteBottomPosition(new NoteDto());
-                return (<div className="sharp" />);
+            return flats.map((note, index) => {
+                const leftPosition = index * 15;
+                const bottomPosition = getNoteBottomPosition(note, note > 3 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight/2;
+                return (<div className="flat" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
             });
         }
     }
 
     const getRenderedItems = () => {
-        const renderedNotes = notes.map((note: NoteDto) => {
+        const renderedNotes = notes?.map((note: NoteDto) => {
             const leftPosition = getNotationLeftPosition(note as NotationDto) + NoteLeftOffset;
-            const bottomPosition = getNoteBottomPosition(note);
+            const bottomPosition = getNoteBottomPosition(note.pitch, note.octave);
             return (<Note model={note} left={leftPosition} bottom={bottomPosition} />);
         });
 
-        const renderedRests = rests.map((rest: RestDto) => {
+        const renderedRests = rests?.map((rest: RestDto) => {
             const leftPosition = getNotationLeftPosition(rest) + NoteLeftOffset;
             return (<Rest model={rest} left={leftPosition} />);
         });
