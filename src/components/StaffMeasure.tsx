@@ -8,10 +8,14 @@ import { NoteDto, RestDto } from '../dtos';
 
 function StaffMeasure({
     clef,
+    beatsPerMeasure,
+    beatDuration,
     sharps,
     flats,
 }: {
     clef: ClefType;
+    beatsPerMeasure: number;
+    beatDuration: number;
     sharps?: number[];
     flats?: number[];
 }) {
@@ -95,6 +99,15 @@ function StaffMeasure({
         }
     }
 
+    const getTimeSignature = () => {
+        const upper = beatsPerMeasure;
+        const lower = 1 / beatDuration;
+        return (<div>
+            <div className={`ts-${upper}`} style={{ top: 0 }}></div>
+            <div className={`ts-${lower}`} style={{ bottom: 0 }}></div>
+        </div>);
+    }
+
     const getNotations = () => {
         const renderedNotes = notes?.map((note: NoteDto) => {
             const leftPosition = getItemLeftPosition(note.time) + NoteLeftOffset;
@@ -128,6 +141,9 @@ function StaffMeasure({
             </div>
             <div className="key-signature-container">
                 {getSharpsAndFlats()}
+            </div>
+            <div className="ts-container">
+                {getTimeSignature()}
             </div>
             <div className="notation-container">
                 {getNotations()}

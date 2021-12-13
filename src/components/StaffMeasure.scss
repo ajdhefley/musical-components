@@ -5,9 +5,11 @@ $key-signature-notation-size: 40px;
 $clef-width: 50px;
 $clef-treble-height: 120px;
 $clef-bass-height: 100px;
-
+$ts-width: 40px;
+$ts-height: 40px;
 $clef-container-width: 50px;
-$key-signature-container-width: 100px;
+$key-signature-container-width: 115px;
+$ts-container-width: 100px;
 
 div.staff-measure {
     border-left: $staff-border;
@@ -67,6 +69,46 @@ div.staff-space {
     background-image: url('../images/clef-bass.svg');
 }
 
+.ts-2 {
+    width: $ts-width;
+    height: $ts-height;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/2.svg');
+}
+
+.ts-3 {
+    width: $ts-width;
+    height: $ts-height;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/3.svg');
+}
+
+.ts-4 {
+    width: $ts-width;
+    height: $ts-height;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/4.svg');
+}
+
+.ts-8 {
+    width: $ts-width;
+    height: $ts-height;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('../images/8.svg');
+}
+
 .clef-container {
     position: absolute;
     bottom: 0;
@@ -82,9 +124,17 @@ div.staff-space {
     left: $clef-container-width;
 }
 
+.ts-container {
+    position: absolute;
+    bottom: 0;
+    width: $ts-container-width;
+    height: 80px;
+    left: $clef-container-width + $key-signature-container-width;
+}
+
 .notation-container {
     position: absolute;
     bottom: 0;
     height: 100px;
-    left: $clef-container-width + $key-signature-container-width;
+    left: $clef-container-width + $key-signature-container-width + $ts-container-width;
 }
