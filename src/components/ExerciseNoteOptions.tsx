@@ -1,13 +1,19 @@
+import { useAppDispatch } from '../redux-hooks';
 import './ExerciseNoteOptions.scss';
-import { Notes } from '../types';
 
-function ExerciseNoteOptions() {
+function ExerciseNoteOptions({
+    options,
+}: {
+    options: { name: string, value: number }[];
+}) {
+    const dispatch = useAppDispatch();
+
     return (
         <div className="exercise-options-note">
             <h3>Exclude Notes</h3>
-            {Notes.map((note) => (<div>
-                <input type="checkbox" id={`exclude-${note}`} />
-                <label htmlFor={`exclude-${note}`}>{note}</label>
+            {options.map((note) => (<div>
+                <input type="checkbox" id={`exclude-${note.name}`} />
+                <label htmlFor={`exclude-${note.name}`}>{note.name}</label>
             </div>))}
         </div>
     );

@@ -4,7 +4,7 @@ $animation-offset: 200px;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    background-image: url('../images/#{$filename}');
+    background-image: url(../images/#{$filename});
 }
 
 @mixin stagger-animation($num-children, $magnitude: 100ms, $baseDelay: 0ms) {

@@ -1,13 +1,19 @@
+import { useAppDispatch } from '../redux-hooks';
 import './ExercisePitchOptions.scss';
-import { Pitches } from '../types';
 
-function ExercisePitchOptions() {
+function ExercisePitchOptions({
+    options,
+}: {
+    options: { name: string, value: number }[];
+}) {
+    const dispatch = useAppDispatch();
+
     return (
         <div className="exercise-options-pitch">
             <h3>Exclude Pitches</h3>
-            {Pitches.map((pitch) => (<div>
-                <input type="checkbox" id={`exclude-${pitch}`} />
-                <label htmlFor={`exclude-${pitch}`}>{pitch}</label>
+            {options.map((pitch) => (<div>
+                <input type="checkbox" id={`exclude-${pitch.name}`} />
+                <label htmlFor={`exclude-${pitch.name}`}>{pitch.name}</label>
             </div>))}
         </div>
     );

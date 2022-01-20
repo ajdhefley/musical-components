@@ -1,5 +1,7 @@
 Frontend for interactive music education platform.
 
+Built with React (TypeScript), GraphQL, and SCSS.
+
 ## Installation
 
 ```bash

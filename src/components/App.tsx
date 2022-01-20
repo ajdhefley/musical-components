@@ -13,18 +13,18 @@ import Header from './Header';
 function App() {
     return (
         <div>
-        <Header />
-        <Provider store={store}>
-        <BrowserRouter>
-        <Switch>
-        <Route exact path={App.Routes.ExerciseSelections} component={ExerciseSelection} />
-        <Route exact path={App.Routes.ExerciseOptions} component={ExerciseOptions} />
-        <Route exact path={App.Routes.ExerciseResults} component={ExerciseResults} />
-        <Route exact path={App.Routes.ExercisePage} component={Exercise} />
-        <Route path="*" component={ErrorPage} />
-        </Switch>
-        </BrowserRouter>
-        </Provider>
+            <Header />
+            <Provider store={store}>
+                <BrowserRouter>
+                    <Switch>
+                        <Route exact path={App.Routes.ExerciseSelections} component={ExerciseSelection} />
+                        <Route exact path={App.Routes.ExerciseOptions} component={ExerciseOptions} />
+                        <Route exact path={App.Routes.ExerciseResults} component={ExerciseResults} />
+                        <Route exact path={App.Routes.ExercisePage} component={Exercise} />
+                        <Route path="*" component={ErrorPage} />
+                    </Switch>
+                </BrowserRouter>
+            </Provider>
         </div>
     );
 }

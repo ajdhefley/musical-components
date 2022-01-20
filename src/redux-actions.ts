@@ -4,7 +4,7 @@ export enum AppActionTypes {
     SetExerciseId
 }
 
-export function setSelectedExercise(exercise: ExerciseSelectionModel) {
+export function setRootExercise(exercise: ExerciseSelectionModel) {
     return {
         type: AppActionTypes.SetExerciseId,
         payload: { exercise }

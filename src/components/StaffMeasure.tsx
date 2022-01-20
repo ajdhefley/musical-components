@@ -102,9 +102,13 @@ function StaffMeasure({
     const getTimeSignature = () => {
         const upper = beatsPerMeasure;
         const lower = 1 / beatDuration;
+
+        // Collapse the time signature by the missing number of sharps/flats (max of 7).
+        const leftReduction = (7 - ((sharps?.length ?? 0) + (flats?.length ?? 0))) * 10;
+
         return (<div>
-            <div className={`ts-${upper}`} style={{ top: 0 }}></div>
-            <div className={`ts-${lower}`} style={{ bottom: 0 }}></div>
+            <div className={`ts-${upper}`} style={{ top: 0, marginLeft: `${-leftReduction}px` }}></div>
+            <div className={`ts-${lower}`} style={{ bottom: 0, marginLeft: `${-leftReduction}px`}}></div>
         </div>);
     }
 
