@@ -1,12 +1,10 @@
 import { useAppDispatch } from '../redux-hooks';
 import './ExerciseOctaveOptions.scss';
 
-function ExerciseOctaveOptions({
-    options,
-}: {
-    options: number[];
-}) {
+function ExerciseOctaveOptions() {
     const dispatch = useAppDispatch();
+
+    const options = [1,2,3,4,5,6];
 
     return (
         <div className="exercise-options-octave">

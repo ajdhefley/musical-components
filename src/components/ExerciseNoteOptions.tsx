@@ -1,12 +1,17 @@
 import { useAppDispatch } from '../redux-hooks';
 import './ExerciseNoteOptions.scss';
 
-function ExerciseNoteOptions({
-    options,
-}: {
-    options: { name: string, value: number }[];
-}) {
+function ExerciseNoteOptions() {
     const dispatch = useAppDispatch();
+
+    const options = [
+        { name: 'whole', value: 1 },
+        { name: 'half', value: 2 },
+        { name: 'quarter', value: 4 },
+        { name: 'eighth', value: 8 },
+        { name: 'sixteenth', value: 16 },
+        { name: 'thirty-second', value: 32 }
+    ];
 
     return (
         <div className="exercise-options-note">

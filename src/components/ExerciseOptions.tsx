@@ -37,10 +37,10 @@ function ExerciseOptions() {
             <br />
             length per problem
 
-            {selectedExercise?.noteTypeOptions && <ExerciseNoteOptions options={selectedExercise?.noteTypeOptions}  />}
-            {selectedExercise?.octaveOptions && <ExerciseOctaveOptions options={selectedExercise?.octaveOptions} />}
-            {selectedExercise?.pitchTypeOptions && <ExercisePitchOptions options={selectedExercise?.pitchTypeOptions} />}
-            {selectedExercise?.clefTypeOptions && <ExerciseClefOptions options={selectedExercise?.clefTypeOptions} />}
+            {selectedExercise?.requiresNoteTypeOptions && <ExerciseNoteOptions  />}
+            {selectedExercise?.requiresPitchTypeOptions && <ExercisePitchOptions />}
+            {selectedExercise?.requiresClefTypeOptions && <ExerciseClefOptions />}
+            {selectedExercise?.requiresOctaveOptions && <ExerciseOctaveOptions />}
         </div>
     );
 };

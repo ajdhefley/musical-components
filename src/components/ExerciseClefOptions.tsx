@@ -1,12 +1,13 @@
 import { useAppDispatch } from '../redux-hooks';
 import './ExerciseClefOptions.scss';
 
-function ExerciseClefOptions({
-    options,
-}: {
-    options: { name: string }[];
-}) {
+function ExerciseClefOptions() {
     const dispatch = useAppDispatch();
+
+    const options = [
+        { name: 'treble' },
+        { name: 'bass' }
+    ];
 
     return (
         <div className="exercise-options-octave">

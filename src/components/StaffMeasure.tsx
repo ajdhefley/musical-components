@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
 import './StaffMeasure.scss';
-import Note from './Note';
+import { ClefType, NoteModel, RestModel } from '../models';
 import Rest from './Rest';
-import { ClefType, OctaveType, Pitches } from '../types';
-import { NoteDto, RestDto } from '../dtos';
+import Note from './Note';
 
 function StaffMeasure({
     clef,
@@ -23,11 +22,11 @@ function StaffMeasure({
     const SpaceHeight: number = 20;
     const NoteLeftOffset: number = 100;
     const NoteSpacing: number = 300;
-    const MiddleOctave: OctaveType = 4;
+    const MiddleOctave: number = 4;
     const NoteSize: number = 30;
 
-    const [notes, setNotes] = useState<NoteDto[]>();
-    const [rests, setRests] = useState<RestDto[]>();
+    const [notes, setNotes] = useState<NoteModel[]>();
+    const [rests, setRests] = useState<RestModel[]>();
 
     const getItemLeftPosition = (time: number) => {
         return (NoteSize + NoteSpacing) * time;
@@ -35,6 +34,7 @@ function StaffMeasure({
 
     const getItemBottomPosition = (pitch: number, octave: number) => {
         const noteHeight = SpaceHeight / 2;
+        const numPitches = 7;
 
         let bottomMiddleC = 0;
 
@@ -47,11 +47,11 @@ function StaffMeasure({
                 break;
         }
 
-        let pitchPosition = (pitch % Pitches.length) * noteHeight;
-        let octavePosition = (octave - MiddleOctave) * Pitches.length * noteHeight;
+        let pitchPosition = (pitch % numPitches) * noteHeight;
+        let octavePosition = (octave - MiddleOctave) * numPitches * noteHeight;
 
         if (clef == 'bass')
-            octavePosition -= Pitches.length * noteHeight;
+            octavePosition -= numPitches * noteHeight;
         
         return bottomMiddleC + pitchPosition + octavePosition;
     }
@@ -113,13 +113,13 @@ function StaffMeasure({
     }
 
     const getNotations = () => {
-        const renderedNotes = notes?.map((note: NoteDto) => {
+        const renderedNotes = notes?.map((note: NoteModel) => {
             const leftPosition = getItemLeftPosition(note.time) + NoteLeftOffset;
             const bottomPosition = getItemBottomPosition(note.pitch, note.octave);
             return (<Note model={note} left={leftPosition} bottom={bottomPosition} />);
         });
 
-        const renderedRests = rests?.map((rest: RestDto) => {
+        const renderedRests = rests?.map((rest: RestModel) => {
             const leftPosition = getItemLeftPosition(rest.time) + NoteLeftOffset;
             return (<Rest model={rest} left={leftPosition} />);
         });
@@ -127,7 +127,7 @@ function StaffMeasure({
         return Array().concat(renderedNotes, renderedRests);
     }
     
-    const addNotes = async (...addedNotes: NoteDto[]) => {
+    const addNotes = async (...addedNotes: NoteModel[]) => {
         await setNotes(notes.concat(addedNotes));
     }
 

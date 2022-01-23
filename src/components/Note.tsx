@@ -1,15 +1,14 @@
 import { useState } from 'react';
 
 import './Note.scss';
-import { Octaves, Pitches } from '../types';
-import { NoteDto } from '../dtos/Note.dto';
+import { NoteModel } from '../models/Note.model';
 
 function Note({
     model,
     left,
     bottom,
 }: {
-    model: NoteDto;
+    model: NoteModel;
     left: number;
     bottom: number;
 }) {
@@ -18,9 +17,11 @@ function Note({
     const [active, setActive] = useState<boolean>();
 
     const stemDown = (() => {
-        const octaveNotes = (model.octave - 1) * Pitches.length;
+        const numPitches = 7;
+        const numOctaves = 6;
+        const octaveNotes = (model.octave - 1) * numPitches;
         const octavePosition = octaveNotes + model.pitch;
-        return octavePosition >= (Pitches.length * Octaves.length / 2) - 1;
+        return octavePosition >= (numPitches * numOctaves / 2) - 1;
     })();
 
     const getNoteClass = () => {

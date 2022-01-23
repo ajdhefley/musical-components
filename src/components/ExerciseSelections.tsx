@@ -14,16 +14,10 @@ function ExerciseSelections() {
                 exerciseTypeId,
                 name,
                 description,
-                noteTypeOptions {
-                    name
-                },
-                pitchTypeOptions {
-                    name
-                },
-                clefTypeOptions {
-                    name
-                },
-                octaveOptions
+                requiresNoteTypeOptions,
+                requiresPitchTypeOptions,
+                requiresClefTypeOptions,
+                requiresOctaveOptions
             }
         }
     `);

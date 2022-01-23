@@ -2,13 +2,13 @@ import { Component } from 'react';
 
 import './Rest.scss';
 import Staff from './StaffMeasure';
-import { RestDto } from '../dtos/Rest.dto';
+import { RestModel } from '../models/Rest.model';
 
 function Rest({
     model,
     left,
 }: {
-    model: RestDto;
+    model: RestModel;
     left: number;
 }) {
     const RestSize: number = 50;

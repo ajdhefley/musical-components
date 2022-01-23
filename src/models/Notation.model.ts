@@ -1,6 +1,6 @@
 import { NoteType } from '../types';
 
-export abstract class NotationDto {
+export abstract class NotationModel {
     type: NoteType;
     time: number;
 }
