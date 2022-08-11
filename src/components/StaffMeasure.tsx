@@ -1,35 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import './StaffMeasure.scss';
-import { ClefType, NoteModel, RestModel } from '../models';
+import { NoteModel, RestModel } from '../models';
 import Rest from './Rest';
-import Note from './Note';
+import StaffNote from './StaffNote';
+import { Note, ClefType } from '../types';
 
 function StaffMeasure({
+    notes,
     clef,
-    beatsPerMeasure,
-    beatDuration,
     sharps,
     flats,
 }: {
+    notes: NoteModel[];
     clef: ClefType;
-    beatsPerMeasure: number;
-    beatDuration: number;
-    sharps?: number[];
-    flats?: number[];
+    sharps?: Note[];
+    flats?: Note[];
 }) {
     const MinMeasureWidth: number = 400;
     const SpaceHeight: number = 20;
-    const NoteLeftOffset: number = 100;
-    const NoteSpacing: number = 300;
+    const NoteLeftOffset: number = 40;
     const MiddleOctave: number = 4;
     const NoteSize: number = 30;
+    const NoteSpacing: number = 40;
 
-    const [notes, setNotes] = useState<NoteModel[]>();
-    const [rests, setRests] = useState<RestModel[]>();
-
-    const getItemLeftPosition = (time: number) => {
-        return (NoteSize + NoteSpacing) * time;
+    const getItemLeftPosition = (time: number, index: number) => {
+        return /*(MinMeasureWidth * time) +*/ (NoteSize + NoteSpacing) * index;
     }
 
     const getItemBottomPosition = (pitch: number, octave: number) => {
@@ -57,13 +53,8 @@ function StaffMeasure({
     }
 
     const getStaffWidth = () => {
-        const noteWidth = !notes || notes.length === 0 ? 0 : notes
-            .map((note) => getItemLeftPosition(note.time))
-            .reduce((prev, next) => prev + next);
-        const restWidth = !rests || rests.length === 0 ? 0 : rests
-            .map((rest) => getItemLeftPosition(rest.time))
-            .reduce((prev, next) => prev + next);
-        return Math.max(MinMeasureWidth, noteWidth + restWidth + NoteLeftOffset);
+        const lastNote = notes[notes.length - 1];
+        return Math.max(MinMeasureWidth, getItemLeftPosition(lastNote.startBeat, notes.length - 1) + NoteLeftOffset);
     };
 
     const getStaffStyle = () => {
@@ -78,80 +69,21 @@ function StaffMeasure({
         };
     }
 
-    const getClef = () => {
-        return <div className={clef}></div>
-    }
-
-    const getSharpsAndFlats = () => {
-        if (sharps) {
-            return sharps.map((note, index) => {
-                const leftPosition = index * 15;
-                const bottomPosition = getItemBottomPosition(note, note > 4 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight;
-                return (<div className="sharp" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
-            });
-        }
-        else if (flats) {
-            return flats.map((note, index) => {
-                const leftPosition = index * 15;
-                const bottomPosition = getItemBottomPosition(note, note > 3 ? MiddleOctave - 1 : MiddleOctave) - SpaceHeight/2;
-                return (<div className="flat" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
-            });
-        }
-    }
-
-    const getTimeSignature = () => {
-        const upper = beatsPerMeasure;
-        const lower = 1 / beatDuration;
-
-        // Collapse the time signature by the missing number of sharps/flats (max of 7).
-        const leftReduction = (7 - ((sharps?.length ?? 0) + (flats?.length ?? 0))) * 10;
-
-        return (<div>
-            <div className={`ts-${upper}`} style={{ top: 0, marginLeft: `${-leftReduction}px` }}></div>
-            <div className={`ts-${lower}`} style={{ bottom: 0, marginLeft: `${-leftReduction}px`}}></div>
-        </div>);
-    }
-
     const getNotations = () => {
-        const renderedNotes = notes?.map((note: NoteModel) => {
-            const leftPosition = getItemLeftPosition(note.time) + NoteLeftOffset;
+        const renderedNotes = notes?.map((note: NoteModel, index) => {
+            const leftPosition = getItemLeftPosition(note.startBeat, index) + NoteLeftOffset;
             const bottomPosition = getItemBottomPosition(note.pitch, note.octave);
-            return (<Note model={note} left={leftPosition} bottom={bottomPosition} />);
+            const hideAccidental = (note.accidental == 'sharp' && sharps?.includes(note.pitch)) || (note.accidental == 'flat' && flats?.includes(note.pitch));
+            const isNatural = typeof(note.accidental) == 'undefined' && (sharps?.includes(note.pitch) || flats?.includes(note.pitch));
+            return (<StaffNote model={note} left={leftPosition} bottom={bottomPosition} showAccidental={!hideAccidental} natural={isNatural} />);
         });
 
-        const renderedRests = rests?.map((rest: RestModel) => {
-            const leftPosition = getItemLeftPosition(rest.time) + NoteLeftOffset;
-            return (<Rest model={rest} left={leftPosition} />);
-        });
-
-        return Array().concat(renderedNotes, renderedRests);
+        return Array().concat(renderedNotes);
     }
-    
-    const addNotes = async (...addedNotes: NoteModel[]) => {
-        await setNotes(notes.concat(addedNotes));
-    }
-
-    // TODO
-    // private addNoteNext = async (type: NoteType, pitch: PitchType, octave: OctaveType) => {
-    //     const lastNote = notes[notes.length-1];
-    //     const nextTime = (lastNote?.time ?? 0) + (lastNote?.getDuration().value ?? 0);
-    //     await addNotes(new NoteModel(type, pitch, octave, nextTime));
-    // }
 
     return (
         <div className="staff-measure" style={getStaffStyle()}>
-            <div className="clef-container">
-                {getClef()}
-            </div>
-            <div className="key-signature-container">
-                {getSharpsAndFlats()}
-            </div>
-            <div className="ts-container">
-                {getTimeSignature()}
-            </div>
-            <div className="notation-container">
-                {getNotations()}
-            </div>
+            <div className="notation-container">{getNotations()}</div>
             <div className="staff-space" style={getStaffSpaceStyle()}></div>
             <div className="staff-space" style={getStaffSpaceStyle()}></div>
             <div className="staff-space" style={getStaffSpaceStyle()}></div>

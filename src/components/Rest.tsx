@@ -15,7 +15,7 @@ function Rest({
     const SpaceHeight: number = 20;
 
     const getClass = () => {
-        return `rest rest-${model.type}`;
+        return `rest rest-${model.durationType}`;
     }
     
     const getStyle = () => {

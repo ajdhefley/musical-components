@@ -1,3 +1,7 @@
+@import "../styles/mixins";
+
+$accidental-size: 40px;
+
 .note {
     background-repeat: no-repeat;
     background-position: center;
@@ -58,4 +62,29 @@
     .stem-flag {
         background-image: url('../images/flag-32.svg');
     }
+}
+
+.accidental {
+    position: absolute;
+}
+
+.key-symbol {
+    width: $accidental-size;
+    height: $accidental-size;
+    position: absolute;
+}
+
+.sharp {
+    @extend .key-symbol;
+    @include background-image('sharp.svg');
+}
+
+.flat {
+    @extend .key-symbol;
+    @include background-image('flat.svg');
+}
+
+.natural {
+    @extend .key-symbol;
+    @include background-image('natural.svg');
 }

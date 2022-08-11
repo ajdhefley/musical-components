@@ -11,7 +11,7 @@ $ts-width: 40px;
 $ts-height: 40px;
 $clef-container-width: 50px;
 $key-signature-container-width: 115px;
-$ts-container-width: 100px;
+$ts-container-width: 25px;
 
 div.staff-measure {
     border-left: $staff-border;
@@ -31,94 +31,9 @@ div.staff-space {
     }
 }
 
-
-.clef-symbol {
-    width: $clef-width;
-    position: absolute;
-}
-
-.treble {
-    @extend .clef-symbol;
-    @include background-image('clef-treble.svg');
-    height: $clef-treble-height;
-}
-
-.bass {
-    @extend .clef-symbol;
-    @include background-image('clef-bass.svg');
-    height: $clef-bass-height;
-}
-
-
-.key-symbol {
-    width: $key-signature-notation-size;
-    height: $key-signature-notation-size;
-    position: absolute;
-}
-
-.sharp {
-    @extend .key-symbol;
-    @include background-image('sharp.svg');
-}
-
-.flat {
-    @extend .key-symbol;
-    @include background-image('flat.svg');
-}
-
-
-.ts-symbol {
-    width: $ts-width;
-    height: $ts-height;
-    position: absolute;
-}
-
-.ts-2 {
-    @extend .ts-symbol;
-    @include background-image('2.svg');
-}
-
-.ts-3 {
-    @extend .ts-symbol;
-    @include background-image('3.svg');
-}
-
-.ts-4 {
-    @extend .ts-symbol;
-    @include background-image('4.svg');
-}
-
-.ts-8 {
-    @extend .ts-symbol;
-    @include background-image('8.svg');
-}
-
-
-.staff-section-container {
+.notation-container {
     position: absolute;
     bottom: 0;
     height: 100px;
-}
-
-.clef-container {
-    @extend .staff-section-container;
-    width: $clef-container-width;
-}
-
-.key-signature-container {
-    @extend .staff-section-container;
-    width: $key-signature-container-width;
-    left: $clef-container-width;
-}
-
-.ts-container {
-    @extend .staff-section-container;
-    width: $ts-container-width;
-    left: $clef-container-width + $key-signature-container-width;
-    height: 80px;
-}
-
-.notation-container {
-    @extend .staff-section-container;
     left: $clef-container-width + $key-signature-container-width + $ts-container-width;
 }

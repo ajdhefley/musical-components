@@ -1,0 +1,119 @@
+@import "../styles/mixins";
+
+$staff-border-size: 1px;
+$staff-border: $staff-border-size solid #000;
+$staff-height: 20px;
+$key-signature-notation-size: 40px;
+$clef-width: 50px;
+$clef-treble-height: 120px;
+$clef-bass-height: 100px;
+$ts-width: 40px;
+$ts-height: 40px;
+$clef-container-width: 50px;
+
+.staff {
+    border-left: $staff-border;
+    border-right: $staff-border;
+    position: relative;
+    display: inline-block;
+}
+
+
+.clef-symbol {
+    width: $clef-width;
+    position: absolute;
+}
+
+.treble {
+    @extend .clef-symbol;
+    @include background-image('clef-treble.svg');
+    height: $clef-treble-height;
+}
+
+.bass {
+    @extend .clef-symbol;
+    @include background-image('clef-bass.svg');
+    height: $clef-bass-height;
+}
+
+
+.key-symbol {
+    width: $key-signature-notation-size;
+    height: $key-signature-notation-size;
+    position: absolute;
+}
+
+.sharp {
+    @extend .key-symbol;
+    @include background-image('sharp.svg');
+}
+
+.flat {
+    @extend .key-symbol;
+    @include background-image('flat.svg');
+}
+
+
+.ts-symbol {
+    width: $ts-width;
+    height: $ts-height;
+    position: absolute;
+}
+
+.ts-2 {
+    @extend .ts-symbol;
+    @include background-image('2.svg');
+}
+
+.ts-3 {
+    @extend .ts-symbol;
+    @include background-image('3.svg');
+}
+
+.ts-4 {
+    @extend .ts-symbol;
+    @include background-image('4.svg');
+}
+
+.ts-5 {
+    @extend .ts-symbol;
+    //@include background-image('5.svg');
+}
+
+.ts-6 {
+    @extend .ts-symbol;
+    //@include background-image('6.svg');
+}
+
+.ts-7 {
+    @extend .ts-symbol;
+   //@include background-image('7.svg');
+}
+
+.ts-8 {
+    @extend .ts-symbol;
+    @include background-image('8.svg');
+}
+
+
+.staff-section-container {
+    position: absolute;
+    bottom: 0;
+    height: 100px;
+}
+
+.clef-container {
+    @extend .staff-section-container;
+    width: $clef-container-width;
+}
+
+.key-signature-container {
+    @extend .staff-section-container;
+    left: $clef-container-width;
+}
+
+.ts-container {
+    @extend .staff-section-container;
+    height: 80px;
+    top: 0;
+}

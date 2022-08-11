@@ -1,6 +1,6 @@
-import { NoteType } from '../types';
+import { NoteDurationType } from '../types';
 
 export abstract class NotationModel {
-    type: NoteType;
-    time: number;
+    durationType: NoteDurationType;
+    startBeat: number;
 }
