@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import './Staff.scss';
 import { NoteModel } from '../models';
-import { Note, ClefType, getDuration } from '../types';
+import { Note, ClefType, DurationType } from '../types';
 import StaffMeasure from './StaffMeasure';
 
 function Staff({
@@ -32,10 +32,10 @@ function Staff({
         let bottomMiddleC = 0;
 
         switch (clef) {
-            case 'treble':
+            case ClefType.Treble:
                 bottomMiddleC = SpaceHeight * 2 + noteHeight;
                 break;
-            case 'bass':
+            case ClefType.Bass:
                 bottomMiddleC = SpaceHeight * 5;
                 break;
         }
@@ -43,17 +43,18 @@ function Staff({
         let pitchPosition = (pitch % numPitches) * noteHeight;
         let octavePosition = (octave - MiddleOctave) * numPitches * noteHeight;
 
-        if (clef == 'bass')
+        if (clef == ClefType.Bass) {
             octavePosition -= numPitches * noteHeight;
+        }
         
         return bottomMiddleC + pitchPosition + octavePosition;
     }
 
     const getClef = () => {
-        return <div className={clef}></div>
+        return <div className={clef.toString().toLowerCase()}></div>
     }
 
-    const getSharpsAndFlats = () => {
+    const getKeySignatureSharpsAndFlats = () => {
         if (sharps) {
             return sharps.map((note, index) => {
                 const leftPosition = index * KeySize;
@@ -105,9 +106,9 @@ function Staff({
         let currentStep = 0;
         let currentNote = null;
         
-        while (currentStep < lastNote.startBeat + getDuration(lastNote.durationType)) {
+        while (currentStep < lastNote.startBeat + 1/lastNote.durationType) {
             let steppedNote = notes.find((note) => {
-                return note.startBeat >= currentStep && note.startBeat < currentStep + getDuration(note.durationType);
+                return note.startBeat >= currentStep && note.startBeat < currentStep + 1/note.durationType;
             });
 
             if (steppedNote != currentNote) {
@@ -115,13 +116,11 @@ function Staff({
 
                 if (stepCounter >= 1) {
                     stepCounter = 0;
-                    console.log('reset counter');
                     noteCollectionArray.push(new Array<NoteModel>());
                 }
 
                 if (currentNote) {
                     noteCollectionArray[noteCollectionArray.length - 1].push(currentNote);
-                    console.log(noteCollectionArray);
                 }
             }
 
@@ -140,24 +139,24 @@ function Staff({
 
     useEffect(() => {
         addNotes(
-            { pitch: Note.C, octave: 4, durationType: 'quarter', startBeat: 0, accidental: 'sharp' } as NoteModel,
-            { pitch: Note.C, octave: 4, durationType: '8th', startBeat: 0.250 } as NoteModel,
-            { pitch: Note.A, octave: 3, durationType: '8th', startBeat: 0.375, accidental: 'sharp' } as NoteModel,
-            { pitch: Note.D, octave: 4, durationType: '16th', startBeat: 0.500 } as NoteModel,
-            { pitch: Note.E, octave: 4, durationType: '16th', startBeat: 0.5625 } as NoteModel,
-            { pitch: Note.B, octave: 3, durationType: '8th', startBeat: 0.625 } as NoteModel,
-            { pitch: Note.G, octave: 3, durationType: '8th', startBeat: 0.75 } as NoteModel,
-            { pitch: Note.F, octave: 4, durationType: '8th', startBeat: 0.875 } as NoteModel,
-            { pitch: Note.F, octave: 4, durationType: '8th', startBeat: 1.0 } as NoteModel,
-            { pitch: Note.F, octave: 4, durationType: '8th', startBeat: 1.125 } as NoteModel,
-            { pitch: Note.F, octave: 4, durationType: 'quarter', startBeat: 1.25 } as NoteModel
+            { pitch: Note.C, octave: MiddleOctave, durationType: DurationType.Quarter, startBeat: 0, accidental: 'sharp' },
+            { pitch: Note.C, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 0.250 },
+            { pitch: Note.A, octave: MiddleOctave-1, durationType: DurationType.Eighth, startBeat: 0.375, accidental: 'sharp' },
+            { pitch: Note.D, octave: MiddleOctave, durationType: DurationType.Sixteenth, startBeat: 0.500 },
+            { pitch: Note.E, octave: MiddleOctave, durationType: DurationType.Sixteenth, startBeat: 0.5625 },
+            { pitch: Note.B, octave: MiddleOctave-1, durationType: DurationType.Eighth, startBeat: 0.625 },
+            { pitch: Note.G, octave: MiddleOctave-1, durationType: DurationType.Eighth, startBeat: 0.75 },
+            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 0.875 },
+            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 1.0 },
+            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 1.125 },
+            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Quarter, startBeat: 1.25 }
         )
     }, []);
 
     return (
         <div className="staff">
             <div className="clef-container">{getClef()}</div>
-            <div className="key-signature-container" style={getKeySignatureStyle()}>{getSharpsAndFlats()}</div>
+            <div className="key-signature-container" style={getKeySignatureStyle()}>{getKeySignatureSharpsAndFlats()}</div>
             <div className="ts-container" style={getTimeSignatureStyle()}>{getTimeSignature()}</div>
             {getMeasures()}
         </div>

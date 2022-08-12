@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import './StaffNote.scss';
 import { NoteModel } from '../models/Note.model';
+import { DurationType } from '../types';
 
 function StaffNote({
     model,
@@ -80,11 +81,37 @@ function StaffNote({
         };
     }
 
+    const getFlag = () => {
+        if (model.durationType == DurationType.Eighth ||
+            model.durationType == DurationType.Sixteenth ||
+            model.durationType == DurationType.ThirtySecond) {
+            return <div className={getFlagClass()} style={getFlagStyle()}></div>;
+        }
+
+        return <></>;
+    }
+
+    const getStem = () => {
+        if (model.durationType == DurationType.Whole) {
+            return <></>;
+        }
+
+        return <div className={getStemClass()} style={getStemStyle()}></div>;
+    }
+
+    const getAccidental = () => {
+        let accidentalClassName = showAccidental ? model.accidental : '';
+        if (natural)
+            accidentalClassName = 'natural';
+        accidentalClassName = `accidental ${accidentalClassName}`;
+        return <div className={accidentalClassName} style={{ left: `${-NoteSize}px`}}></div>;
+    }
+
     return (
         <div data-note={model} className={getNoteClass()} style={getNoteStyle()}>
-            <div className={`accidental ${natural ? 'natural' : showAccidental ? model.accidental : ''}`} style={{ left: `${-NoteSize}px`}}></div>
-            {model.durationType !== 'whole' && <div className={getStemClass()} style={getStemStyle()}></div>}
-            {['8th', '16th', '32nd'].includes(model.durationType) && <div className={getFlagClass()} style={getFlagStyle()}></div>}
+            {getAccidental()}
+            {getStem()}
+            {getFlag()}
         </div>
     );
 }

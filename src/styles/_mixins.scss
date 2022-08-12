@@ -1,12 +1,5 @@
 $animation-offset: 200px;
 
-@mixin background-image($filename) {
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    background-image: url(../images/#{$filename});
-}
-
 @mixin stagger-animation($num-children, $magnitude: 100ms, $baseDelay: 0ms) {
     @for $i from 1 through $num-children {
         &:nth-child(#{$i}) {

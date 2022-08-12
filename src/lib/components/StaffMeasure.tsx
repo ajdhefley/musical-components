@@ -35,10 +35,10 @@ function StaffMeasure({
         let bottomMiddleC = 0;
 
         switch (clef) {
-            case 'treble':
+            case ClefType.Treble:
                 bottomMiddleC = SpaceHeight * 2 + noteHeight;
                 break;
-            case 'bass':
+            case ClefType.Bass:
                 bottomMiddleC = SpaceHeight * 5;
                 break;
         }
@@ -46,8 +46,9 @@ function StaffMeasure({
         let pitchPosition = (pitch % numPitches) * noteHeight;
         let octavePosition = (octave - MiddleOctave) * numPitches * noteHeight;
 
-        if (clef == 'bass')
+        if (clef == ClefType.Bass) {
             octavePosition -= numPitches * noteHeight;
+        }
         
         return bottomMiddleC + pitchPosition + octavePosition;
     }
