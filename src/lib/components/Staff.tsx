@@ -2,22 +2,45 @@ import { useEffect, useState } from 'react';
 
 import './Staff.scss';
 import { NoteModel } from '../models';
-import { Note, ClefType, DurationType } from '../types';
+import { Pitch, ClefType, Duration, BeatsPerMeasureType } from '../types';
 import StaffMeasure from './StaffMeasure';
 
-function Staff({
-    clef,
-    beatsPerMeasure,
-    beatDuration,
-    sharps,
-    flats,
-}: {
+/**
+ * 
+ **/
+interface StaffProps {
+    /**
+     * The treble or bass clef.
+     **/
     clef: ClefType;
-    beatsPerMeasure: number;
-    beatDuration: number;
-    sharps?: Note[];
-    flats?: Note[];
-}) {
+
+    /**
+     * Number of beats per measure, determining the top number of the time signature.
+     **/
+    beatsPerMeasure: BeatsPerMeasureType;
+
+    /**
+     * The value of a given beat, determining the bottom number of the time signature.
+     **/
+    beatDuration: Duration;
+
+    /**
+     * The pitches that are sharped, determining the major key.
+     * If both sharps and flats have values, flats will be ignored.
+     **/
+    sharps?: Pitch[];
+
+    /**
+     * The pitches that are flatted, determining the major key.
+     * If both sharps and flats have values, flats will be ignored.
+     **/
+    flats?: Pitch[];
+}
+
+/**
+ * 
+ **/
+function Staff({ clef, beatsPerMeasure, beatDuration, sharps, flats }: StaffProps) {
     const ClefWidth: number = 50;
     const SpaceHeight: number = 20;
     const MiddleOctave: number = 4;
@@ -78,12 +101,9 @@ function Staff({
     }
 
     const getTimeSignature = () => {
-        const upper = beatsPerMeasure;
-        const lower = 1 / beatDuration;
-
         return (<div>
-            <div className={`ts-${upper}`} style={{ top: 0 }}></div>
-            <div className={`ts-${lower}`} style={{ bottom: 0 }}></div>
+            <div className={`ts-${beatsPerMeasure}`} style={{ top: 0 }}></div>
+            <div className={`ts-${beatDuration}`} style={{ bottom: 0 }}></div>
         </div>);
     }
 
@@ -139,17 +159,17 @@ function Staff({
 
     useEffect(() => {
         addNotes(
-            { pitch: Note.C, octave: MiddleOctave, durationType: DurationType.Quarter, startBeat: 0, accidental: 'sharp' },
-            { pitch: Note.C, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 0.250 },
-            { pitch: Note.A, octave: MiddleOctave-1, durationType: DurationType.Eighth, startBeat: 0.375, accidental: 'sharp' },
-            { pitch: Note.D, octave: MiddleOctave, durationType: DurationType.Sixteenth, startBeat: 0.500 },
-            { pitch: Note.E, octave: MiddleOctave, durationType: DurationType.Sixteenth, startBeat: 0.5625 },
-            { pitch: Note.B, octave: MiddleOctave-1, durationType: DurationType.Eighth, startBeat: 0.625 },
-            { pitch: Note.G, octave: MiddleOctave-1, durationType: DurationType.Eighth, startBeat: 0.75 },
-            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 0.875 },
-            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 1.0 },
-            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Eighth, startBeat: 1.125 },
-            { pitch: Note.F, octave: MiddleOctave, durationType: DurationType.Quarter, startBeat: 1.25 }
+            { pitch: Pitch.C, octave: MiddleOctave, durationType: Duration.Quarter, startBeat: 0, accidental: 'sharp' },
+            { pitch: Pitch.C, octave: MiddleOctave, durationType: Duration.Eighth, startBeat: 0.250 },
+            { pitch: Pitch.A, octave: MiddleOctave-1, durationType: Duration.Eighth, startBeat: 0.375, accidental: 'sharp' },
+            { pitch: Pitch.D, octave: MiddleOctave, durationType: Duration.Sixteenth, startBeat: 0.500 },
+            { pitch: Pitch.E, octave: MiddleOctave, durationType: Duration.Sixteenth, startBeat: 0.5625 },
+            { pitch: Pitch.B, octave: MiddleOctave-1, durationType: Duration.Eighth, startBeat: 0.625 },
+            { pitch: Pitch.G, octave: MiddleOctave-1, durationType: Duration.Eighth, startBeat: 0.75 },
+            { pitch: Pitch.F, octave: MiddleOctave, durationType: Duration.Eighth, startBeat: 0.875 },
+            { pitch: Pitch.F, octave: MiddleOctave, durationType: Duration.Eighth, startBeat: 1.0 },
+            { pitch: Pitch.F, octave: MiddleOctave, durationType: Duration.Eighth, startBeat: 1.125 },
+            { pitch: Pitch.F, octave: MiddleOctave, durationType: Duration.Quarter, startBeat: 1.25 }
         )
     }, []);
 

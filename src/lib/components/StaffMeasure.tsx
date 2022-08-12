@@ -2,21 +2,39 @@ import { useEffect, useState } from 'react';
 
 import './StaffMeasure.scss';
 import { NoteModel, RestModel } from '../models';
-import Rest from './Rest';
+import Rest from './StaffRest';
 import StaffNote from './StaffNote';
-import { Note, ClefType } from '../types';
+import { Pitch, ClefType } from '../types';
 
-function StaffMeasure({
-    notes,
-    clef,
-    sharps,
-    flats,
-}: {
+/**
+ * 
+ **/
+interface StaffMeasureProps {
+    /**
+     * 
+     **/
     notes: NoteModel[];
+
+    /**
+     * The treble or bass clef, which affects note position.
+     **/
     clef: ClefType;
-    sharps?: Note[];
-    flats?: Note[];
-}) {
+
+    /**
+     * Notes that should be implicitly sharped (by key) without being denoted by an explicit accidental.
+     **/
+    sharps?: Pitch[];
+
+    /**
+     * Notes that should be implicitly flatted (by key) without being denoted by an explicit accidental.
+     **/
+    flats?: Pitch[];
+}
+
+/**
+ * 
+ **/
+function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     const MinMeasureWidth: number = 400;
     const SpaceHeight: number = 20;
     const NoteLeftOffset: number = 40;

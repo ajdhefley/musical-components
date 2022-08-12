@@ -1,16 +1,27 @@
 import { Component } from 'react';
 
-import './Rest.scss';
-import Staff from './StaffMeasure';
+import './StaffRest.scss';
 import { RestModel } from '../models/Rest.model';
 
-function Rest({
-    model,
-    left,
-}: {
+/**
+ * 
+ **/
+interface RestProps {
+    /**
+     * 
+     **/
     model: RestModel;
+
+    /**
+     * 
+     **/
     left: number;
-}) {
+}
+
+/**
+ * 
+ **/
+function Rest({ model, left }: RestProps) {
     const RestSize: number = 50;
     const SpaceHeight: number = 20;
 

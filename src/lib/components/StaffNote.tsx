@@ -2,21 +2,42 @@ import { useState } from 'react';
 
 import './StaffNote.scss';
 import { NoteModel } from '../models/Note.model';
-import { DurationType } from '../types';
+import { Duration } from '../types';
 
-function StaffNote({
-    model,
-    left,
-    bottom,
-    showAccidental,
-    natural
-}: {
+/**
+ * 
+ **/
+interface StaffNoteProps {
+    /**
+     * 
+     **/
     model: NoteModel;
+
+    /**
+     * 
+     **/
     left: number;
+
+    /**
+     * 
+     **/
     bottom: number;
+
+    /**
+     * 
+     **/
     showAccidental: boolean;
+
+    /**
+     * 
+     **/
     natural: boolean;
-}) {
+}
+
+/**
+ * 
+ **/
+function StaffNote({ model, left, bottom, showAccidental, natural }: StaffNoteProps) {
     const NoteSize = 30;
 
     const [active, setActive] = useState<'active' | 'inactive'>();
@@ -82,9 +103,9 @@ function StaffNote({
     }
 
     const getFlag = () => {
-        if (model.durationType == DurationType.Eighth ||
-            model.durationType == DurationType.Sixteenth ||
-            model.durationType == DurationType.ThirtySecond) {
+        if (model.durationType == Duration.Eighth ||
+            model.durationType == Duration.Sixteenth ||
+            model.durationType == Duration.ThirtySecond) {
             return <div className={getFlagClass()} style={getFlagStyle()}></div>;
         }
 
@@ -92,7 +113,7 @@ function StaffNote({
     }
 
     const getStem = () => {
-        if (model.durationType == DurationType.Whole) {
+        if (model.durationType == Duration.Whole) {
             return <></>;
         }
 
