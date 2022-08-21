@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import './StaffMeasure.scss';
-import { NoteModel, RestModel } from '../models';
+import { NotationModel, NoteModel, RestModel } from '../models';
 import Rest from './StaffRest';
 import StaffNote from './StaffNote';
 import { NaturalNote, ClefType, Pitch } from '../types';
+import StaffRest from './StaffRest';
 
 /**
  * 
@@ -113,39 +114,44 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     }
 
     const getNotations = () => {
-        return notes?.map((noteModel: NoteModel, index) => {
-            const noteFromPitch = noteModel.pitch % 12;
-            const sharpedInKey = sharps?.includes(noteFromPitch) ?? false;
-            const flattedInKey = flats?.includes(noteFromPitch) ?? false;
-            const prevNoteSharpedInKey = sharps?.includes(noteFromPitch-1) ?? false;
-            const nextNoteFlattedInKey = flats?.includes(noteFromPitch+1) ?? false;
-            const isNatural = Object.values(NaturalNote).includes(noteFromPitch);
+        return notes?.map((notationModel: NotationModel, index) => {
+            if (notationModel instanceof NoteModel) {
+                const noteFromPitch = notationModel.pitch % 12;
+                const sharpedInKey = sharps?.includes(noteFromPitch) ?? false;
+                const flattedInKey = flats?.includes(noteFromPitch) ?? false;
+                const prevNoteSharpedInKey = sharps?.includes(noteFromPitch-1) ?? false;
+                const nextNoteFlattedInKey = flats?.includes(noteFromPitch+1) ?? false;
+                const isNatural = Object.values(NaturalNote).includes(noteFromPitch);
 
-            let accidental = undefined;
-            if (isNatural && (sharpedInKey || flattedInKey)) {
-                // For example, key is D (sharp F by default) but note is natural F
-                // means explicit natural accidental should be written next to note
-                accidental = 'natural';
+                let accidental = undefined;
+                if (isNatural && (sharpedInKey || flattedInKey)) {
+                    // For example, key is D (sharp F by default) but note is natural F
+                    // means explicit natural accidental should be written next to note
+                    accidental = 'natural';
+                }
+                else if (!isNatural && !prevNoteSharpedInKey) {
+                    // For example: note if F# (not natural) and key is C (previous note F is not sharped)
+                    // means explicit sharp should be written next to note
+                    accidental = 'sharp';
+                }
+                else if (!isNatural && !nextNoteFlattedInKey) {
+                    // For example: note is Bb (not natural) and key is C (next note B is not flatted)
+                    // means explicit flat should be written next to note
+                    accidental = 'flat';
+                }
+
+                // Otherwise, note is either sharped/flatted in correspondence with key,
+                // or note is natural and not sharped/flatted by key.
+                // In either case, do not write an accidental next to the note.
+
+                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index) + NoteLeftOffset;
+                const bottomPosition = getNotationBottomPosition(notationModel.pitch);
+                return (<StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />);
             }
-            else if (!isNatural && !prevNoteSharpedInKey) {
-                // For example: note if F# (not natural) and key is C (previous note F is not sharped)
-                // means explicit sharp should be written next to note
-                accidental = 'sharp';
+            else if (notationModel instanceof RestModel) {
+                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index) + NoteLeftOffset;
+                return (<StaffRest model={notationModel} left={leftPosition} />);
             }
-            else if (!isNatural && !nextNoteFlattedInKey) {
-                // For example: note is Bb (not natural) and key is C (next note B is not flatted)
-                // means explicit flat should be written next to note
-                accidental = 'flat';
-            }
-
-            // Otherwise, note is either sharped/flatted in correspondence with key,
-            // or note is natural and not sharped/flatted by key.
-            // In either case, do not write an accidental next to the note.
-
-            const leftPosition = getNotationLeftPosition(noteModel.startBeat, index) + NoteLeftOffset;
-            const bottomPosition = getNotationBottomPosition(noteModel.pitch);
-
-            return (<StaffNote model={noteModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />);
         });
     }
 

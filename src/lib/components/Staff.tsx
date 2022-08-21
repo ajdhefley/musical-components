@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import './Staff.scss';
-import { NoteModel } from '../models';
-import { NaturalNote, ClefType, Duration, BeatsPerMeasureType, Pitch } from '../types';
+import { NotationModel, NoteModel, RestModel } from '../models';
+import { NaturalNote, ClefType, Duration, BeatsPerMeasureType, Pitch, getDurationTypeFromValue } from '../types';
 import StaffMeasure from './StaffMeasure';
 import { MidiAudioRelay } from '../audio/midi-audio-relay';
 
@@ -51,7 +51,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     const SpaceHeight: number = 20;
     const KeySize: number = 17;
 
-    const [notes, setNotes] = useState(new Array<NoteModel>());
+    const [notes, setNotes] = useState(new Array<NotationModel>());
     const [midi, setMidi] = useState<WebMidi.MIDIAccess>();
 
     const initializeMIDI = () => {
@@ -185,7 +185,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         </>)
     }
     
-    const addNotes = async (...addedNotes: NoteModel[]) => {
+    const addNotes = async (...addedNotes: NotationModel[]) => {
         let nextTime = 0;
 
         if (notes.length > 0) {
@@ -194,9 +194,21 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         }
         
         addedNotes.forEach((addedNote, addedNoteIndex) => {
+            if (addedNote instanceof RestModel) {
+                return;
+            }
+
             if (addedNoteIndex > 0) {
                 let lastNote = addedNotes[addedNoteIndex - 1];
                 nextTime = lastNote.startBeat + 1 / lastNote.durationType;
+                let timediff = addedNote.startBeat - nextTime;
+
+                // TODO: find largest possible rest in time diff, keep repeating until time filled
+                // TODO: handle dotted rests
+                
+                if (timediff > 0) {
+                    addedNotes.splice(addedNoteIndex, 0, new RestModel(getDurationTypeFromValue(timediff), nextTime));
+                }
             }
 
             addedNote.startBeat = nextTime;
@@ -217,23 +229,24 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         }
     }
 
-    const activateNote = (note?: NoteModel) => {
-        const newNotes = notes.map((iteratedNote) => {
-            if (iteratedNote === note) {
-                iteratedNote.active = true;
-                return iteratedNote;
+    const activateNotation = (notation?: NotationModel) => {
+        const newNotes = notes.map((iteratedNotation) => {
+            if (iteratedNotation === notation) {
+                iteratedNotation.active = true;
+                return iteratedNotation;
             }
 
-            iteratedNote.active = false;
-            return iteratedNote;
+            iteratedNotation.active = false;
+            return iteratedNotation;
         });
+
         setNotes(newNotes);
     }
 
-    const dispatchNoteMidi = (note: NoteModel, duration: number) => {
+    const dispatchNoteMidi = (pitch: Pitch | number, duration: number) => {
         midi.outputs.forEach((output) => {
-            output.send([ 0x90, note.pitch, 0x7f ]);
-            window.setTimeout(() => output.send([ 0x80, note.pitch, 0x7f ]), duration);
+            output.send([ 0x90, pitch, 0x7f ]);
+            window.setTimeout(() => output.send([ 0x80, pitch, 0x7f ]), duration);
         });
     }
 
@@ -243,29 +256,27 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
             const baseBeatDuration = 1000;
             const beatDuration = (baseBpm / beatsPerMinute) * baseBeatDuration;
             const noteDuration = getBeatDurationProportion(note.durationType) * beatDuration;
-            activateNote(note);
-            dispatchNoteMidi(note, noteDuration);
+
+            activateNotation(note);
+
+            if (note instanceof NoteModel) {
+                dispatchNoteMidi(note.pitch, noteDuration);
+            }
+
             await new Promise((resolve) => setTimeout(resolve, noteDuration));
         }
 
         // Set all notes to inactive.
-        activateNote(null);
+        activateNotation(null);
     }
 
     useEffect(() => {
         addNotes(
-            { pitch: Pitch.G4, durationType: Duration.Sixteenth },
-            { pitch: Pitch.Fs4, durationType: Duration.Sixteenth },
-            { pitch: Pitch.E4, durationType: Duration.Eighth },
-            { pitch: Pitch.D4, durationType: Duration.Eighth },
-            { pitch: Pitch.E4, durationType: Duration.Eighth },
-            { pitch: Pitch.D4, durationType: Duration.Eighth },
-            { pitch: Pitch.E4, durationType: Duration.Eighth },
-            { pitch: Pitch.G4, durationType: Duration.Sixteenth },
-            { pitch: Pitch.Fs4, durationType: Duration.Sixteenth },
-            { pitch: Pitch.E4, durationType: Duration.Eighth },
-            { pitch: Pitch.D4, durationType: Duration.Eighth },
-            { pitch: Pitch.E4, durationType: Duration.Eighth }
+            new NoteModel(Pitch.G4, Duration.Sixteenth, 0),
+            new NoteModel(Pitch.Fs4, Duration.Sixteenth, (1/16)),
+            new NoteModel(Pitch.E4, Duration.Eighth, (1/16) * 2),
+            new NoteModel(Pitch.D4, Duration.Eighth, 0.375),
+            new NoteModel(Pitch.E4, Duration.Eighth, 0.500)
         );
     }, []);
 

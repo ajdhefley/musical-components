@@ -6,7 +6,7 @@ import { RestModel } from '../models/Rest.model';
 /**
  * 
  **/
-interface RestProps {
+interface StaffRestProps {
     /**
      * 
      **/
@@ -21,7 +21,7 @@ interface RestProps {
 /**
  * 
  **/
-function Rest({ model, left }: RestProps) {
+function StaffRest({ model, left }: StaffRestProps) {
     const RestSize: number = 50;
     const SpaceHeight: number = 20;
 
@@ -42,8 +42,8 @@ function Rest({ model, left }: RestProps) {
     }
 
     return (
-        <div className={this.getClass()} style={this.getStyle()}></div>
+        <div className={getClass()} style={getStyle()}></div>
     );
 }
 
-export default Rest;
+export default StaffRest;
