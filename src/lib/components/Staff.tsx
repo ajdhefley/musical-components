@@ -52,8 +52,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     const KeySize: number = 17;
 
     const [notes, setNotes] = useState(new Array<NoteModel>());
-
-    var midi: WebMidi.MIDIAccess;
+    const [midi, setMidi] = useState<WebMidi.MIDIAccess>();
 
     const initializeMIDI = () => {
         navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
@@ -62,7 +61,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     const onMIDISuccess = (midiAccess: WebMidi.MIDIAccess) => {
         var midiAudioRelay = new MidiAudioRelay();
         midiAudioRelay.init(midiAccess);
-        midi = midiAccess;
+        setMidi(midiAccess);
     }
 
     const onMIDIFailure = (msg: string) => {
