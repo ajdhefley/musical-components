@@ -41,7 +41,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     const NoteSize: number = 30;
     const NoteSpacing: number = 40;
 
-    const getItemLeftPosition = (time: number, index: number) => {
+    const getNotationLeftPosition = (time: number, index: number) => {
         return (NoteSize + NoteSpacing) * index;
     }
 
@@ -53,11 +53,13 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
 
         // Determine base natural, to calculate correct position on staff
         let naturalPitch = pitch;
-        if (sharps?.includes(naturalNoteValues.indexOf(NaturalNote[(pitch - 1) % 12]))) {
-            naturalPitch = pitch - 1;
-        }
-        else if (flats?.includes(naturalNoteValues.indexOf(NaturalNote[(pitch + 1) % 12]))) {
-            naturalPitch = pitch + 1;
+        if (naturalNoteValues.includes(NaturalNote[pitch % 12]) == false) {
+            if (naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
+                naturalPitch = pitch - 1;
+            }
+            else if (naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
+                naturalPitch = pitch + 1;
+            }
         }
 
         // String value ("A", "B", "C", etc) of the note
@@ -95,7 +97,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
 
     const getStaffWidth = () => {
         const lastNote = notes[notes.length - 1];
-        return Math.max(MinMeasureWidth, getItemLeftPosition(lastNote.startBeat, notes.length - 1) + NoteLeftOffset);
+        return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote.startBeat, notes.length - 1) + NoteLeftOffset);
     };
 
     const getStaffStyle = () => {
@@ -111,45 +113,40 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     }
 
     const getNotations = () => {
-        const renderedNotes = notes?.map((noteModel: NoteModel, index) => {
-            // If is not semitone
-                // if note is sharped or flatted (key), show natural
-                // if note is not sharped or flatted (key), show nothing
-            // If is semitone
-                // if next note is flatted (key), show nothing
-                // if next note is not flatted (key), show flat
-                // If previous note is sharped (key), show nothing
-                // If previous note is not sharped (key), show sharp
-
+        return notes?.map((noteModel: NoteModel, index) => {
             const noteFromPitch = noteModel.pitch % 12;
+            const sharpedInKey = sharps?.includes(noteFromPitch) ?? false;
+            const flattedInKey = flats?.includes(noteFromPitch) ?? false;
+            const prevNoteSharpedInKey = sharps?.includes(noteFromPitch-1) ?? false;
+            const nextNoteFlattedInKey = flats?.includes(noteFromPitch+1) ?? false;
             const isNatural = Object.values(NaturalNote).includes(noteFromPitch);
-            const currNoteSharped = sharps?.includes(noteFromPitch);
-            const currNoteFlatted = flats?.includes(noteFromPitch);
-            const prevNoteSharped = sharps?.includes(noteFromPitch-1);
-            const nextNoteFlatted = flats?.includes(noteFromPitch+1);
 
             let accidental = undefined;
-
-            if (isNatural) {
-                if (currNoteSharped || currNoteFlatted) {
-                    accidental = 'natural';
-                }
+            if (isNatural && (sharpedInKey || flattedInKey)) {
+                // For example, key is D (sharp F by default) but note is natural F
+                // means explicit natural accidental should be written next to note
+                accidental = 'natural';
             }
-            else {
-                if (sharps?.length > 0 && !prevNoteSharped) {
-                    accidental = 'sharp';
-                }
-                else if (flats?.length > 0 && !nextNoteFlatted) {
-                    accidental = 'flat';
-                }
+            else if (!isNatural && !prevNoteSharpedInKey) {
+                // For example: note if F# (not natural) and key is C (previous note F is not sharped)
+                // means explicit sharp should be written next to note
+                accidental = 'sharp';
+            }
+            else if (!isNatural && !nextNoteFlattedInKey) {
+                // For example: note is Bb (not natural) and key is C (next note B is not flatted)
+                // means explicit flat should be written next to note
+                accidental = 'flat';
             }
 
-            const leftPosition = getItemLeftPosition(noteModel.startBeat, index) + NoteLeftOffset;
+            // Otherwise, note is either sharped/flatted in correspondence with key,
+            // or note is natural and not sharped/flatted by key.
+            // In either case, do not write an accidental next to the note.
+
+            const leftPosition = getNotationLeftPosition(noteModel.startBeat, index) + NoteLeftOffset;
             const bottomPosition = getNotationBottomPosition(noteModel.pitch);
+
             return (<StaffNote model={noteModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />);
         });
-
-        return Array().concat(renderedNotes);
     }
 
     return (
