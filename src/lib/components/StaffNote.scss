@@ -19,7 +19,7 @@ $accidental-size: 40px;
         background-image: url('../images/note-half.svg');
     }
 
-    &.note-quarter, &.note-8th, &.note-16th, &.note-32nd {
+    &.note-quarter, &.note-eighth, &.note-sixteenth, &.note-thirtysecond {
         background-image: url('../images/note.svg');
     }
 }

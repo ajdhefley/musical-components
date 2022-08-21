@@ -26,32 +26,27 @@ interface StaffNoteProps {
     /**
      * 
      **/
-    showAccidental: boolean;
-
-    /**
-     * 
-     **/
-    natural: boolean;
+    accidental: 'sharp' | 'flat' | 'natural' | undefined;
 }
 
 /**
  * 
  **/
-function StaffNote({ model, left, bottom, showAccidental, natural }: StaffNoteProps) {
+function StaffNote({ model, left, bottom, accidental }: StaffNoteProps) {
     const NoteSize = 30;
 
-    const [active, setActive] = useState<'active' | 'inactive'>();
+    const [activeStatus, setActiveStatus] = useState<'active' | 'inactive'>('inactive');
 
     const stemType: 'up' | 'down' = (() => {
         const numPitches = 7;
         const numOctaves = 6;
-        const octaveNotes = (model.octave - 1) * numPitches;
+        const octaveNotes = (Math.floor(model.pitch / 12) - 1) * numPitches;
         const octavePosition = octaveNotes + model.pitch;
         return octavePosition >= (numPitches * numOctaves / 2) - 1 ? 'down' : 'up';
     })();
 
     const getNoteClass = () => {
-        return `note note-${model.durationType} ${active}`;
+        return `note note-${Duration[model.durationType].toLowerCase()} ${activeStatus} ${model.active ? 'active' : ''}`;
     }
     
     const getNoteStyle = () => {
@@ -121,11 +116,7 @@ function StaffNote({ model, left, bottom, showAccidental, natural }: StaffNotePr
     }
 
     const getAccidental = () => {
-        let accidentalClassName = showAccidental ? model.accidental : '';
-        if (natural)
-            accidentalClassName = 'natural';
-        accidentalClassName = `accidental ${accidentalClassName}`;
-        return <div className={accidentalClassName} style={{ left: `${-NoteSize}px`}}></div>;
+        return <div className={`accidental ${accidental}`} style={{ left: `${-NoteSize}px`}}></div>;
     }
 
     return (
