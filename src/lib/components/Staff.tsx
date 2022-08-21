@@ -4,7 +4,7 @@ import './Staff.scss';
 import { NoteModel } from '../models';
 import { NaturalNote, ClefType, Duration, BeatsPerMeasureType, Pitch } from '../types';
 import StaffMeasure from './StaffMeasure';
-import { MidiRelay } from '../audio/midi-relay';
+import { MidiAudioRelay } from '../audio/midi-audio-relay';
 
 /**
  * 
@@ -60,8 +60,9 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     }
 
     const onMIDISuccess = (midiAccess: WebMidi.MIDIAccess) => {
-        var midiRelay = new MidiRelay();
-        midiRelay.init(midiAccess);
+        var midiAudioRelay = new MidiAudioRelay();
+        midiAudioRelay.init(midiAccess);
+        midi = midiAccess;
     }
 
     const onMIDIFailure = (msg: string) => {
