@@ -14,7 +14,7 @@ interface StaffMeasureProps {
     /**
      * 
      **/
-    notes: NoteModel[];
+    notes: NotationModel[];
 
     /**
      * The treble or bass clef, which affects note position.
@@ -36,6 +36,7 @@ interface StaffMeasureProps {
  * 
  **/
 function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
+    console.log(notes);
     const MinMeasureWidth: number = 400;
     const SpaceHeight: number = 20;
     const NoteSize: number = 30;
@@ -44,19 +45,37 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     
     const id = 'measure' + notes[0].startBeat;
 
-    const getNotationLeftPosition = (time: number, index: number) => {
+    const getNoteAt = (beat: number) => {
+        for (let note of notes) {
+            if (note instanceof NoteModel && note.startBeat <= beat && beat < note.startBeat + (1/note.durationType)) {
+                return note;
+            }
+        }
+    }
+
+    const getNotationLeftPosition = (notation: NotationModel) => {
         const leftOffset = 25;
         const accidentalWidth = 15;
         
         let total = 0;
-        for (let i = 0; i < index; i++) {
-            total += (NoteSize + NoteSpacing);
-            if (getNoteAccidental(notes[i]))
+        let lastNote = null;
+
+        for (let i = 0; i < notation.startBeat; i += 1/32) {
+            const note = getNoteAt(i);
+
+            if (note?.startBeat !== lastNote?.startBeat) {
+                lastNote = note;
+                total += (NoteSize + NoteSpacing);
+            }
+
+            if (getNoteAccidental(note)) {
                 total += accidentalWidth;
+            }
         }
 
-        if (getNoteAccidental(notes[index]))
+        if (notation instanceof NoteModel && getNoteAccidental(notation)) {
             total += accidentalWidth;
+        }
 
         return total + leftOffset;
     }
@@ -114,7 +133,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     const getMeasureWidth = () => {
         const lastNote = notes[notes.length - 1];
         const rightOffset = 30;
-        return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote.startBeat, notes.length - 1) + rightOffset);
+        return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote) + rightOffset);
     };
 
     const getStaffStyle = () => {
@@ -157,11 +176,13 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     }
 
     const getConnectingStem = (startIndex: number, endIndex: number) => {
+        const startNote = notes[startIndex] as NoteModel;
+        const endNote = notes[startIndex] as NoteModel;
         const durationType = notes[startIndex].durationType;
-        const stemStartXPos = getNotationLeftPosition(0, startIndex) - (NoteSize / 2) + 2;
-        const stemStartYPos = getNotationBottomPosition(notes[startIndex].pitch) - BaseStemHeight;
-        const stemEndXPos = getNotationLeftPosition(0, endIndex) - (NoteSize / 2);
-        const stemEndYPos = getNotationBottomPosition(notes[endIndex].pitch) - BaseStemHeight;
+        const stemStartXPos = getNotationLeftPosition(notes[startIndex]) - (NoteSize / 2) + 2;
+        const stemStartYPos = getNotationBottomPosition(startNote.pitch) - BaseStemHeight;
+        const stemEndXPos = getNotationLeftPosition(notes[endIndex]) - (NoteSize / 2);
+        const stemEndYPos = getNotationBottomPosition(endNote.pitch) - BaseStemHeight;
         const stemWidth = stemEndXPos - stemStartXPos - 1;
         //const degrees = Math.atan2(stemEndYPos - stemStartYPos, stemEndXPos - stemStartXPos) * 180 / Math.PI;
 
@@ -220,48 +241,50 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
                     let stem = undefined;
 
                     if (index < notes.length - 1 && notes[index+1].durationType == notationModel.durationType) {
+                        const note = notes[index] as NoteModel;
+                        const note3 = notes[index+3] as NoteModel;
+                        const note2 = notes[index+2] as NoteModel;
+                        const note1 = notes[index+1] as NoteModel;
+
                         if (index < notes.length - 2 && notes[index+2].durationType == notationModel.durationType) {
                             if (index < notes.length - 3 && notes[index+3].durationType == notationModel.durationType) {
-                                console.log(getNotationBottomPosition(notes[index+3].pitch));
-                                console.log(getNotationBottomPosition(notes[index].pitch));
-                                console.log((getNotationBottomPosition(notes[index].pitch) - getNotationBottomPosition(notes[index+3].pitch)) / BaseStemHeight);
                                 // Four notes
                                 stem = getConnectingStem(index, index+3);
-                                const stemProportion3 = (getNotationBottomPosition(notes[index+3].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
-                                notes[index+3].stemStretchFactor = 1 + stemProportion3;
-                                const stemProportion2 = (getNotationBottomPosition(notes[index+2].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
-                                notes[index+2].stemStretchFactor = 1 + stemProportion2;
-                                const stemProportion1 = (getNotationBottomPosition(notes[index+1].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
-                                notes[index+1].stemStretchFactor = 1 + stemProportion1;
+                                const stemProportion3 = (getNotationBottomPosition(note3.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                note3.stemStretchFactor = 1 + stemProportion3;
+                                const stemProportion2 = (getNotationBottomPosition(note2.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                note2.stemStretchFactor = 1 + stemProportion2;
+                                const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                note1.stemStretchFactor = 1 + stemProportion1;
                                 lastHorizontalStemIndex = index+3;
                             }
                             else {
                                 // Three notes
                                 stem = getConnectingStem(index, index+2);
-                                const stemProportion2 = (getNotationBottomPosition(notes[index+2].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
-                                notes[index+2].stemStretchFactor = 1 + stemProportion2;
-                                const stemProportion1 = (getNotationBottomPosition(notes[index+1].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
-                                notes[index+1].stemStretchFactor = 1 + stemProportion1;
+                                const stemProportion2 = (getNotationBottomPosition(note2.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                note2.stemStretchFactor = 1 + stemProportion2;
+                                const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                note1.stemStretchFactor = 1 + stemProportion1;
                                 lastHorizontalStemIndex = index+2;
                             }
                         }
                         else {
                             // Two notes
                             stem = getConnectingStem(index, index+1);
-                            const stemProportion1 = (getNotationBottomPosition(notes[index+1].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
-                            notes[index+1].stemStretchFactor = 1 + stemProportion1;
+                            const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                            note1.stemStretchFactor = 1 + stemProportion1;
                             lastHorizontalStemIndex = index+1;
                         }
                     }
                 }
 
                 const accidental = getNoteAccidental(notationModel);
-                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index);
+                const leftPosition = getNotationLeftPosition(notationModel);
                 const bottomPosition = getNotationBottomPosition(notationModel.pitch);
                 return <StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />;
             }
             else if (notationModel instanceof RestModel) {
-                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index);
+                const leftPosition = getNotationLeftPosition(notationModel);
                 return <StaffRest model={notationModel} left={leftPosition} />;
             }
         });

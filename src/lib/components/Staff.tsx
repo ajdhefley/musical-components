@@ -164,7 +164,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         }
 
         const minStep = 1/32;
-        const noteCollectionArray = Array<Array<NoteModel>>();
+        const noteCollectionArray = Array<Array<NotationModel>>();
         const lastNote = notes[notes.length - 1];
 
         let stepCounter = 1;
@@ -172,18 +172,18 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         let currentNote = null;
         
         while (currentStep < lastNote.startBeat + 1/lastNote.durationType) {
-            const steppedNote = notes.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + 1/n.durationType);
+            const steppedNotes = notes.filter(n => currentStep >= n.startBeat && currentStep < n.startBeat + 1/n.durationType);
 
-            if (steppedNote != currentNote) {
-                currentNote = steppedNote;
+            if (steppedNotes[0] != currentNote) {
+                currentNote = steppedNotes[0];
 
                 if (stepCounter >= 1) {
                     stepCounter = 0;
-                    noteCollectionArray.push(new Array<NoteModel>());
+                    noteCollectionArray.push(new Array<NotationModel>());
                 }
 
                 if (currentNote) {
-                    noteCollectionArray[noteCollectionArray.length - 1].push(currentNote);
+                    noteCollectionArray[noteCollectionArray.length - 1] = noteCollectionArray[noteCollectionArray.length - 1].concat(steppedNotes);
                 }
             }
 
@@ -197,21 +197,14 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     }
     
     const addNotes = async (...addedNotes: NotationModel[]) => {
-        let nextTime = 0;
-
-        if (notes.length > 0) {
-            let lastNote = notes[notes.length - 1];
-            nextTime = lastNote.startBeat + 1 / lastNote.durationType;
-        }
-        
         addedNotes.forEach((addedNote, addedNoteIndex) => {
             if (addedNote instanceof RestModel) {
                 return;
             }
 
             if (addedNoteIndex > 0) {
-                let lastNote = addedNotes[addedNoteIndex - 1];
-                nextTime = lastNote.startBeat + 1 / lastNote.durationType;
+                let prevNote = addedNotes[addedNoteIndex - 1];
+                let nextTime = prevNote.startBeat + (1 / prevNote.durationType);
                 let timediff = addedNote.startBeat - nextTime;
 
                 // TODO: find largest possible rest in time diff, keep repeating until time filled
@@ -222,7 +215,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
                 }
             }
 
-            addedNote.startBeat = nextTime;
+            //addedNote.startBeat = nextTime;
             addedNote.active = false;
         });
 
@@ -283,25 +276,16 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
 
     useEffect(() => {
         addNotes(
-            new NoteModel(Pitch.G3, Duration.Sixteenth),
-            new NoteModel(Pitch.A3, Duration.Sixteenth),
-            new NoteModel(Pitch.C4, Duration.Sixteenth),
-            new NoteModel(Pitch.D4, Duration.Sixteenth),
-            new NoteModel(Pitch.G3, Duration.Eighth),
-            new NoteModel(Pitch.A3, Duration.Eighth),
-            new NoteModel(Pitch.C4, Duration.Eighth),
-            new NoteModel(Pitch.D4, Duration.Eighth),
-            new NoteModel(Pitch.C4, Duration.Eighth),
-            new NoteModel(Pitch.D4, Duration.Eighth),
-            new NoteModel(Pitch.G3, Duration.Quarter),
-            new NoteModel(Pitch.A3, Duration.Quarter),
-            new NoteModel(Pitch.C4, Duration.Quarter),
-            new NoteModel(Pitch.D4, Duration.Quarter),
+            new NoteModel(Pitch.F3, Duration.Eighth, 0),
+            new NoteModel(Pitch.G3, Duration.Eighth, 0.125),
+            new NoteModel(Pitch.B3, Duration.Eighth, 0.125),
+            new NoteModel(Pitch.C4, Duration.Eighth, 0.250),
+            new NoteModel(Pitch.E4, Duration.Eighth, 0.250)
         );
     }, []);
 
     return <>
-        <button onClick={play}>Play</button>
+        <button onClick={play} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button>
         <div className="staff" onClick={initializeMIDI}>
             <div style={getIntroContainerStyle()}>
                 <div className="staff-space"></div>

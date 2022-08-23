@@ -3,7 +3,7 @@ import { NotationModel } from './Notation.model';
 
 export class NoteModel extends NotationModel {
     pitch: Pitch;
-    stemStretchFactor: number = 1.0;
+    stemStretchFactor: number = 1.0; // Move out of model, UI logic should not be mixed with data
 
     constructor(pitch: Pitch, durationType: Duration, startBeat: number = 0) {
         super();
