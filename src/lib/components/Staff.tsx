@@ -147,6 +147,17 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         }
     }
 
+    const getIntroContainerStyle = () => {
+        const ksWidth = ((sharps?.length ?? 0) + (flats?.length ?? 0)) * (KeySize + 5);
+        const tsWidth = 40;
+        const clefWidth = 50;
+        return {
+            width: `${ksWidth + tsWidth + clefWidth + 25}px`,
+            display: 'inline-block',
+            borderBottom: '1px solid #000'
+        }
+    }
+
     const getMeasures = () => {
         if (notes.length == 0) {
             return [];
@@ -272,20 +283,35 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
 
     useEffect(() => {
         addNotes(
-            new NoteModel(Pitch.G4, Duration.Sixteenth, 0),
-            new NoteModel(Pitch.Fs4, Duration.Sixteenth, (1/16)),
-            new NoteModel(Pitch.E4, Duration.Eighth, (1/16) * 2),
-            new NoteModel(Pitch.D4, Duration.Eighth, 0.375),
-            new NoteModel(Pitch.E4, Duration.Eighth, 0.500)
+            new NoteModel(Pitch.G3, Duration.Sixteenth),
+            new NoteModel(Pitch.A3, Duration.Sixteenth),
+            new NoteModel(Pitch.C4, Duration.Sixteenth),
+            new NoteModel(Pitch.D4, Duration.Sixteenth),
+            new NoteModel(Pitch.G3, Duration.Eighth),
+            new NoteModel(Pitch.A3, Duration.Eighth),
+            new NoteModel(Pitch.C4, Duration.Eighth),
+            new NoteModel(Pitch.D4, Duration.Eighth),
+            new NoteModel(Pitch.C4, Duration.Eighth),
+            new NoteModel(Pitch.D4, Duration.Eighth),
+            new NoteModel(Pitch.G3, Duration.Quarter),
+            new NoteModel(Pitch.A3, Duration.Quarter),
+            new NoteModel(Pitch.C4, Duration.Quarter),
+            new NoteModel(Pitch.D4, Duration.Quarter),
         );
     }, []);
 
     return <>
         <button onClick={play}>Play</button>
         <div className="staff" onClick={initializeMIDI}>
-            <div className="clef-container">{getClef()}</div>
-            <div className="key-signature-container" style={getKeySignatureStyle()}>{getKeySignatureAccidentals()}</div>
-            <div className="ts-container" style={getTimeSignatureStyle()}>{getTimeSignature()}</div>
+            <div style={getIntroContainerStyle()}>
+                <div className="staff-space"></div>
+                <div className="staff-space"></div>
+                <div className="staff-space"></div>
+                <div className="staff-space"></div>
+                <div className="clef-container">{getClef()}</div>
+                <div className="key-signature-container" style={getKeySignatureStyle()}>{getKeySignatureAccidentals()}</div>
+                <div className="ts-container" style={getTimeSignatureStyle()}>{getTimeSignature()}</div>
+            </div>
             {getMeasures()}
         </div>
     </>

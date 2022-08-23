@@ -4,7 +4,7 @@ import './StaffMeasure.scss';
 import { NotationModel, NoteModel, RestModel } from '../models';
 import Rest from './StaffRest';
 import StaffNote from './StaffNote';
-import { NaturalNote, ClefType, Pitch } from '../types';
+import { NaturalNote, ClefType, Pitch, Duration } from '../types';
 import StaffRest from './StaffRest';
 
 /**
@@ -38,12 +38,27 @@ interface StaffMeasureProps {
 function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     const MinMeasureWidth: number = 400;
     const SpaceHeight: number = 20;
-    const NoteLeftOffset: number = 40;
     const NoteSize: number = 30;
     const NoteSpacing: number = 40;
+    const BaseStemHeight: number = 75;
+    
+    const id = 'measure' + notes[0].startBeat;
 
     const getNotationLeftPosition = (time: number, index: number) => {
-        return (NoteSize + NoteSpacing) * index;
+        const leftOffset = 25;
+        const accidentalWidth = 15;
+        
+        let total = 0;
+        for (let i = 0; i < index; i++) {
+            total += (NoteSize + NoteSpacing);
+            if (getNoteAccidental(notes[i]))
+                total += accidentalWidth;
+        }
+
+        if (getNoteAccidental(notes[index]))
+            total += accidentalWidth;
+
+        return total + leftOffset;
     }
 
     const getNotationBottomPosition = (pitch: Pitch) => {
@@ -96,72 +111,169 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         return (middleCPosition + pitchPosition) * noteHeight;
     }
 
-    const getStaffWidth = () => {
+    const getMeasureWidth = () => {
         const lastNote = notes[notes.length - 1];
-        return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote.startBeat, notes.length - 1) + NoteLeftOffset);
+        const rightOffset = 30;
+        return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote.startBeat, notes.length - 1) + rightOffset);
     };
 
     const getStaffStyle = () => {
         return {
-            width: `${getStaffWidth()}px`
+            width: `${getMeasureWidth()}px`
         };
     }
 
-    const getStaffSpaceStyle = () => {
-        return {
+    const getNoteAccidental = (note: NoteModel) => {
+        const noteFromPitch = note.pitch % 12;
+        const sharpedInKey = sharps?.includes(noteFromPitch) ?? false;
+        const flattedInKey = flats?.includes(noteFromPitch) ?? false;
+        const prevNoteSharpedInKey = sharps?.includes(noteFromPitch-1) ?? false;
+        const nextNoteFlattedInKey = flats?.includes(noteFromPitch+1) ?? false;
+        const isNatural = Object.values(NaturalNote).includes(noteFromPitch);
 
-        };
+        let accidental = undefined;
+
+        if (isNatural && (sharpedInKey || flattedInKey)) {
+            // For example, key is D (sharp F by default) but note is natural F
+            // means explicit natural accidental should be written next to note
+            accidental = 'natural';
+        }
+        else if (!isNatural && !prevNoteSharpedInKey) {
+            // For example: note if F# (not natural) and key is C (previous note F is not sharped)
+            // means explicit sharp should be written next to note
+            accidental = 'sharp';
+        }
+        else if (!isNatural && !nextNoteFlattedInKey) {
+            // For example: note is Bb (not natural) and key is C (next note B is not flatted)
+            // means explicit flat should be written next to note
+            accidental = 'flat';
+        }
+
+        // Otherwise, note is either sharped/flatted in correspondence with key,
+        // or note is natural and not sharped/flatted by key.
+        // In either case, an accidental is not written next to the note.
+
+        return accidental;
+    }
+
+    const getConnectingStem = (startIndex: number, endIndex: number) => {
+        const durationType = notes[startIndex].durationType;
+        const stemStartXPos = getNotationLeftPosition(0, startIndex) - (NoteSize / 2) + 2;
+        const stemStartYPos = getNotationBottomPosition(notes[startIndex].pitch) - BaseStemHeight;
+        const stemEndXPos = getNotationLeftPosition(0, endIndex) - (NoteSize / 2);
+        const stemEndYPos = getNotationBottomPosition(notes[endIndex].pitch) - BaseStemHeight;
+        const stemWidth = stemEndXPos - stemStartXPos - 1;
+        //const degrees = Math.atan2(stemEndYPos - stemStartYPos, stemEndXPos - stemStartXPos) * 180 / Math.PI;
+
+        let b = document.createElement('div');
+        b.id = notes[endIndex].startBeat.toString();
+        b.style.position = 'absolute';
+        b.style.left = `${stemStartXPos}px`;
+        b.style.bottom = `${stemStartYPos}px`;
+        b.style.width = `${stemWidth}px`;
+        b.style.border = '3px solid #000';
+        //b.style.transform = `rotate(${-degrees}deg)`;
+        //b.style.transformOrigin = 'top-left';
+        //b.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
+        window.setTimeout(() => document.getElementById(id).appendChild(b));
+
+        if (durationType == Duration.Sixteenth) {
+            let b2 = document.createElement('div');
+            b2.id = notes[endIndex].startBeat.toString();
+            b2.style.position = 'absolute';
+            b2.style.left = `${stemStartXPos}px`;
+            b2.style.bottom = `${stemStartYPos + 10}px`;
+            b2.style.width = `${stemWidth}px`;
+            b2.style.border = '3px solid #000';
+            //b2.style.transform = `rotate(${-degrees}deg)`;
+            //b2.style.transformOrigin = 'top-left';
+            //b2.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
+            window.setTimeout(() => document.getElementById(id).appendChild(b2));
+        }
+
+        if (durationType == Duration.ThirtySecond) {
+            let b3 = document.createElement('div');
+            b3.id = notes[endIndex].startBeat.toString();
+            b3.style.position = 'absolute';
+            b3.style.left = `${stemStartXPos}px`;
+            b3.style.bottom = `${stemStartYPos + 20}px`;
+            b3.style.width = `${stemWidth}px`;
+            b3.style.border = '3px solid #000';
+            //b3.style.transform = `rotate(${-degrees}deg)`;
+            //b3.style.transformOrigin = 'top-left';
+            //b3.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
+            window.setTimeout(() => document.getElementById(id).appendChild(b3));
+        }
     }
 
     const getNotations = () => {
+        let lastHorizontalStemIndex = -1;
+        
         return notes?.map((notationModel: NotationModel, index) => {
             if (notationModel instanceof NoteModel) {
-                const noteFromPitch = notationModel.pitch % 12;
-                const sharpedInKey = sharps?.includes(noteFromPitch) ?? false;
-                const flattedInKey = flats?.includes(noteFromPitch) ?? false;
-                const prevNoteSharpedInKey = sharps?.includes(noteFromPitch-1) ?? false;
-                const nextNoteFlattedInKey = flats?.includes(noteFromPitch+1) ?? false;
-                const isNatural = Object.values(NaturalNote).includes(noteFromPitch);
+                
+                if (index > lastHorizontalStemIndex &&
+                    (notationModel.durationType == Duration.ThirtySecond ||
+                    notationModel.durationType == Duration.Sixteenth ||
+                    notationModel.durationType == Duration.Eighth)) {
+                    
+                    let stem = undefined;
 
-                let accidental = undefined;
-                if (isNatural && (sharpedInKey || flattedInKey)) {
-                    // For example, key is D (sharp F by default) but note is natural F
-                    // means explicit natural accidental should be written next to note
-                    accidental = 'natural';
-                }
-                else if (!isNatural && !prevNoteSharpedInKey) {
-                    // For example: note if F# (not natural) and key is C (previous note F is not sharped)
-                    // means explicit sharp should be written next to note
-                    accidental = 'sharp';
-                }
-                else if (!isNatural && !nextNoteFlattedInKey) {
-                    // For example: note is Bb (not natural) and key is C (next note B is not flatted)
-                    // means explicit flat should be written next to note
-                    accidental = 'flat';
+                    if (index < notes.length - 1 && notes[index+1].durationType == notationModel.durationType) {
+                        if (index < notes.length - 2 && notes[index+2].durationType == notationModel.durationType) {
+                            if (index < notes.length - 3 && notes[index+3].durationType == notationModel.durationType) {
+                                console.log(getNotationBottomPosition(notes[index+3].pitch));
+                                console.log(getNotationBottomPosition(notes[index].pitch));
+                                console.log((getNotationBottomPosition(notes[index].pitch) - getNotationBottomPosition(notes[index+3].pitch)) / BaseStemHeight);
+                                // Four notes
+                                stem = getConnectingStem(index, index+3);
+                                const stemProportion3 = (getNotationBottomPosition(notes[index+3].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
+                                notes[index+3].stemStretchFactor = 1 + stemProportion3;
+                                const stemProportion2 = (getNotationBottomPosition(notes[index+2].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
+                                notes[index+2].stemStretchFactor = 1 + stemProportion2;
+                                const stemProportion1 = (getNotationBottomPosition(notes[index+1].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
+                                notes[index+1].stemStretchFactor = 1 + stemProportion1;
+                                lastHorizontalStemIndex = index+3;
+                            }
+                            else {
+                                // Three notes
+                                stem = getConnectingStem(index, index+2);
+                                const stemProportion2 = (getNotationBottomPosition(notes[index+2].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
+                                notes[index+2].stemStretchFactor = 1 + stemProportion2;
+                                const stemProportion1 = (getNotationBottomPosition(notes[index+1].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
+                                notes[index+1].stemStretchFactor = 1 + stemProportion1;
+                                lastHorizontalStemIndex = index+2;
+                            }
+                        }
+                        else {
+                            // Two notes
+                            stem = getConnectingStem(index, index+1);
+                            const stemProportion1 = (getNotationBottomPosition(notes[index+1].pitch) - getNotationBottomPosition(notes[index].pitch)) / BaseStemHeight;
+                            notes[index+1].stemStretchFactor = 1 + stemProportion1;
+                            lastHorizontalStemIndex = index+1;
+                        }
+                    }
                 }
 
-                // Otherwise, note is either sharped/flatted in correspondence with key,
-                // or note is natural and not sharped/flatted by key.
-                // In either case, do not write an accidental next to the note.
-
-                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index) + NoteLeftOffset;
+                const accidental = getNoteAccidental(notationModel);
+                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index);
                 const bottomPosition = getNotationBottomPosition(notationModel.pitch);
-                return (<StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />);
+                return <StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />;
             }
             else if (notationModel instanceof RestModel) {
-                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index) + NoteLeftOffset;
-                return (<StaffRest model={notationModel} left={leftPosition} />);
+                const leftPosition = getNotationLeftPosition(notationModel.startBeat, index);
+                return <StaffRest model={notationModel} left={leftPosition} />;
             }
         });
     }
 
     return (
-        <div className="staff-measure" style={getStaffStyle()}>
+        <div id={id} className="staff-measure" style={getStaffStyle()}>
             <div className="notation-container">{getNotations()}</div>
-            <div className="staff-space" style={getStaffSpaceStyle()}></div>
-            <div className="staff-space" style={getStaffSpaceStyle()}></div>
-            <div className="staff-space" style={getStaffSpaceStyle()}></div>
-            <div className="staff-space" style={getStaffSpaceStyle()}></div>
+            <div className="staff-space"></div>
+            <div className="staff-space"></div>
+            <div className="staff-space"></div>
+            <div className="staff-space"></div>
         </div>
     );
 }

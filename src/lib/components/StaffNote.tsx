@@ -68,6 +68,7 @@ function StaffNote({ model, left, bottom, accidental }: StaffNoteProps) {
 
     const getStemStyle = () => {
         return {
+            transform: `scale(1, ${model.stemStretchFactor})`,
             width: `${NoteSize}px`,
             height: `${NoteSize * 2.5}px`,
 

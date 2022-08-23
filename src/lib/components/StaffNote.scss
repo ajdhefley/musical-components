@@ -25,6 +25,7 @@ $accidental-size: 40px;
 }
 
 .stem {
+    transform-origin: top;
     position: absolute;
     background-repeat: no-repeat;
     background-position: right center;

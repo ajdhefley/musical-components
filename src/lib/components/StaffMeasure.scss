@@ -3,15 +3,6 @@
 $staff-border-size: 1px;
 $staff-border: $staff-border-size solid #000;
 $staff-height: 20px;
-$key-signature-notation-size: 40px;
-$clef-width: 50px;
-$clef-treble-height: 120px;
-$clef-bass-height: 100px;
-$ts-width: 40px;
-$ts-height: 40px;
-$clef-container-width: 50px;
-$key-signature-container-width: 115px;
-$ts-container-width: 25px;
 
 div.staff-measure {
     border-left: $staff-border;
@@ -35,5 +26,4 @@ div.staff-space {
     position: absolute;
     bottom: 0;
     height: 100px;
-    left: $clef-container-width + $key-signature-container-width + $ts-container-width;
 }
