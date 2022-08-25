@@ -1,5 +1,7 @@
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Staff from '../lib/components/Staff';
+import { ClefType, Duration } from '../lib/types';
 import { store } from '../redux-store';
 
 import './App.scss';
@@ -17,11 +19,13 @@ function App() {
             <Provider store={store}>
                 <BrowserRouter>
                     <Switch>
-                        <Route exact path={App.Routes.ExerciseSelections} component={ExerciseSelection} />
+                        {/* <Route exact path={App.Routes.ExerciseSelections} component={ExerciseSelection} />
                         <Route exact path={App.Routes.ExerciseOptions} component={ExerciseOptions} />
                         <Route exact path={App.Routes.ExerciseResults} component={ExerciseResults} />
                         <Route exact path={App.Routes.ExercisePage} component={Exercise} />
-                        <Route path="*" component={ErrorPage} />
+                        <Route path="*" component={ErrorPage} /> */}
+
+                        <Staff clef={ClefType.Treble} beatsPerMeasure={4} beatDuration={Duration.Quarter} beatsPerMinute={120} /> 
                     </Switch>
                 </BrowserRouter>
             </Provider>

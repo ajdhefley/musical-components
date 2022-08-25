@@ -1,22 +1,37 @@
 export class PitchOscillator {
     private context: AudioContext;
     private node: OscillatorNode;
+    private gainNode: GainNode;
+    private activePitch: number;
 
-    init() {
-        this.context = new AudioContext();
-        this.context.resume();
+    init(context: AudioContext) {
+        this.context = context;
+        this.node = this.context.createOscillator();
+        this.gainNode = context.createGain();
+        return this;
     }
 
     generateFrequencyFromPitch(pitch: number) {
         const frequency = this.convertPitchToFrequency(pitch);
-        this.node = this.context.createOscillator();
+        this.gainNode.connect(this.context.destination);
+        this.node.connect(this.gainNode);
         this.node.frequency.setTargetAtTime(frequency, this.context.currentTime, 0);
-        this.node.connect(this.context.destination);
+        //this.node.connect(this.context.destination);
         this.node.start(0);
+        this.activePitch = pitch;
+        return this;
     }
 
     stop() {
         this.node.stop();
+    }
+
+    getActivePitch() {
+        return this.activePitch;
+    }
+
+    setVolume(value) {
+        this.gainNode.gain.setValueAtTime(value, this.context.currentTime);
     }
 
     private convertPitchToFrequency(pitch: number) {

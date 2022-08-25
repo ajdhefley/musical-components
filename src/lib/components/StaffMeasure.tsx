@@ -36,7 +36,6 @@ interface StaffMeasureProps {
  * 
  **/
 function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
-    console.log(notes);
     const MinMeasureWidth: number = 400;
     const SpaceHeight: number = 20;
     const NoteSize: number = 30;
@@ -186,7 +185,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         const stemWidth = stemEndXPos - stemStartXPos - 1;
         //const degrees = Math.atan2(stemEndYPos - stemStartYPos, stemEndXPos - stemStartXPos) * 180 / Math.PI;
 
-        let b = document.createElement('div');
+        let b = window.document.createElement('div');
         b.id = notes[endIndex].startBeat.toString();
         b.style.position = 'absolute';
         b.style.left = `${stemStartXPos}px`;
@@ -196,10 +195,10 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         //b.style.transform = `rotate(${-degrees}deg)`;
         //b.style.transformOrigin = 'top-left';
         //b.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
-        window.setTimeout(() => document.getElementById(id).appendChild(b));
+        window.setTimeout(() => window.document.getElementById(id).appendChild(b));
 
         if (durationType == Duration.Sixteenth) {
-            let b2 = document.createElement('div');
+            let b2 = window.document.createElement('div');
             b2.id = notes[endIndex].startBeat.toString();
             b2.style.position = 'absolute';
             b2.style.left = `${stemStartXPos}px`;
@@ -209,11 +208,11 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
             //b2.style.transform = `rotate(${-degrees}deg)`;
             //b2.style.transformOrigin = 'top-left';
             //b2.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
-            window.setTimeout(() => document.getElementById(id).appendChild(b2));
+            window.setTimeout(() => window.document.getElementById(id).appendChild(b2));
         }
 
         if (durationType == Duration.ThirtySecond) {
-            let b3 = document.createElement('div');
+            let b3 = window.document.createElement('div');
             b3.id = notes[endIndex].startBeat.toString();
             b3.style.position = 'absolute';
             b3.style.left = `${stemStartXPos}px`;
@@ -223,7 +222,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
             //b3.style.transform = `rotate(${-degrees}deg)`;
             //b3.style.transformOrigin = 'top-left';
             //b3.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
-            window.setTimeout(() => document.getElementById(id).appendChild(b3));
+            window.setTimeout(() => window.document.getElementById(id).appendChild(b3));
         }
     }
 

@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import './ExerciseSelections.scss';
@@ -8,24 +8,20 @@ import { useAppDispatch } from '../redux-hooks';
 
 function ExerciseSelections() {
     const dispatch = useAppDispatch();
-    const { data } = useQuery(gql`
-        query {
-            exerciseTypes {
-                exerciseTypeId,
-                name,
-                description,
-                requiresNoteTypeOptions,
-                requiresPitchTypeOptions,
-                requiresClefTypeOptions,
-                requiresOctaveOptions
-            }
-        }
-    `);
+    const [exerciseTypes, setExerciseTypes] = useState(new Array());
+
+    console.log(process.env);
+    fetch(`${process.env.API_URL}/exercise/types`)
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data);
+            setExerciseTypes(data);
+        });
     
     return (
         <div className="content-wrapper">
             <p className="intro-text">Select an exercise below.</p>
-            {data?.exerciseTypes.map((exerciseType) => (
+            {exerciseTypes.map((exerciseType) => (
                 <Link className="exercise-container" to={App.Routes.ExerciseOptions} onClick={() => dispatch(setRootExercise(exerciseType))}>
                     <div className="exercise-icon"></div>
                     <div className="exercise-text">

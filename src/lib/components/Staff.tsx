@@ -255,19 +255,24 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     }
 
     const play = async () => {
-        for (let note of notes) {
-            const baseBpm = 60;
-            const baseBeatDuration = 1000;
-            const beatDuration = (baseBpm / beatsPerMinute) * baseBeatDuration;
-            const noteDuration = getBeatDurationProportion(note.durationType) * beatDuration;
+        let lastNote = notes[notes.length - 1];
+        const lastTick = lastNote.startBeat + (1/lastNote.durationType);
 
-            activateNotation(note);
-
-            if (note instanceof NoteModel) {
-                dispatchNoteMidi(note.pitch, noteDuration);
-            }
-
-            await new Promise((resolve) => setTimeout(resolve, noteDuration));
+        for (let i = 0; i < lastTick; i += 1/32) {
+            await Promise.all(
+                notes
+                    .filter(n => n instanceof NoteModel)
+                    .filter(n => n.startBeat == i)
+                    .map((note: NoteModel) => {
+                        const baseBpm = 60;
+                        const baseBeatDuration = 1000;
+                        const beatDuration = (baseBpm / beatsPerMinute) * baseBeatDuration;
+                        const noteDuration = getBeatDurationProportion(note.durationType) * beatDuration;
+                        activateNotation(note);
+                        dispatchNoteMidi(note.pitch, noteDuration);
+                        return new Promise((resolve) => setTimeout(resolve, noteDuration));
+                    })
+            );
         }
 
         // Set all notes to inactive.
