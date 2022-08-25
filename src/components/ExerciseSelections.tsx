@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import './ExerciseSelections.scss';
@@ -10,13 +10,14 @@ function ExerciseSelections() {
     const dispatch = useAppDispatch();
     const [exerciseTypes, setExerciseTypes] = useState(new Array());
 
-    console.log(process.env);
-    fetch(`${process.env.API_URL}/exercise/types`)
-        .then((res) => res.json())
-        .then((data) => {
-            console.log(data);
-            setExerciseTypes(data);
-        });
+    useEffect(() => {
+        fetch(`${process.env.API_URL}/exercise/types`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+                setExerciseTypes(data);
+            });
+    }, []);
     
     return (
         <div className="content-wrapper">
