@@ -76,8 +76,6 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
         const clefWidth = 50;
         return {
             width: `${ksWidth + tsWidth + clefWidth + 25}px`,
-            display: 'inline-block',
-            borderBottom: '1px solid #000'
         }
     }
 
@@ -135,7 +133,7 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     return <>
         <button onClick={play} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button>
         <div className="staff">
-            <div style={getIntroContainerStyle()}>
+            <div className="staff-intro" style={getIntroContainerStyle()}>
                 <StaffLines />
                 <StaffClef type={clef} />
                 <StaffKeySignature clef={clef} sharps={sharps} flats={flats} />

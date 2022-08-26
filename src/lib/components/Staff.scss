@@ -6,4 +6,11 @@
     border-right: $staff-border;
     position: relative;
     display: inline-block;
+    height: (($staff-space-height + 1) * 4) - ($staff-line-height * 5) + 1;
+}
+
+.staff-intro {
+    display: inline-block;
+    border-bottom: 1px solid #000;
+    height: (($staff-space-height + 1) * 4) - ($staff-line-height * 5) + 1;
 }

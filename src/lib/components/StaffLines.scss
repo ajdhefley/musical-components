@@ -2,7 +2,7 @@
 
 .staff-space {
     width: 100%;
-    height: $staff-height - $staff-border-size;
+    height: $staff-space-height - $staff-line-height;
     box-shadow: 0px -1px 3px -2px #000, 0px 1px 3px -2px #000;
     border-top: $staff-border;
 
