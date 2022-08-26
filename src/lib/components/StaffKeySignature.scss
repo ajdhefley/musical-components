@@ -1,0 +1,25 @@
+@import "../styles/mixins";
+@import "../styles/variables";
+
+.key-signature-container {
+    position: absolute;
+    bottom: 0;
+    height: 100px;
+    left: $clef-container-width;
+}
+
+.key-symbol {
+    width: $key-signature-notation-size;
+    height: $key-signature-notation-size;
+    position: absolute;
+}
+
+.sharp {
+    @extend .key-symbol;
+    @include background-image('sharp.svg');
+}
+
+.flat {
+    @extend .key-symbol;
+    @include background-image('flat.svg');
+}

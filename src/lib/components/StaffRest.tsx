@@ -1,7 +1,7 @@
 import { Component } from 'react';
 
 import './StaffRest.scss';
-import { RestModel } from '../models/Rest.model';
+import { RestModel } from '../models/rest.model';
 
 /**
  * 

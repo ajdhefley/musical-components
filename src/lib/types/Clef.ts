@@ -1,4 +1,4 @@
-export enum ClefType {
+export enum Clef {
     Treble,
     Bass
 }

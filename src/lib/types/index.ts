@@ -1,3 +1,4 @@
-export * from './Clef';
-export * from './Duration';
-export * from './Pitch';
+export * from './accidental';
+export * from './clef';
+export * from './duration';
+export * from './pitch';

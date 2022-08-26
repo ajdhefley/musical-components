@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import './StaffNote.scss';
-import { NoteModel } from '../models/Note.model';
-import { Duration } from '../types';
+import { NoteModel } from '../models/note.model';
+import { Accidental, Duration } from '../types';
 
 /**
  * 
@@ -26,7 +26,7 @@ interface StaffNoteProps {
     /**
      * 
      **/
-    accidental: 'sharp' | 'flat' | 'natural' | undefined;
+    accidental: Accidental | undefined;
 }
 
 /**
@@ -116,13 +116,13 @@ function StaffNote({ model, left, bottom, accidental }: StaffNoteProps) {
         return <div className={getStemClass()} style={getStemStyle()}></div>;
     }
 
-    const getAccidental = () => {
+    const getAccidentalElement = () => {
         return <div className={`accidental ${accidental}`} style={{ left: `${-NoteSize}px`}}></div>;
     }
 
     return (
         <div data-note={model} className={getNoteClass()} style={getNoteStyle()}>
-            {getAccidental()}
+            {getAccidentalElement()}
             {getStem()}
             {getFlag()}
         </div>

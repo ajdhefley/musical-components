@@ -1,5 +1,5 @@
 import { Duration } from '../types';
-import { NotationModel } from './Notation.model';
+import { NotationModel } from './notation.model';
 
 export class RestModel extends NotationModel {
     constructor(durationType: Duration, startBeat: number = 0) {

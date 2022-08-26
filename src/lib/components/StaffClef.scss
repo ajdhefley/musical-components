@@ -1,0 +1,27 @@
+@import "../styles/mixins";
+@import "../styles/variables";
+
+.clef-symbol {
+    width: $clef-width;
+    position: absolute;
+}
+
+.treble {
+    @extend .clef-symbol;
+    @include background-image('clef-treble.svg');
+    height: $clef-treble-height;
+}
+
+.bass {
+    @extend .clef-symbol;
+    @include background-image('clef-bass.svg');
+    height: $clef-bass-height;
+}
+
+.clef-container {
+    position: absolute;
+    bottom: 0;
+    height: 100px;
+    width: $clef-container-width;
+    
+}

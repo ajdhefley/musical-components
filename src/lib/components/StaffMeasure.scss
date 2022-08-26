@@ -1,4 +1,5 @@
 @import "../styles/mixins";
+@import "../styles/variables";
 
 $staff-border-size: 1px;
 $staff-border: $staff-border-size solid #000;
@@ -9,17 +10,6 @@ div.staff-measure {
     border-right: $staff-border;
     position: relative;
     display: inline-block;
-}
-
-div.staff-space {
-    width: 100%;
-    height: $staff-height - $staff-border-size;
-    box-shadow: 0px -1px 3px -2px #000, 0px 1px 3px -2px #000;
-    border-top: $staff-border;
-
-    &:last-child {
-        border-bottom: $staff-border;
-    }
 }
 
 .notation-container {

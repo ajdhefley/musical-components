@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Staff from '../lib/components/Staff';
-import { Duration } from '../lib/types';
+import { Clef, Duration } from '../lib/types';
 import { store } from '../redux-store';
 
 import './App.scss';

@@ -4,8 +4,10 @@ import './StaffMeasure.scss';
 import { NotationModel, NoteModel, RestModel } from '../models';
 import Rest from './StaffRest';
 import StaffNote from './StaffNote';
-import { NaturalNote, ClefType, Pitch, Duration } from '../types';
+import { NaturalNote, Clef, Pitch, Duration } from '../types';
 import StaffRest from './StaffRest';
+import StaffLines from './StaffLines';
+import { MusicLogic } from '../music-logic';
 
 /**
  * 
@@ -19,7 +21,7 @@ interface StaffMeasureProps {
     /**
      * The treble or bass clef, which affects note position.
      **/
-    clef: ClefType;
+    clef: Clef;
 
     /**
      * Notes that should be implicitly sharped (by key) without being denoted by an explicit accidental.
@@ -42,7 +44,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     const NoteSpacing: number = 40;
     const BaseStemHeight: number = 75;
     
-    const id = 'measure' + notes[0].startBeat;
+    const id = 'measure' + (notes?.length > 0 ? notes[0].startBeat : '0');
 
     const getNoteAt = (beat: number) => {
         for (let note of notes) {
@@ -67,12 +69,12 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
                 total += (NoteSize + NoteSpacing);
             }
 
-            if (getNoteAccidental(note)) {
+            if (MusicLogic.getAccidentalForPitch(note.pitch)) {
                 total += accidentalWidth;
             }
         }
 
-        if (notation instanceof NoteModel && getNoteAccidental(notation)) {
+        if (notation instanceof NoteModel && MusicLogic.getAccidentalForPitch(notation.pitch)) {
             total += accidentalWidth;
         }
 
@@ -107,11 +109,11 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         // to be known ahead of time.
         let middleCPosition = 0;
         switch (clef) {
-            case ClefType.Treble:
+            case Clef.Treble:
                 // Occupies the 3rd space from the bottom, which is the 5th index where the bottom line is 0
                 middleCPosition = 5;
                 break;
-            case ClefType.Bass:
+            case Clef.Bass:
                 // Occupies a whole step above the 4th line from the bottom, which is the 10th index where the bottom line is 0 
                 middleCPosition = 10;
                 break;
@@ -130,6 +132,10 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     }
 
     const getMeasureWidth = () => {
+        if (notes.length == 0) {
+            return MinMeasureWidth;
+        }
+        
         const lastNote = notes[notes.length - 1];
         const rightOffset = 30;
         return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote) + rightOffset);
@@ -139,39 +145,6 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         return {
             width: `${getMeasureWidth()}px`
         };
-    }
-
-    const getNoteAccidental = (note: NoteModel) => {
-        const noteFromPitch = note.pitch % 12;
-        const sharpedInKey = sharps?.includes(noteFromPitch) ?? false;
-        const flattedInKey = flats?.includes(noteFromPitch) ?? false;
-        const prevNoteSharpedInKey = sharps?.includes(noteFromPitch-1) ?? false;
-        const nextNoteFlattedInKey = flats?.includes(noteFromPitch+1) ?? false;
-        const isNatural = Object.values(NaturalNote).includes(noteFromPitch);
-
-        let accidental = undefined;
-
-        if (isNatural && (sharpedInKey || flattedInKey)) {
-            // For example, key is D (sharp F by default) but note is natural F
-            // means explicit natural accidental should be written next to note
-            accidental = 'natural';
-        }
-        else if (!isNatural && !prevNoteSharpedInKey) {
-            // For example: note if F# (not natural) and key is C (previous note F is not sharped)
-            // means explicit sharp should be written next to note
-            accidental = 'sharp';
-        }
-        else if (!isNatural && !nextNoteFlattedInKey) {
-            // For example: note is Bb (not natural) and key is C (next note B is not flatted)
-            // means explicit flat should be written next to note
-            accidental = 'flat';
-        }
-
-        // Otherwise, note is either sharped/flatted in correspondence with key,
-        // or note is natural and not sharped/flatted by key.
-        // In either case, an accidental is not written next to the note.
-
-        return accidental;
     }
 
     const getConnectingStem = (startIndex: number, endIndex: number) => {
@@ -277,7 +250,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
                     }
                 }
 
-                const accidental = getNoteAccidental(notationModel);
+                const accidental = MusicLogic.getAccidentalForPitch(notationModel.pitch);
                 const leftPosition = getNotationLeftPosition(notationModel);
                 const bottomPosition = getNotationBottomPosition(notationModel.pitch);
                 return <StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />;
@@ -292,10 +265,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     return (
         <div id={id} className="staff-measure" style={getStaffStyle()}>
             <div className="notation-container">{getNotations()}</div>
-            <div className="staff-space"></div>
-            <div className="staff-space"></div>
-            <div className="staff-space"></div>
-            <div className="staff-space"></div>
+            <StaffLines />
         </div>
     );
 }
