@@ -2,9 +2,19 @@
 @import "../styles/variables";
 
 .ts-symbol {
-    width: $ts-width;
-    height: $ts-height;
+    width: $ts-digit-width;
+    height: $ts-digit-height;
     position: absolute;
+}
+
+.ts-top {
+    top: 0;
+    left: calc($ts-container-width / 2) - calc($ts-digit-width / 2);
+}
+
+.ts-bottom {
+    top: $ts-digit-height;
+    left: calc($ts-container-width / 2) - calc($ts-digit-width / 2);
 }
 
 .ts-2 {
@@ -45,7 +55,7 @@
 .ts-container {
     position: absolute;
     bottom: 0;
-    height: 100px;
-    height: 80px;
-    top: 0;
+    width: $ts-container-width;
+    height: $ts-digit-height * 2;
+    top: calc($staff-height / 2) - $ts-digit-height;
 }

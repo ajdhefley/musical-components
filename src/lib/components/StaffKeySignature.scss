@@ -3,8 +3,8 @@
 
 .key-signature-container {
     position: absolute;
-    bottom: -($staff-line-height * 5);
-    height: 100px;
+    bottom: 0;
+    height: $staff-height;
     left: $clef-container-width;
 }
 

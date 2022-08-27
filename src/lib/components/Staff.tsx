@@ -58,8 +58,6 @@ interface StaffProps {
  * 
  **/
 function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, flats, initialNotations }: StaffProps) {
-    const KeySize: number = 17;
-
     const [midiHandler] = useState(new MidiBrowserHandler());
     const [notations, setNotations] = useState(new Array<NotationModel>());
 
@@ -71,7 +69,8 @@ function Staff({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, fl
     }, []);
 
     const getIntroContainerStyle = () => {
-        const ksWidth = ((sharps?.length ?? 0) + (flats?.length ?? 0)) * (KeySize + 5);
+        const keySize = 17;
+        const ksWidth = ((sharps?.length ?? 0) + (flats?.length ?? 0)) * (keySize + 5);
         const tsWidth = 40;
         const clefWidth = 50;
         return {

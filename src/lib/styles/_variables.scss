@@ -1,10 +1,12 @@
 $staff-line-height: 1px;
 $staff-border: $staff-line-height solid #000;
-$staff-space-height: 20px;
+$staff-space-height: 25px;
+$staff-height: ($staff-space-height * 4) + ($staff-line-height * 5);
 $key-signature-notation-size: 40px;
 $clef-width: 50px;
 $clef-treble-height: 120px;
 $clef-bass-height: 100px;
 $clef-container-width: 50px;
-$ts-width: 40px;
-$ts-height: 40px;
+$ts-digit-width: 40px;
+$ts-digit-height: 40px;
+$ts-container-width: 65px;

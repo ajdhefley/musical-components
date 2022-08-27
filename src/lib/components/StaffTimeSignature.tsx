@@ -30,10 +30,10 @@ function StaffTimeSignature({ beatsPerMeasure, beatDuration, sharps, flats }: St
     const KeySize: number = 17;
 
     const getTimeSignature = () => {
-        return (<div>
-            <div className={`ts-${beatsPerMeasure}`} style={{ top: 0 }}></div>
-            <div className={`ts-${beatDuration}`} style={{ bottom: 0 }}></div>
-        </div>);
+        return <>
+            <div className={`ts-top ts-${beatsPerMeasure}`}></div>
+            <div className={`ts-bottom ts-${beatDuration}`}></div>
+        </>;
     }
 
     const getTimeSignatureStyle = () => {

@@ -10,18 +10,19 @@
     @extend .clef-symbol;
     @include background-image('clef-treble.svg');
     height: $clef-treble-height;
+    max-height: $staff-height;
 }
 
 .bass {
     @extend .clef-symbol;
     @include background-image('clef-bass.svg');
     height: $clef-bass-height;
+    max-height: $staff-height;
 }
 
 .clef-container {
     position: absolute;
     bottom: 0;
-    height: 100px;
+    height: $staff-height;
     width: $clef-container-width;
-    
 }

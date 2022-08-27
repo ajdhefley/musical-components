@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import './StaffMeasure.scss';
 import { NotationModel, NoteModel, RestModel } from '../models';
@@ -38,11 +38,17 @@ interface StaffMeasureProps {
  * 
  **/
 function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
-    const MinMeasureWidth: number = 400;
-    const SpaceHeight: number = 20;
-    const NoteSize: number = 30;
-    const NoteSpacing: number = 40;
-    const BaseStemHeight: number = 75;
+    const ref = useRef(null);
+    const [staffSpaceHeight, setStaffSpaceHeight] = useState(0);
+    const [noteSize] = useState(35);
+    const [noteSpacing] = useState(35);
+    const [defaultStemHeight] = useState(noteSize * 3 - (noteSize / 2));
+    const [minMeasureHeight] = useState(400);
+
+    useEffect(() => {
+        if (ref.current)
+            setStaffSpaceHeight(ref.current.clientHeight / 4);
+    }, [ref]);
     
     const id = 'measure' + (notes?.length > 0 ? notes[0].startBeat : '0');
 
@@ -66,7 +72,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
 
             if (note?.startBeat !== lastNote?.startBeat) {
                 lastNote = note;
-                total += (NoteSize + NoteSpacing);
+                total += (noteSize + noteSpacing);
             }
 
             if (MusicLogic.getAccidentalForPitch(note.pitch)) {
@@ -126,19 +132,19 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         const pitchPosition = basePitchPosition + totalNotes * octaveDiff;
 
         // One note per line and one per space equates to each note occupying a height of half each space
-        const noteHeight = SpaceHeight / 2;
+        const noteHeight = staffSpaceHeight / 2;
         
         return (middleCPosition + pitchPosition) * noteHeight;
     }
 
     const getMeasureWidth = () => {
         if (notes.length == 0) {
-            return MinMeasureWidth;
+            return minMeasureHeight;
         }
-        
+
         const lastNote = notes[notes.length - 1];
         const rightOffset = 30;
-        return Math.max(MinMeasureWidth, getNotationLeftPosition(lastNote) + rightOffset);
+        return Math.max(minMeasureHeight, getNotationLeftPosition(lastNote) + rightOffset);
     };
 
     const getStaffStyle = () => {
@@ -151,11 +157,12 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         const startNote = notes[startIndex] as NoteModel;
         const endNote = notes[startIndex] as NoteModel;
         const durationType = notes[startIndex].durationType;
-        const stemStartXPos = getNotationLeftPosition(notes[startIndex]) - (NoteSize / 2) + 2;
-        const stemStartYPos = getNotationBottomPosition(startNote.pitch) - BaseStemHeight;
-        const stemEndXPos = getNotationLeftPosition(notes[endIndex]) - (NoteSize / 2);
-        const stemEndYPos = getNotationBottomPosition(endNote.pitch) - BaseStemHeight;
+        const stemStartXPos = getNotationLeftPosition(notes[startIndex]) - (noteSize / 2) + 2;
+        const stemStartYPos = getNotationBottomPosition(startNote.pitch) - defaultStemHeight;
+        const stemEndXPos = getNotationLeftPosition(notes[endIndex]) - (noteSize / 2);
+        const stemEndYPos = getNotationBottomPosition(endNote.pitch) - defaultStemHeight;
         const stemWidth = stemEndXPos - stemStartXPos - 1;
+        const stemHeight = 3;
         //const degrees = Math.atan2(stemEndYPos - stemStartYPos, stemEndXPos - stemStartXPos) * 180 / Math.PI;
 
         let b = window.document.createElement('div');
@@ -164,23 +171,17 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
         b.style.left = `${stemStartXPos}px`;
         b.style.bottom = `${stemStartYPos}px`;
         b.style.width = `${stemWidth}px`;
-        b.style.border = '3px solid #000';
-        //b.style.transform = `rotate(${-degrees}deg)`;
-        //b.style.transformOrigin = 'top-left';
-        //b.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
+        b.style.border = `${stemHeight}px solid #000`;
         window.setTimeout(() => window.document.getElementById(id).appendChild(b));
 
-        if (durationType == Duration.Sixteenth) {
+        if (durationType == Duration.Sixteenth || durationType == Duration.ThirtySecond) {
             let b2 = window.document.createElement('div');
             b2.id = notes[endIndex].startBeat.toString();
             b2.style.position = 'absolute';
             b2.style.left = `${stemStartXPos}px`;
-            b2.style.bottom = `${stemStartYPos + 10}px`;
+            b2.style.bottom = `${stemStartYPos + (stemHeight * 3)}px`;
             b2.style.width = `${stemWidth}px`;
-            b2.style.border = '3px solid #000';
-            //b2.style.transform = `rotate(${-degrees}deg)`;
-            //b2.style.transformOrigin = 'top-left';
-            //b2.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
+            b2.style.border = `${stemHeight}px solid #000`;
             window.setTimeout(() => window.document.getElementById(id).appendChild(b2));
         }
 
@@ -189,12 +190,9 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
             b3.id = notes[endIndex].startBeat.toString();
             b3.style.position = 'absolute';
             b3.style.left = `${stemStartXPos}px`;
-            b3.style.bottom = `${stemStartYPos + 20}px`;
+            b3.style.bottom = `${stemStartYPos + (stemHeight * 3 * 2)}px`;
             b3.style.width = `${stemWidth}px`;
-            b3.style.border = '3px solid #000';
-            //b3.style.transform = `rotate(${-degrees}deg)`;
-            //b3.style.transformOrigin = 'top-left';
-            //b3.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.';
+            b3.style.border = `${stemHeight}px solid #000`;
             window.setTimeout(() => window.document.getElementById(id).appendChild(b3));
         }
     }
@@ -222,20 +220,20 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
                             if (index < notes.length - 3 && notes[index+3].durationType == notationModel.durationType) {
                                 // Four notes
                                 stem = getConnectingStem(index, index+3);
-                                const stemProportion3 = (getNotationBottomPosition(note3.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                const stemProportion3 = (getNotationBottomPosition(note3.pitch) - getNotationBottomPosition(note.pitch)) / defaultStemHeight;
                                 note3.stemStretchFactor = 1 + stemProportion3;
-                                const stemProportion2 = (getNotationBottomPosition(note2.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                const stemProportion2 = (getNotationBottomPosition(note2.pitch) - getNotationBottomPosition(note.pitch)) / defaultStemHeight;
                                 note2.stemStretchFactor = 1 + stemProportion2;
-                                const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / defaultStemHeight;
                                 note1.stemStretchFactor = 1 + stemProportion1;
                                 lastHorizontalStemIndex = index+3;
                             }
                             else {
                                 // Three notes
                                 stem = getConnectingStem(index, index+2);
-                                const stemProportion2 = (getNotationBottomPosition(note2.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                const stemProportion2 = (getNotationBottomPosition(note2.pitch) - getNotationBottomPosition(note.pitch)) / defaultStemHeight;
                                 note2.stemStretchFactor = 1 + stemProportion2;
-                                const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                                const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / defaultStemHeight;
                                 note1.stemStretchFactor = 1 + stemProportion1;
                                 lastHorizontalStemIndex = index+2;
                             }
@@ -243,7 +241,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
                         else {
                             // Two notes
                             stem = getConnectingStem(index, index+1);
-                            const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / BaseStemHeight;
+                            const stemProportion1 = (getNotationBottomPosition(note1.pitch) - getNotationBottomPosition(note.pitch)) / defaultStemHeight;
                             note1.stemStretchFactor = 1 + stemProportion1;
                             lastHorizontalStemIndex = index+1;
                         }
@@ -253,7 +251,7 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
                 const accidental = MusicLogic.getAccidentalForPitch(notationModel.pitch);
                 const leftPosition = getNotationLeftPosition(notationModel);
                 const bottomPosition = getNotationBottomPosition(notationModel.pitch);
-                return <StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} accidental={accidental} />;
+                return <StaffNote model={notationModel} left={leftPosition} bottom={bottomPosition} size={noteSize} accidental={accidental} />;
             }
             else if (notationModel instanceof RestModel) {
                 const leftPosition = getNotationLeftPosition(notationModel);
@@ -263,9 +261,11 @@ function StaffMeasure({ notes, clef, sharps, flats }: StaffMeasureProps) {
     }
 
     return (
-        <div id={id} className="staff-measure" style={getStaffStyle()}>
-            <div className="notation-container">{getNotations()}</div>
+        <div id={id} ref={ref} className="staff-measure" style={getStaffStyle()}>
             <StaffLines />
+            <div className="notation-container">
+                {getNotations()}
+            </div>
         </div>
     );
 }

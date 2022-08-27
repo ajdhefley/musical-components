@@ -1,5 +1,6 @@
 import './StaffKeySignature.scss';
 import { Clef, NaturalNote } from '../types';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * 
@@ -27,7 +28,18 @@ interface StaffKeySignatureProps {
  * 
  **/
 function StaffKeySignature({ clef, sharps, flats }: StaffKeySignatureProps) {
-    const SpaceHeight: number = 20;
+    const ref = useRef(null);
+    const [accidentalSize, setAccidentalSize] = useState(0);
+    const [spaceHeight, setSpaceHeight] = useState(0);
+
+    useEffect(() => {
+        if (ref.current) {
+            const refSpaceHeight = ref.current.clientHeight / 4;
+            setSpaceHeight(refSpaceHeight);
+            setAccidentalSize(refSpaceHeight * 1.75);
+        }
+    }, [ref]);
+
     const KeySize: number = 17;
 
     const getKeyAccidentalBottomPosition = (note: NaturalNote) => {
@@ -63,9 +75,12 @@ function StaffKeySignature({ clef, sharps, flats }: StaffKeySignatureProps) {
         if (middleCPosition + pitchPosition > maxValidPosition)
             pitchPosition -= totalNotes;
 
+        console.log({ note, pitchPosition });
+
         // One note per line and one per space equates to each note occupying a height of half each space
-        const noteHeight = SpaceHeight / 2;
+        const noteHeight = spaceHeight / 2;
         
+        // Subtract by (accidentalSize / 2) to center vertically on position.
         return (middleCPosition + pitchPosition) * noteHeight;
     }
 
@@ -73,15 +88,15 @@ function StaffKeySignature({ clef, sharps, flats }: StaffKeySignatureProps) {
         if (sharps) {
             return sharps.map((note, index) => {
                 const leftPosition = index * KeySize;
-                const bottomPosition = getKeyAccidentalBottomPosition(note) - SpaceHeight + 5;
-                return (<div className="sharp" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
+                const bottomPosition = getKeyAccidentalBottomPosition(note) - spaceHeight + 5;
+                return (<div className="sharp" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px`, width: `${accidentalSize}px`, height: `${accidentalSize}px` }} />);
             });
         }
         else if (flats) {
             return flats.map((note, index) => {
                 const leftPosition = index * KeySize;
-                const bottomPosition = getKeyAccidentalBottomPosition(note) - SpaceHeight/2 + 5;
-                return (<div className="flat" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px` }} />);
+                const bottomPosition = getKeyAccidentalBottomPosition(note) - spaceHeight/2 + 5;
+                return (<div className="flat" style={{ left: `${leftPosition}px`, bottom: `${bottomPosition}px`, width: `${accidentalSize}px`, height: `${accidentalSize}px` }} />);
             });
         }
     }
@@ -92,7 +107,7 @@ function StaffKeySignature({ clef, sharps, flats }: StaffKeySignatureProps) {
         }
     }
 
-    return <div className="key-signature-container" style={getKeySignatureStyle()}>{getKeySignatureAccidentals()}</div>;
+    return <div ref={ref} className="key-signature-container" style={getKeySignatureStyle()}>{getKeySignatureAccidentals()}</div>;
 }
 
 export default StaffKeySignature;
