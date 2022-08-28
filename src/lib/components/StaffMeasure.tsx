@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import './StaffMeasure.scss'
-import { NotationModel, NoteModel, RestModel } from '../models'
-import { NaturalNote, Clef, Pitch, Duration } from '../types'
+import { NotationModel, NoteModel, RestModel } from '../core/models'
+import { NaturalNote, Clef, Pitch, Duration } from '../core/enums'
+import { MusicLogic } from '../core/music-logic'
 import StaffNote from './StaffNote'
 import StaffRest from './StaffRest'
 import StaffLines from './StaffLines'
-import { MusicLogic } from '../music-logic'
 
 /**
  *

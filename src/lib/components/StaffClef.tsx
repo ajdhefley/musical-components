@@ -1,6 +1,7 @@
 import React from 'react'
+
 import './StaffClef.scss'
-import { Clef } from '../types'
+import { Clef } from '../core/enums'
 
 /**
  *

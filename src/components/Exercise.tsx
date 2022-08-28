@@ -2,8 +2,8 @@ import React from 'react'
 
 import './Exercise.scss'
 import Staff from '../lib/components/Staff'
-import { Clef, Duration, Pitch } from '../lib/types'
-import { NotationModel, NoteModel } from '../lib/models'
+import { Clef, Duration, Pitch } from '../lib/core/enums'
+import { NotationModel, NoteModel } from '../lib/core/models'
 
 function Exercise (): React.ReactElement {
     const notes: NotationModel[] = [

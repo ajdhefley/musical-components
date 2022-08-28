@@ -6,5 +6,3 @@ export enum Duration {
     Sixteenth = 16,
     ThirtySecond = 32
 }
-
-export type BeatsPerMeasureType = 2|3|4|5|6|7|8|9;

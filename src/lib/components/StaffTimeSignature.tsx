@@ -1,13 +1,13 @@
 import React from 'react'
 
 import './StaffTimeSignature.scss'
-import { BeatsPerMeasureType, Duration, NaturalNote } from '../types'
+import { Duration, NaturalNote } from '../core/enums'
 
 interface StaffTimeSignatureProps {
     /**
      * Number of beats per measure, determining the top number of the time signature.
      **/
-    beatsPerMeasure: BeatsPerMeasureType
+    beatsPerMeasure: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
     /**
      * The value of a given beat, determining the bottom number of the time signature.

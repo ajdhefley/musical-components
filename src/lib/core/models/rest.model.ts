@@ -1,4 +1,4 @@
-import { Duration } from '../types'
+import { Duration } from '../enums'
 import { NotationModel } from './notation.model'
 
 export class RestModel extends NotationModel {

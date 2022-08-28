@@ -31,6 +31,10 @@ export class MidiAudio {
         this.midiInput.onmidimessage = (e) => this.onMessage(e)
     }
 
+    /**
+     *
+     * @param e
+     **/
     private onMessage (e: WebMidi.MIDIMessageEvent) {
         switch (e.data[0]) {
             case MidiAudio.COMMAND_NOTE_ON:
@@ -44,6 +48,10 @@ export class MidiAudio {
         }
     }
 
+    /**
+     *
+     * @param e
+     **/
     private handleMessageNoteOn (e: WebMidi.MIDIMessageEvent) {
         this.pitchOscillators.push(
             new PitchOscillator()
@@ -52,12 +60,19 @@ export class MidiAudio {
         )
     }
 
+    /**
+     *
+     * @param e
+     **/
     private handleMessageNoteOff (e: WebMidi.MIDIMessageEvent) {
         const oscillator = this.pitchOscillators.find(o => o.getActivePitch() === e.data[1])
         oscillator.stop()
         this.pitchOscillators.splice(this.pitchOscillators.indexOf(oscillator), 1)
     }
 
+    /**
+     *
+     **/
     private normalizeOscillatorVolume () {
         this.pitchOscillators.forEach(o => {
             o.setVolume(1 / this.pitchOscillators.length)

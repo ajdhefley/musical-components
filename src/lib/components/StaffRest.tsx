@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './StaffRest.scss'
-import { RestModel } from '../models/rest.model'
+import { RestModel } from '../core/models'
 
 /**
  *

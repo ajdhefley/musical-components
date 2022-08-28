@@ -1,5 +1,5 @@
 import { NotationModel, RestModel } from './models'
-import { NaturalNote, Pitch, Accidental, Duration } from './types'
+import { NaturalNote, Pitch, Accidental, Duration } from './enums'
 
 export abstract class MusicLogic {
     /**

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
 import './Staff.scss'
-import { NotationModel, NoteModel } from '../models'
-import { NaturalNote, Clef, Duration, BeatsPerMeasureType } from '../types'
+import { NotationModel, NoteModel } from '../core/models'
+import { NaturalNote, Clef, Duration } from '../core/enums'
+import { MusicLogic } from '../core/music-logic'
+import { MidiRelay } from '../core/audio/midi-relay'
 import StaffMeasure from './StaffMeasure'
-import { MidiAudio } from '../audio/midi-audio'
+import { MidiAudio } from '../core/audio/midi-audio'
 import StaffKeySignature from './StaffKeySignature'
 import StaffTimeSignature from './StaffTimeSignature'
 import StaffClef from './StaffClef'
 import StaffLines from './StaffLines'
-import { MusicLogic } from '../music-logic'
-import { MidiRelay } from '../audio/midi-relay'
 
 /**
  *
@@ -24,7 +24,7 @@ interface StaffProps {
     /**
      * Number of beats per measure, determining the top number of the time signature.
      **/
-    beatsPerMeasure: BeatsPerMeasureType
+    beatsPerMeasure: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
     /**
      * The value of a given beat, determining the bottom number of the time signature.

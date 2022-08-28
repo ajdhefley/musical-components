@@ -2,8 +2,8 @@ import React from 'react'
 
 import './ErrorPage.scss'
 import Staff from '../lib/components/Staff'
-import { Clef, Duration, Pitch, SharpKeys } from '../lib/types'
-import { NotationModel, NoteModel } from '../lib/models'
+import { Clef, Duration, Pitch, SharpKeys } from '../lib/core/enums'
+import { NotationModel, NoteModel } from '../lib/core/models'
 
 function ErrorPage (): React.ReactElement {
     const notes: NotationModel[] = [

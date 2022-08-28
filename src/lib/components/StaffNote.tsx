@@ -1,8 +1,8 @@
 import React from 'react'
 
 import './StaffNote.scss'
-import { NoteModel } from '../models/note.model'
-import { Accidental, Duration } from '../types'
+import { NoteModel } from '../core/models'
+import { Accidental, Duration } from '../core/enums'
 
 /**
  *
@@ -42,7 +42,7 @@ function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): 
         const numPitches = 7
         const numOctaves = 6
         const octaveNotes = (Math.floor(model.pitch / 12) - 1) * numPitches
-        const octavePosition = octaveNotes + model.pitch
+        const octavePosition = octaveNotes + parseInt(model.pitch.toString())
         return octavePosition >= (numPitches * numOctaves / 2) - 1 ? 'down' : 'up'
     })()
 

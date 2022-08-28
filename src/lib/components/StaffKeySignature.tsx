@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
+
 import './StaffKeySignature.scss'
-import { Clef, NaturalNote } from '../types'
+import { Clef, NaturalNote } from '../core/enums'
 
 /**
  *
