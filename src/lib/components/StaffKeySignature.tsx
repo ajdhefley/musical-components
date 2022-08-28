@@ -50,34 +50,37 @@ function StaffKeySignature ({ clef, sharps, flats }: StaffKeySignatureProps): Re
         // @ts-expect-error
         const totalNaturalNotes = Object.values(NaturalNote).filter(isNaN).length
 
-        // 4 spaces plus 5 lines on the staff is 9 total valid positions occupied by the sharps/flats
-        const maxValidPosition = 9
-
         // The position of Middle C on the staff is different depending on the clef.
         // We calculate the position of each note relative to Middle C, so this needs
         // to be known ahead of time.
+
+        let maxValidPosition = 0
         let middleCPosition = 0
+
         switch (clef) {
             case Clef.TrebleClef:
                 // Occupies the 3rd space from the bottom, which is the 5th index where the bottom line is 0
                 middleCPosition = 5
+                maxValidPosition = 11
                 break
             case Clef.BassClef:
                 // Occupies a whole step above the 4th line from the bottom, which is the 10th index where the bottom line is 0
                 middleCPosition = 10
+                maxValidPosition = 9
                 break
         }
 
         // Sharps/flats for key signature should occupy visible lines and spaces only
-        // If a note exceeds it, bring it down an octave
+        // If a note exceeds it, bring it down an octave (total number of natural notes in terms of position)
         let pitchPosition = Object.values(NaturalNote).indexOf(noteValue)
-        if (middleCPosition + pitchPosition > maxValidPosition) { pitchPosition -= totalNaturalNotes }
+        while (middleCPosition + pitchPosition >= maxValidPosition) {
+            pitchPosition -= totalNaturalNotes
+        }
 
         // One note per line and one per space equates to each note occupying a height of half each space
         const noteHeight = spaceHeight / 2
 
-        // Subtract by (accidentalSize / 2) to center vertically on position.
-        return (middleCPosition + pitchPosition) * noteHeight
+        return (middleCPosition + pitchPosition) * noteHeight - 4
     }
 
     const getKeySignatureAccidentals = () => {

@@ -12,6 +12,6 @@ export class Note extends Notation {
     }
 
     getEndBeat () {
-        return this.startBeat + this.type.getBeatValue()
+        return this.startBeat + this.type.beatValue
     }
 }

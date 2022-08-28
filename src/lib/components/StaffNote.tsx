@@ -46,7 +46,7 @@ function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): 
     })()
 
     const getNoteClass = () => {
-        return `note note-${model.type.getCountPerMeasure()} ${model.active ? 'active' : ''}`
+        return `note note-${model.type.getCountsPerMeasure()} ${model.active ? 'active' : ''}`
     }
 
     const getNoteStyle = () => {

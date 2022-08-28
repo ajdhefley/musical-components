@@ -2,7 +2,7 @@ import React from 'react'
 
 import './Exercise.scss'
 import Staff from '../lib/components/Staff'
-import { Clef, Notation, NotationType, Note, Pitch } from '../lib/core/models'
+import { Clef, FlatKeys, Notation, NotationType, Note, Pitch } from '../lib/core/models'
 
 function Exercise (): React.ReactElement {
     const notes: Notation[] = [
@@ -24,6 +24,7 @@ function Exercise (): React.ReactElement {
                 beatDuration={NotationType.Quarter}
                 beatsPerMinute={120}
                 initialNotations={notes}
+                flats={FlatKeys.FMajor}
             />
         </div>
     )

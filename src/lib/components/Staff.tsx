@@ -59,6 +59,8 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
     const [midiPlayer] = useState(new MidiNotationPlayer(beatsPerMeasure, beatsPerMinute))
     const [notations, setNotations] = useState(new Array<Notation>())
 
+    const id = Date.now().toString()
+
     useEffect(() => {
         // @ts-expect-error
         const notes = MusicLogic.addNotations(notations, initialNotations, beatsPerMeasure)
@@ -93,15 +95,16 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
     }
 
     const getMeasureElements = () => {
-        const measures = MusicLogic.getMeasures(notations, beatsPerMeasure)
+        const measures = MusicLogic.splitIntoMeasures(notations, beatsPerMeasure, beatDuration)
         return measures.map((measureNotes) => <>
-            <StaffMeasure clef={clef} sharps={sharps} flats={flats} notes={measureNotes} beatsPerMeasure={beatsPerMeasure} />
+            <StaffMeasure staffId={id} clef={clef} sharps={sharps} flats={flats} notations={measureNotes} beatsPerMeasure={beatsPerMeasure} beatDuration={beatDuration} />
         </>)
     }
 
     return <>
-        <button onClick={play} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button>
-        <div className="staff">
+        {/* <button onClick={play} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button> */}
+        <br /><br /><br /><br /><br /><br /><br />
+        <div className="staff" id={id}>
             <div className="staff-intro">
                 <StaffLines />
                 <StaffClef type={clef} />

@@ -19,7 +19,7 @@ function StaffTimeSignature ({ beatsPerMeasure, beatDuration }: StaffTimeSignatu
     return <>
         <div className="ts-container">
             <div className={`ts-top ts-${beatsPerMeasure}`}></div>
-            <div className={`ts-bottom ts-${beatDuration.getCountPerMeasure()}`}></div>
+            <div className={`ts-bottom ts-${beatDuration.getCountsPerMeasure()}`}></div>
         </div>
     </>
 }

@@ -41,54 +41,54 @@ export abstract class MusicLogic {
      * Automatically calculates and inserts rests into gaps between notes.
      *
      * @param items
-     * @param addedItems
+     * @param itemstoAdd
      * @returns A full list of notations, including calculated rests.
      **/
-    static addNotations (items: Notation[], addedItems: Notation[], beatsPerMeasure: number): Notation[] {
+    static addNotations (items: Notation[], itemstoAdd: Notation[], beatsPerMeasure: number): Notation[] {
         const totalMeasureBeatValue = beatsPerMeasure / 4
 
         let nextTime = 0
-
         if (items.length > 0) {
             const lastNote = items[items.length - 1]
-            nextTime = lastNote.startBeat + lastNote.type.getBeatValue()
+            nextTime = lastNote.startBeat + lastNote.type.beatValue
         }
 
-        addedItems.forEach((addedItem, addedNoteIndex) => {
+        itemstoAdd.forEach((itemToAdd, itemToAddIndex) => {
             // Rests are calculated/added automatically when gaps between notes are encountered.
             // Tthey do not need to be processed when causally iterated upon.
-            if (addedItem instanceof Rest) {
+            if (itemToAdd instanceof Rest) {
                 return
             }
 
-            if (addedNoteIndex > 0) {
+            if (itemToAddIndex > 0) {
                 // Check for gap between the last added note and this one
                 // to see if a rest needs to be added between them.
 
-                const lastNote = addedItems[addedNoteIndex - 1]
-                nextTime = lastNote.startBeat + lastNote.type.getBeatValue()
-                const timediff = addedItem.startBeat - nextTime
+                const timediff = itemToAdd.startBeat - nextTime
 
                 // TODO: find largest possible rest in time diff, keep repeating until time filled
                 // TODO: handle dotted rests
 
                 if (timediff > 0) {
-                    addedItems.splice(addedNoteIndex, 0, new Rest(NotationType.getNotationTypeFromDuration(timediff), nextTime))
+                    const rest = new Rest(NotationType.getNotationTypeFromDuration(timediff), nextTime)
+                    nextTime = rest.startBeat + rest.type.beatValue
+                    itemstoAdd.splice(itemToAddIndex, 0, rest)
                 }
             }
 
-            addedItem.startBeat = nextTime
-            addedItem.active = false
+            itemToAdd.startBeat = nextTime
+            itemToAdd.active = false
+            nextTime = itemToAdd.startBeat + itemToAdd.type.beatValue
         })
 
-        if (nextTime % totalMeasureBeatValue < totalMeasureBeatValue) {
-            const lastNote = addedItems[addedItems.length - 1]
-            const remainingBeatValue = totalMeasureBeatValue - (nextTime % totalMeasureBeatValue) - lastNote.type.getBeatValue()
-            const remainingDurationValue = NotationType.getNotationTypeFromDuration(remainingBeatValue)
-            addedItems.push(new Rest(remainingDurationValue, nextTime + lastNote.type.getBeatValue()))
-        }
+        // if (nextTime % totalMeasureBeatValue > 0 && nextTime % totalMeasureBeatValue < totalMeasureBeatValue) {
+        //     const lastNote = itemstoAdd[itemstoAdd.length - 1]
+        //     const remainingBeatValue = totalMeasureBeatValue - (nextTime % totalMeasureBeatValue) - lastNote.type.getBeatValue()
+        //     const remainingDurationValue = NotationType.getNotationTypeFromDuration(remainingBeatValue)
+        //     itemstoAdd.push(new Rest(remainingDurationValue, nextTime + lastNote.type.getBeatValue()))
+        // }
 
-        items = items.concat(addedItems)
+        items = items.concat(itemstoAdd)
 
         return items
     }
@@ -98,9 +98,10 @@ export abstract class MusicLogic {
      *
      * @param notations All of the notes/rests in a given sequence.
      * @param beatsPerMeasure Determines how notes/rests will be divided into measures according to their beat values.
+     * @param beatDuration The type of note that counts as a single beat.
      * @returns Converts an array of notes/rests into a two-dimensional array, each element an array of notes corresponding to a measure.
      **/
-    static getMeasures (notations: Notation[], beatsPerMeasure: number): Notation[][] {
+    static splitIntoMeasures (notations: Notation[], beatsPerMeasure: number, beatDuration: NotationType): Notation[][] {
         if (notations.length === 0) {
             return [[]]
         }
@@ -108,18 +109,19 @@ export abstract class MusicLogic {
         const minStep = 1 / 32
         const noteCollectionArray = Array<Notation[]>()
         const lastNote = notations[notations.length - 1]
+        const measureBeatValue = beatsPerMeasure * (beatDuration.beatValue / 0.25)
 
         let stepCounter = 1
         let currentStep = 0
         let currentNote = null
 
-        while (currentStep < lastNote.startBeat + lastNote.type.getBeatValue()) {
-            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.type.getBeatValue())
+        while (currentStep < lastNote.startBeat + lastNote.type.beatValue) {
+            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.type.beatValue)
 
             if (steppedNote && steppedNote !== currentNote) {
                 currentNote = steppedNote
 
-                if (stepCounter >= beatsPerMeasure / 4) {
+                if (stepCounter >= measureBeatValue / 4) {
                     stepCounter = 0
                     noteCollectionArray.push(new Array<Notation>())
                 }

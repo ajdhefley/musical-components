@@ -26,7 +26,7 @@ function StaffRest ({ model, left }: StaffRestProps): React.ReactElement {
     const SpaceHeight: number = 20
 
     const getClass = () => {
-        return `rest rest-${model.type.getCountPerMeasure()}`
+        return `rest rest-${model.type.getCountsPerMeasure()}`
     }
 
     const getStyle = () => {

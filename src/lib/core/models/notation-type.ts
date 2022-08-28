@@ -10,6 +10,7 @@ export class NotationType {
      * Determines note type from the given duration.
      *
      * @param notationDuration Numerical representation of notation's duration, falling within a note type window.
+     *
      * @returns Notation type falling within window of beat value, or undefined if not a valid beat value.
      **/
     static getNotationTypeFromDuration (notationDuration: number) {
@@ -31,30 +32,15 @@ export class NotationType {
     }
 
     /**
-     * Determines how many beats this note lasts.
+     * Determines how many of this note is equal to one measure.
      *
-     * @returns Number of beats this note type lasts per measure.
-     **/
-    getBeatsPerMeasure () {
-        return this.beatValue * 4
-    }
-
-    /**
-     * Determines how many of this note equals one measure.
+     * @param beatsPerMeasure Number of total beats in the measure, which affects the number of counts.
+     * @param measureBeatType The type of note that registers as one beat in the measure.
      *
      * @returns How many of this type of note can fit into a single measure.
      **/
-    getCountPerMeasure () {
-        return 1 / this.beatValue
-    }
-
-    /**
-     * The value of a beat proportional to one measure.
-     *
-     * @returns One divided by the counts per measure (E.G. thirty-second note is 32 counts per measure, or 1/32 = 0.03125)
-     **/
-    getBeatValue () {
-        return this.beatValue
+    getCountsPerMeasure (beatsPerMeasure: number = 4, measureBeatType: NotationType = NotationType.Quarter) {
+        return Math.floor(1 / this.beatValue * beatsPerMeasure / 4 * (measureBeatType.beatValue / 0.25))
     }
 
     private constructor (public readonly name: string, public readonly beatValue: number) { }

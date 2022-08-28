@@ -15,7 +15,6 @@ export class MidiRelay {
                 this.midi = midi
                 resolve(midi)
             }, (err: string) => {
-                console.log(`Failed to get MIDI access - ${err}`)
                 reject(err)
             })
         })
