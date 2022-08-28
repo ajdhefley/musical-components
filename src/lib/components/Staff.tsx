@@ -83,9 +83,13 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
         // Deactivate all notes
         activateNotation(undefined)
 
-        midiPlayer.play(notations, true)
-            .on('message', (note) => activateNotation(note))
-            .on('stop', () => activateNotation(undefined))
+        if (midiPlayer.running()) {
+            midiPlayer.stop()
+        } else {
+            midiPlayer.play(notations, true)
+                .on('message', (note) => activateNotation(note))
+                .on('stop', () => activateNotation(undefined))
+        }
     }
 
     const getMeasureElements = () => {
