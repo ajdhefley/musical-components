@@ -49,11 +49,14 @@ export class Metronome {
             this.audioMetronomeBeat.play()
         }
 
-        if (this.active) {
-            const baseBpm = 60
-            const baseCountDuration = 1000
-            const countDuration = (baseBpm / this.beatsPerMinute) * baseCountDuration
-            window.setTimeout(() => this.click(count + 1), countDuration)
-        }
+        const baseBpm = 60
+        const baseCountDuration = 1000
+        const countDuration = (baseBpm / this.beatsPerMinute) * baseCountDuration
+
+        window.setTimeout(() => {
+            if (this.active) {
+                this.click(count + 1)
+            }
+        }, countDuration)
     }
 }

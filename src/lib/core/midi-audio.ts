@@ -22,7 +22,7 @@ export class MidiAudio {
      *
      * @param midiInputs Inputs provided by Web MIDI API access.
      */
-    async listen (midiInputs: WebMidi.MIDIInputMap) {
+    listen (midiInputs: WebMidi.MIDIInputMap) {
         this.pitchOscillators = new Array<PitchOscillator>()
         this.context = new AudioContext()
         this.context.resume()
