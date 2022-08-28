@@ -2,10 +2,10 @@
 @import "../styles/variables";
 
 .key-signature-container {
-    position: absolute;
+    position: relative;
+    display: inline-block;
     bottom: 0;
-    height: $staff-height;
-    left: $clef-container-width;
+    height: 100%;
 }
 
 .key-symbol {

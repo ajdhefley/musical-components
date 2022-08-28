@@ -8,13 +8,13 @@
 }
 
 .ts-top {
-    top: 0;
-    left: calc($ts-container-width / 2) - calc($ts-digit-width / 2);
+    top: calc((#{$staff-height} / 2) - (#{$ts-digit-height}));
+    left: calc((#{$ts-container-width} / 2) - (#{$ts-digit-width} / 2));
 }
 
 .ts-bottom {
-    top: $ts-digit-height;
-    left: calc($ts-container-width / 2) - calc($ts-digit-width / 2);
+    top: calc((#{$staff-height} / 2));
+    left: calc((#{$ts-container-width} / 2) - (#{$ts-digit-width} / 2));
 }
 
 .ts-2 {
@@ -34,17 +34,17 @@
 
 .ts-5 {
     @extend .ts-symbol;
-    //@include background-image('5.svg');
+    @include background-image('5.svg');
 }
 
 .ts-6 {
     @extend .ts-symbol;
-    //@include background-image('6.svg');
+    @include background-image('6.svg');
 }
 
 .ts-7 {
     @extend .ts-symbol;
-   //@include background-image('7.svg');
+   @include background-image('7.svg');
 }
 
 .ts-8 {
@@ -52,10 +52,16 @@
     @include background-image('8.svg');
 }
 
+.ts-9 {
+    @extend .ts-symbol;
+    @include background-image('9.svg');
+}
+
 .ts-container {
-    position: absolute;
+    position: relative;
+    display: inline-block;
     bottom: 0;
     width: $ts-container-width;
-    height: $ts-digit-height * 2;
+    height: 100%;
     top: calc($staff-height / 2) - $ts-digit-height;
 }
