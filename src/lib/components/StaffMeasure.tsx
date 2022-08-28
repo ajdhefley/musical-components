@@ -6,7 +6,7 @@ import { MusicLogic } from '../core/music-logic'
 import StaffNote from './StaffNote'
 import StaffRest from './StaffRest'
 import StaffLines from './StaffLines'
-import StaffHorizontalStem from './StaffHorizontalStem'
+import StaffNoteBeam from './StaffNoteBeam'
 
 /**
  *
@@ -208,7 +208,7 @@ function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasur
         }
 
         return beams.map((beam, index) => (
-            <StaffHorizontalStem key={index} left={beam.left} bottom={beam.bottom} width={beam.width} />
+            <StaffNoteBeam key={index} left={beam.left} bottom={beam.bottom} width={beam.width} />
         ))
     }
 
