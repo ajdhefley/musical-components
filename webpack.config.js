@@ -1,10 +1,10 @@
-const path = require('path');
-const dotenv = require('dotenv');
-const webpack = require('webpack');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path')
+const dotenv = require('dotenv')
+const webpack = require('webpack')
+const HtmlWebPackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-dotenv.config();
+dotenv.config()
 
 module.exports = {
     devServer: {
@@ -12,14 +12,14 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'build'),
-        filename: 'bundle.js',
+        filename: 'bundle.js'
     },
     resolve: {
         modules: [path.join(__dirname, 'src'), 'node_modules'],
         alias: {
-            react: path.join(__dirname, 'node_modules', 'react'),
+            react: path.join(__dirname, 'node_modules', 'react')
         },
-        extensions: [ '.tsx', '.ts', '.js', 'scss' ]
+        extensions: ['.tsx', '.ts', '.js', 'scss']
     },
     module: {
         rules: [
@@ -32,10 +32,10 @@ module.exports = {
                 test: /\.scss?$/,
                 use: [
                     // Creates `style` nodes from JS strings
-                    "style-loader",
+                    'style-loader',
 
                     // Translates CSS into CommonJS
-                    "css-loader",
+                    'css-loader',
 
                     // Compiles Sass to CSS
                     {
@@ -45,12 +45,16 @@ module.exports = {
                         }
                     }
                 ]
+            },
+            {
+                test: /\.mp3$/,
+                loader: 'file-loader'
             }
-        ],
+        ]
     },
     plugins: [
         new HtmlWebPackPlugin({
-            template: './public/index.html',
+            template: './public/index.html'
         }),
         new MiniCssExtractPlugin({
             filename: process.env.NODE_ENV == 'development' ? '[name].css' : '[name].[hash].css',
@@ -62,5 +66,5 @@ module.exports = {
     ],
     entry: {
         app: './src/index.tsx'
-    },
-};
+    }
+}
