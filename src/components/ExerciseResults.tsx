@@ -1,11 +1,12 @@
-import App from './App';
-import './ExerciseResults.scss';
+import React from 'react'
 
-function ExerciseResults() {
+import './ExerciseResults.scss'
+
+function ExerciseResults (): React.ReactElement {
     return (
         <div>
         </div>
-    );
+    )
 }
 
-export default ExerciseResults;
+export default ExerciseResults

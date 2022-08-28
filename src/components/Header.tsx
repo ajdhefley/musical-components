@@ -1,11 +1,18 @@
-import './Header.scss';
+import React from 'react'
 
-function Header() {
+import './Header.scss'
+
+function Header (): React.ReactElement {
     return (
         <header>
-            <div className="logo" style={{ fontSize: '2rem' }}>Music App</div>
+            <div
+                className="logo"
+                style={{ fontSize: '2rem' }}
+            >
+                Music App
+            </div>
         </header>
-    );
+    )
 }
 
-export default Header;
+export default Header

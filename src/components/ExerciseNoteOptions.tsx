@@ -1,9 +1,8 @@
-import { useAppDispatch } from '../redux-hooks';
-import './ExerciseNoteOptions.scss';
+import React from 'react'
 
-function ExerciseNoteOptions() {
-    const dispatch = useAppDispatch();
+import './ExerciseNoteOptions.scss'
 
+function ExerciseNoteOptions (): React.ReactElement {
     const options = [
         { name: 'whole', value: 1 },
         { name: 'half', value: 2 },
@@ -11,17 +10,20 @@ function ExerciseNoteOptions() {
         { name: 'eighth', value: 8 },
         { name: 'sixteenth', value: 16 },
         { name: 'thirty-second', value: 32 }
-    ];
+    ]
 
     return (
         <div className="exercise-options-note">
             <h3>Exclude Notes</h3>
-            {options.map((note) => (<div>
-                <input type="checkbox" id={`exclude-${note.name}`} />
+            {options.map((note) => <div key={note.value}>
+                <input
+                    type="checkbox"
+                    id={`exclude-${note.name}`}
+                />
                 <label htmlFor={`exclude-${note.name}`}>{note.name}</label>
-            </div>))}
+            </div>)}
         </div>
-    );
+    )
 }
 
-export default ExerciseNoteOptions;
+export default ExerciseNoteOptions

@@ -1,0 +1,42 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "standard-with-typescript"
+    ],
+    "overrides": [
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": ["./tsconfig.json"]
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        // Allow boolean coalescing (non-boolean values in conditionals)
+        "@typescript-eslint/strict-boolean-expressions": 0,
+
+        // Allow static classes
+        "@typescript-eslint/no-extraneous-class": 0,
+
+        // Error when more than one prop on single line
+        "react/jsx-closing-bracket-location": [2, "tag-aligned"],
+        "react/jsx-first-prop-new-line": [2, "multiline"],
+        "react/jsx-max-props-per-line": [2, { "maximum": 1, "when": "multiline" }],
+
+        // Do not require awaiting promises
+        "@typescript-eslint/no-misused-promises": 0,
+        "@typescript-eslint/no-floating-promises": 0,
+
+        // Do not require return type on functions
+        "@typescript-eslint/explicit-function-return-type": 0,
+
+        "indent": [1, 4, { "SwitchCase": 1 }],
+        "@typescript-eslint/indent": [1, 4, { "SwitchCase": 1 }]
+    }
+}

@@ -1,9 +1,8 @@
-import { useAppDispatch } from '../redux-hooks';
-import './ExercisePitchOptions.scss';
+import React from 'react'
 
-function ExercisePitchOptions() {
-    const dispatch = useAppDispatch();
+import './ExercisePitchOptions.scss'
 
+function ExercisePitchOptions (): React.ReactElement {
     const options = [
         { name: 'C', value: 1, natural: true },
         { name: 'C/D', value: 2, natural: false },
@@ -17,17 +16,20 @@ function ExercisePitchOptions() {
         { name: 'A', value: 10, natural: true },
         { name: 'A/B', value: 11, natural: false },
         { name: 'B', value: 12, natural: true }
-    ];
+    ]
 
     return (
         <div className="exercise-options-pitch">
             <h3>Exclude Pitches</h3>
-            {options.map((pitch) => (<div>
-                <input type="checkbox" id={`exclude-${pitch.name}`} />
+            {options.map((pitch) => <div key={pitch.value}>
+                <input
+                    type="checkbox"
+                    id={`exclude-${pitch.name}`}
+                />
                 <label htmlFor={`exclude-${pitch.name}`}>{pitch.name}</label>
-            </div>))}
+            </div>)}
         </div>
-    );
+    )
 }
 
-export default ExercisePitchOptions;
+export default ExercisePitchOptions

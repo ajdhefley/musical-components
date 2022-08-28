@@ -1,29 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
-import './ExerciseSelections.scss';
-import App from './App';
-import { setRootExercise } from '../redux-actions';
-import { useAppDispatch } from '../redux-hooks';
+import './ExerciseSelections.scss'
+import App from './App'
+import { setRootExercise } from '../redux-actions'
+import { useAppDispatch } from '../redux-hooks'
 
-function ExerciseSelections() {
-    const dispatch = useAppDispatch();
-    const [exerciseTypes, setExerciseTypes] = useState(new Array());
+function ExerciseSelections (): React.ReactElement {
+    const dispatch = useAppDispatch()
+    const [exerciseTypes, setExerciseTypes] = useState([])
 
     useEffect(() => {
-        fetch(`${process.env.API_URL}/exercise/types`)
-            .then((res) => res.json())
+        const apiUrl: string = process.env.API_URL
+        fetch(`${apiUrl}/exercise/types`)
+            .then(async (res) => await res.json())
             .then((data) => {
-                console.log(data);
-                setExerciseTypes(data);
-            });
-    }, []);
-    
+                setExerciseTypes(data)
+            })
+    }, [])
+
     return (
         <div className="content-wrapper">
             <p className="intro-text">Select an exercise below.</p>
             {exerciseTypes.map((exerciseType) => (
-                <Link className="exercise-container" to={App.Routes.ExerciseOptions} onClick={() => dispatch(setRootExercise(exerciseType))}>
+                <Link
+                    key={exerciseType.exerciseTypeId}
+                    className="exercise-container"
+                    to={App.Routes.ExerciseOptions}
+                    onClick={() => dispatch(setRootExercise(exerciseType))}
+                >
                     <div className="exercise-icon"></div>
                     <div className="exercise-text">
                         <div className="exercise-title">{exerciseType.name}</div>
@@ -32,7 +37,7 @@ function ExerciseSelections() {
                 </Link>
             ))}
         </div>
-    );
+    )
 };
 
-export default ExerciseSelections;
+export default ExerciseSelections

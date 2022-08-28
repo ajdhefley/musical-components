@@ -1,39 +1,41 @@
-import './StaffTimeSignature.scss';
-import { BeatsPerMeasureType, Duration, NaturalNote } from '../types';
+import React from 'react'
+
+import './StaffTimeSignature.scss'
+import { BeatsPerMeasureType, Duration, NaturalNote } from '../types'
 
 interface StaffTimeSignatureProps {
     /**
      * Number of beats per measure, determining the top number of the time signature.
      **/
-    beatsPerMeasure: BeatsPerMeasureType;
+    beatsPerMeasure: BeatsPerMeasureType
 
     /**
      * The value of a given beat, determining the bottom number of the time signature.
      **/
-    beatDuration: Duration;
- 
+    beatDuration: Duration
+
     /**
      * The pitches that are sharped, determining the major key.
      * If both sharps and flats have values, flats will be ignored.
      **/
-    sharps?: NaturalNote[];
- 
+    sharps?: NaturalNote[]
+
     /**
      * The pitches that are flatted, determining the major key.
      * If both sharps and flats have values, flats will be ignored.
      **/
-    flats?: NaturalNote[];
+    flats?: NaturalNote[]
 }
 
-function StaffTimeSignature({ beatsPerMeasure, beatDuration, sharps, flats }: StaffTimeSignatureProps) {
-    const ClefWidth: number = 50;
-    const KeySize: number = 17;
+function StaffTimeSignature ({ beatsPerMeasure, beatDuration, sharps, flats }: StaffTimeSignatureProps): React.ReactElement {
+    const ClefWidth: number = 50
+    const KeySize: number = 17
 
     const getTimeSignature = () => {
         return <>
             <div className={`ts-top ts-${beatsPerMeasure}`}></div>
             <div className={`ts-bottom ts-${beatDuration}`}></div>
-        </>;
+        </>
     }
 
     const getTimeSignatureStyle = () => {
@@ -42,7 +44,7 @@ function StaffTimeSignature({ beatsPerMeasure, beatDuration, sharps, flats }: St
         }
     }
 
-    return <div className="ts-container" style={getTimeSignatureStyle()}>{getTimeSignature()}</div>;
+    return <div className="ts-container" style={getTimeSignatureStyle()}>{getTimeSignature()}</div>
 }
 
-export default StaffTimeSignature;
+export default StaffTimeSignature

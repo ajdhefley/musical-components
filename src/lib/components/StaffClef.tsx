@@ -1,25 +1,26 @@
-import './StaffClef.scss';
-import { Clef } from '../types';
+import React from 'react'
+import './StaffClef.scss'
+import { Clef } from '../types'
 
 /**
- * 
+ *
  **/
 interface StaffClefProps {
     /**
-     * 
+     *
      **/
-    type: Clef;
+    type: Clef
 }
 
 /**
- * 
+ *
  **/
-function StaffClef({ type }: StaffClefProps) {
+function StaffClef ({ type }: StaffClefProps): React.ReactElement {
     return <>
         <div className="clef-container">
             <div className={Clef[type].toLowerCase()}></div>
         </div>
-    </>;
+    </>
 }
 
-export default StaffClef;
+export default StaffClef

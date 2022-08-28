@@ -1,57 +1,55 @@
-import { useState } from 'react';
+import React from 'react'
 
-import './StaffNote.scss';
-import { NoteModel } from '../models/note.model';
-import { Accidental, Duration } from '../types';
+import './StaffNote.scss'
+import { NoteModel } from '../models/note.model'
+import { Accidental, Duration } from '../types'
 
 /**
- * 
+ *
  **/
 interface StaffNoteProps {
     /**
-     * 
+     *
      **/
-    model: NoteModel;
+    model: NoteModel
 
     /**
-     * 
+     *
      **/
-    left: number;
+    left: number
 
     /**
-     * 
+     *
      **/
-    bottom: number;
+    bottom: number
 
     /**
-     * 
+     *
      **/
-    size: number;
+    size: number
 
     /**
-     * 
+     *
      **/
-    accidental: Accidental | undefined;
+    accidental: Accidental | undefined
 }
 
 /**
- * 
+ *
  **/
-function StaffNote({ model, left, bottom, size, accidental }: StaffNoteProps) {
-    const [activeStatus, setActiveStatus] = useState<'active' | 'inactive'>('inactive');
-
+function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): React.ReactElement {
     const stemType: 'up' | 'down' = (() => {
-        const numPitches = 7;
-        const numOctaves = 6;
-        const octaveNotes = (Math.floor(model.pitch / 12) - 1) * numPitches;
-        const octavePosition = octaveNotes + model.pitch;
-        return octavePosition >= (numPitches * numOctaves / 2) - 1 ? 'down' : 'up';
-    })();
+        const numPitches = 7
+        const numOctaves = 6
+        const octaveNotes = (Math.floor(model.pitch / 12) - 1) * numPitches
+        const octavePosition = octaveNotes + model.pitch
+        return octavePosition >= (numPitches * numOctaves / 2) - 1 ? 'down' : 'up'
+    })()
 
     const getNoteClass = () => {
-        return `note note-${Duration[model.durationType].toLowerCase()} ${activeStatus} ${model.active ? 'active' : ''}`;
+        return `note note-${Duration[model.durationType].toLowerCase()} ${model.active ? 'active' : ''}`
     }
-    
+
     const getNoteStyle = () => {
         return {
             width: `${size}px`,
@@ -60,13 +58,13 @@ function StaffNote({ model, left, bottom, size, accidental }: StaffNoteProps) {
 
             // Subtracting by half the note size centers it horizontally/vertically
             // (places center of the note on position instead of top-left corner)
-            left: `${left - size/2}px`,
-            bottom: `${bottom - size/2}px`, 
-        };
+            left: `${left - size / 2}px`,
+            bottom: `${bottom - size / 2}px`
+        }
     }
 
     const getStemClass = () => {
-        return `stem ${stemType}`;
+        return `stem ${stemType}`
     }
 
     const getStemStyle = () => {
@@ -77,50 +75,50 @@ function StaffNote({ model, left, bottom, size, accidental }: StaffNoteProps) {
 
             // If stem faces down, position it so that the top of the stem meets the bottom of the note
             // If stem faces up, position it so that the bottom of the stem meets the top of the note
-            top: stemType == 'down' ? `${size/2}px` : `${-size*2}px`,
+            top: stemType === 'down' ? `${size / 2}px` : `${-size * 2}px`,
 
             // hack for now to fix visual bug
-            left: stemType == 'down' ? '1px' : '0'
-        };
+            left: stemType === 'down' ? '1px' : '0'
+        }
     }
 
     const getFlagClass = () => {
-        return `stem-flag ${stemType}`;;
+        return `stem-flag ${stemType}`
     }
 
     const getFlagStyle = () => {
         return {
             width: `${size}px`,
-            height: `${size*2}px`,
+            height: `${size * 2}px`,
 
             // Position flag at top or bottom of stem depending on direction stem is facing
-            top: stemType == 'down' ? `${size}px` : `${-size*2}px`,
+            top: stemType === 'down' ? `${size}px` : `${-size * 2}px`,
 
             // hack for now to fix visual bug
-            left: stemType == 'down' ? '2px' : `${size/2}px`
-        };
+            left: stemType === 'down' ? '2px' : `${size / 2}px`
+        }
     }
 
     const getFlag = () => {
-        if (model.durationType == Duration.Eighth ||
-            model.durationType == Duration.Sixteenth ||
-            model.durationType == Duration.ThirtySecond) {
-            return <div className={getFlagClass()} style={getFlagStyle()}></div>;
+        if (model.durationType === Duration.Eighth ||
+            model.durationType === Duration.Sixteenth ||
+            model.durationType === Duration.ThirtySecond) {
+            return <div className={getFlagClass()} style={getFlagStyle()}></div>
         }
 
-        return <></>;
+        return <></>
     }
 
     const getStem = () => {
-        if (model.durationType == Duration.Whole) {
-            return <></>;
+        if (model.durationType === Duration.Whole) {
+            return <></>
         }
 
-        return <div className={getStemClass()} style={getStemStyle()}></div>;
+        return <div className={getStemClass()} style={getStemStyle()}></div>
     }
 
     const getAccidentalElement = () => {
-        return <div className={`accidental ${accidental}`} style={{ left: `${-size}px`}}></div>;
+        return <div className={`accidental ${accidental ?? ''}`} style={{ left: `${-size}px` }}></div>
     }
 
     return (
@@ -129,7 +127,7 @@ function StaffNote({ model, left, bottom, size, accidental }: StaffNoteProps) {
             {getStem()}
             {getFlag()}
         </div>
-    );
+    )
 }
 
-export default StaffNote;
+export default StaffNote
