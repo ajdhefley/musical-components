@@ -1,58 +1,6 @@
-import { NotationModel, RestModel } from './models'
-import { NaturalNote, Pitch, Accidental, Duration } from './enums'
+import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from './models'
 
 export abstract class MusicLogic {
-    /**
-     * Determines duration type from the beat value, a finite set of numbers.
-     * Returns n from the following where d is the input: d = 1/n
-     *
-     * - 1/1  | 1       = Whole
-     * - 1/2  | 0.5     = Half
-     * - 1/4  | 0.25    = Quarter
-     * - 1/8  | 0.125   = Eighth
-     * - 1/16 | 0.0625  = Sixteenth
-     * - 1/32 | 0.03125 = ThirtySecond
-     *
-     * Any other input will return undefined.
-     *
-     * @param beatValue Numerical representation of note's duration (a Quarter Note, for example, being 0.25)
-     * @returns Duration enum value, or undefined if not a valid beat value.
-     **/
-    static getDurationTypeFromBeatValue (beatValue: number): Duration {
-        switch (beatValue) {
-            case 1 / Duration.Whole: return Duration.Whole
-            case 1 / Duration.Half: return Duration.Half
-            case 1 / Duration.Quarter: return Duration.Quarter
-            case 1 / Duration.Eighth: return Duration.Eighth
-            case 1 / Duration.Sixteenth: return Duration.Sixteenth
-            case 1 / Duration.ThirtySecond: return Duration.ThirtySecond
-        }
-    }
-
-    /**
-     * Returns beat value for a given duration type.
-     *
-     * - Whole        = 1/1
-     * - Half         = 1/2
-     * - Quarter      = 1/4
-     * - Eighth       = 1/8
-     * - Sixteenth    = 1/16
-     * - ThirtySecond = 1/32
-     *
-     * @param durationType The enum value representing the duration type.
-     * @returns Numerical beat value for a given duration type, a Whole Note being 1.0.
-     **/
-    static getBeatValueFromDurationType (durationType: Duration): number {
-        switch (durationType) {
-            case Duration.ThirtySecond: return 1 / 8
-            case Duration.Sixteenth: return 1 / 4
-            case Duration.Eighth: return 1 / 2
-            case Duration.Quarter: return 1
-            case Duration.Half: return 2
-            case Duration.Whole: return 4
-        }
-    }
-
     /**
      * Determines which accidental (sharp, flat, natural, or none) should be displayed
      * next to note, based on whether the note is sharped or flatted by key signature.
@@ -96,20 +44,20 @@ export abstract class MusicLogic {
      * @param addedItems
      * @returns A full list of notations, including calculated rests.
      **/
-    static addNotations (items: NotationModel[], addedItems: NotationModel[], beatsPerMeasure: number): NotationModel[] {
+    static addNotations (items: Notation[], addedItems: Notation[], beatsPerMeasure: number): Notation[] {
         const totalMeasureBeatValue = beatsPerMeasure / 4
 
         let nextTime = 0
 
         if (items.length > 0) {
             const lastNote = items[items.length - 1]
-            nextTime = lastNote.startBeat + 1 / lastNote.durationType
+            nextTime = lastNote.startBeat + lastNote.type.getBeatValue()
         }
 
         addedItems.forEach((addedItem, addedNoteIndex) => {
             // Rests are calculated/added automatically when gaps between notes are encountered.
             // Tthey do not need to be processed when causally iterated upon.
-            if (addedItem instanceof RestModel) {
+            if (addedItem instanceof Rest) {
                 return
             }
 
@@ -118,14 +66,14 @@ export abstract class MusicLogic {
                 // to see if a rest needs to be added between them.
 
                 const lastNote = addedItems[addedNoteIndex - 1]
-                nextTime = lastNote.startBeat + 1 / lastNote.durationType
+                nextTime = lastNote.startBeat + lastNote.type.getBeatValue()
                 const timediff = addedItem.startBeat - nextTime
 
                 // TODO: find largest possible rest in time diff, keep repeating until time filled
                 // TODO: handle dotted rests
 
                 if (timediff > 0) {
-                    addedItems.splice(addedNoteIndex, 0, new RestModel(MusicLogic.getDurationTypeFromBeatValue(timediff), nextTime))
+                    addedItems.splice(addedNoteIndex, 0, new Rest(NotationType.getNotationTypeFromDuration(timediff), nextTime))
                 }
             }
 
@@ -135,9 +83,9 @@ export abstract class MusicLogic {
 
         if (nextTime % totalMeasureBeatValue < totalMeasureBeatValue) {
             const lastNote = addedItems[addedItems.length - 1]
-            const remainingBeatValue = totalMeasureBeatValue - (nextTime % totalMeasureBeatValue) - (1 / lastNote.durationType)
-            const remainingDurationValue = MusicLogic.getDurationTypeFromBeatValue(remainingBeatValue)
-            addedItems.push(new RestModel(remainingDurationValue, nextTime + (1 / lastNote.durationType)))
+            const remainingBeatValue = totalMeasureBeatValue - (nextTime % totalMeasureBeatValue) - lastNote.type.getBeatValue()
+            const remainingDurationValue = NotationType.getNotationTypeFromDuration(remainingBeatValue)
+            addedItems.push(new Rest(remainingDurationValue, nextTime + lastNote.type.getBeatValue()))
         }
 
         items = items.concat(addedItems)
@@ -146,33 +94,34 @@ export abstract class MusicLogic {
     }
 
     /**
+     * Divides list of notes into separate measures according to measure properties.
      *
      * @param notations All of the notes/rests in a given sequence.
      * @param beatsPerMeasure Determines how notes/rests will be divided into measures according to their beat values.
      * @returns Converts an array of notes/rests into a two-dimensional array, each element an array of notes corresponding to a measure.
      **/
-    static getMeasures (notations: NotationModel[], beatsPerMeasure: number): NotationModel[][] {
+    static getMeasures (notations: Notation[], beatsPerMeasure: number): Notation[][] {
         if (notations.length === 0) {
             return [[]]
         }
 
         const minStep = 1 / 32
-        const noteCollectionArray = Array<NotationModel[]>()
+        const noteCollectionArray = Array<Notation[]>()
         const lastNote = notations[notations.length - 1]
 
         let stepCounter = 1
         let currentStep = 0
         let currentNote = null
 
-        while (currentStep < lastNote.startBeat + 1 / lastNote.durationType) {
-            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + 1 / n.durationType)
+        while (currentStep < lastNote.startBeat + lastNote.type.getBeatValue()) {
+            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.type.getBeatValue())
 
-            if (steppedNote !== currentNote) {
+            if (steppedNote && steppedNote !== currentNote) {
                 currentNote = steppedNote
 
                 if (stepCounter >= beatsPerMeasure / 4) {
                     stepCounter = 0
-                    noteCollectionArray.push(new Array<NotationModel>())
+                    noteCollectionArray.push(new Array<Notation>())
                 }
 
                 noteCollectionArray[noteCollectionArray.length - 1].push(currentNote)

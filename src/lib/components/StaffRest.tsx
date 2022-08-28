@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './StaffRest.scss'
-import { RestModel } from '../core/models'
+import { Rest } from '../core/models'
 
 /**
  *
@@ -10,7 +10,7 @@ interface StaffRestProps {
     /**
      *
      **/
-    model: RestModel
+    model: Rest
 
     /**
      *
@@ -26,7 +26,7 @@ function StaffRest ({ model, left }: StaffRestProps): React.ReactElement {
     const SpaceHeight: number = 20
 
     const getClass = () => {
-        return `rest rest-${model.durationType}`
+        return `rest rest-${model.type.getCountPerMeasure()}`
     }
 
     const getStyle = () => {

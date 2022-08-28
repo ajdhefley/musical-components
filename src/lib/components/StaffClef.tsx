@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './StaffClef.scss'
-import { Clef } from '../core/enums'
+import { Clef } from '../core/models'
 
 /**
  *
@@ -19,7 +19,7 @@ interface StaffClefProps {
 function StaffClef ({ type }: StaffClefProps): React.ReactElement {
     return <>
         <div className="clef-container">
-            <div className={Clef[type].toLowerCase()}></div>
+            <div className={type.name}></div>
         </div>
     </>
 }

@@ -12,15 +12,15 @@ $accidental-size: 40px;
         filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
     }
 
-    &.note-whole {
+    &.note-1 {
         background-image: url('../images/note-whole.svg');
     }
 
-    &.note-half {
+    &.note-2 {
         background-image: url('../images/note-half.svg');
     }
 
-    &.note-quarter, &.note-eighth, &.note-sixteenth, &.note-thirtysecond {
+    &.note-4, &.note-8, &.note-16, &.note-32 {
         background-image: url('../images/note.svg');
     }
 }
@@ -48,19 +48,19 @@ $accidental-size: 40px;
     }
 }
 
-.note-8th {
+.note-8 {
     .stem-flag {
         background-image: url('../images/flag-8.svg');
     }
 }
 
-.note-16th {
+.note-16 {
     .stem-flag {
         background-image: url('../images/flag-16.svg');
     }
 }
 
-.note-32nd {
+.note-32 {
     .stem-flag {
         background-image: url('../images/flag-32.svg');
     }

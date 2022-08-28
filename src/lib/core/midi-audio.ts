@@ -2,12 +2,12 @@ import { PitchOscillator } from './pitch-oscillator'
 
 /**
  * Binds to MIDI input port, listens for MIDI messages, and generates
- * frequences based on the pitches encoded in the MIDI messages.
+ * audio frequencies based on the pitches encoded in the MIDI messages.
  *
  * Once listening:
  *
- * Generates frequency from pitch when ON command is received in message.
- * Stops frequency matching pitch when OFF command is received in message.
+ * - Generates frequency from pitch when Note On command is received in MIDI message.
+ * - Stops frequency matching pitch when Note Off command is received in MIDI message.
  **/
 export class MidiAudio {
     private static readonly COMMAND_NOTE_ON = 0x90
@@ -32,6 +32,8 @@ export class MidiAudio {
     }
 
     /**
+     * Handles Note On and Note Off messages, maintaining
+     * a list of pitch/frequency oscillators underneath.
      *
      * @param e
      **/
@@ -49,29 +51,36 @@ export class MidiAudio {
     }
 
     /**
+     * Initializes new pitch oscillator from data encoded in MIDI message.
      *
      * @param e
      **/
     private handleMessageNoteOn (e: WebMidi.MIDIMessageEvent) {
-        this.pitchOscillators.push(
-            new PitchOscillator()
-                .init(this.context)
-                .generateFrequencyFromPitch(e.data[1])
-        )
+        const oscillator = new PitchOscillator()
+        oscillator.init(this.context)
+        oscillator.generateFrequencyFromPitch(e.data[1])
+        this.pitchOscillators.push(oscillator)
     }
 
     /**
+     * Finds the oscillator actively generating pitch encoded
+     * in this MIDI message. Stops and disposes the oscillator.
      *
      * @param e
      **/
     private handleMessageNoteOff (e: WebMidi.MIDIMessageEvent) {
         const oscillator = this.pitchOscillators.find(o => o.getActivePitch() === e.data[1])
-        oscillator.stop()
-        this.pitchOscillators.splice(this.pitchOscillators.indexOf(oscillator), 1)
+
+        if (oscillator) {
+            this.pitchOscillators.splice(this.pitchOscillators.indexOf(oscillator), 1)
+            oscillator.stop()
+        }
     }
 
     /**
-     *
+     * Sets the volume of all currently active oscillators proportionally to the
+     * total number of active oscillators, such that the total output volume will
+     * remain consistent and all oscillators will output at equal volume.
      **/
     private normalizeOscillatorVolume () {
         this.pitchOscillators.forEach(o => {

@@ -36,6 +36,9 @@
         // Do not require return type on functions
         "@typescript-eslint/explicit-function-return-type": 0,
 
+        // Allow non-strings in template literals (interpolated strings)
+        "@typescript-eslint/restrict-template-expressions": 0,
+
         "indent": [1, 4, { "SwitchCase": 1 }],
         "@typescript-eslint/indent": [1, 4, { "SwitchCase": 1 }]
     }

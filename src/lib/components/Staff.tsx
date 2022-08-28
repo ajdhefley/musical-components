@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 
 import './Staff.scss'
-import { NotationModel, NoteModel } from '../core/models'
-import { NaturalNote, Clef, Duration } from '../core/enums'
+import { Clef, NaturalNote, Notation, NotationType, Note } from '../core/models'
 import { MusicLogic } from '../core/music-logic'
-import { MidiRelay } from '../core/audio/midi-relay'
+import { MidiRelay } from '../core/midi-relay'
+import { MidiAudio } from '../core/midi-audio'
 import StaffMeasure from './StaffMeasure'
-import { MidiAudio } from '../core/audio/midi-audio'
 import StaffKeySignature from './StaffKeySignature'
 import StaffTimeSignature from './StaffTimeSignature'
 import StaffClef from './StaffClef'
 import StaffLines from './StaffLines'
+import { Metronome } from '../core/metronome'
 
 /**
  *
@@ -29,7 +29,7 @@ interface StaffProps {
     /**
      * The value of a given beat, determining the bottom number of the time signature.
      **/
-    beatDuration: Duration
+    beatDuration: NotationType
 
     /**
      * The intended tempo of the music.
@@ -51,7 +51,7 @@ interface StaffProps {
     /**
      *
      **/
-    initialNotations?: NotationModel[]
+    initialNotations?: Notation[]
 }
 
 /**
@@ -59,9 +59,11 @@ interface StaffProps {
  **/
 function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, flats, initialNotations }: StaffProps): React.ReactElement {
     const [midiHandler] = useState(new MidiRelay())
-    const [notations, setNotations] = useState(new Array<NotationModel>())
+    const [metronome] = useState(new Metronome(beatsPerMeasure, beatsPerMinute))
+    const [notations, setNotations] = useState(new Array<Notation>())
 
     useEffect(() => {
+        // @ts-expect-error
         addNotations(...initialNotations)
         midiHandler.openAccess().then((midiAccess) => {
             new MidiAudio().listen(midiAccess.inputs)
@@ -85,12 +87,12 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
         </>)
     }
 
-    const addNotations = async (...addedNotations: NotationModel[]) => {
+    const addNotations = async (...addedNotations: Notation[]) => {
         const notes = MusicLogic.addNotations(notations, addedNotations, beatsPerMeasure)
         setNotations(notations.concat(notes))
     }
 
-    const activateNotation = (notation?: NotationModel) => {
+    const activateNotation = (notation?: Notation) => {
         const newNotes = notations.map((iteratedNotation) => {
             if (iteratedNotation === notation) {
                 iteratedNotation.active = true
@@ -106,27 +108,35 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
 
     const play = async () => {
         const lastNote = notations[notations.length - 1]
-        const lastTick = lastNote.startBeat + (1 / lastNote.durationType)
+        const lastTick = lastNote.startBeat + lastNote.type.getBeatValue()
+
+        const usingMetronome = true // TODO: make configurable by user or code
+        if (usingMetronome) {
+            metronome.start()
+        }
 
         for (let i = 0; i < lastTick; i += 1 / 32) {
             await Promise.all(
                 notations
-                    .filter(n => n instanceof NoteModel)
+                    .filter(n => n instanceof Note)
                     .filter(n => n.startBeat === i)
-                    .map(async (note: NoteModel) => {
+                    .map(async (note: any) => {
                         const baseBpm = 60
-                        const baseBeatDuration = 1000
-                        const beatDuration = (baseBpm / beatsPerMinute) * baseBeatDuration
-                        const noteDuration = MusicLogic.getBeatValueFromDurationType(note.durationType) * beatDuration
-                        activateNotation(note)
+                        const baseCountDuration = 1000
+                        const countDuration = (baseBpm / beatsPerMinute) * baseCountDuration
+                        const noteDuration = note.type.getBeatsPerMeasure() * countDuration
                         midiHandler.sendMidi(note.pitch, noteDuration)
-                        return await new Promise((resolve) => setTimeout(resolve, noteDuration))
+                        activateNotation(note)
+                        return await new Promise<void>((resolve) => setTimeout(resolve, noteDuration))
                     })
             )
         }
 
+        // Stop metronome.
+        metronome.stop()
+
         // Set all notes to inactive.
-        activateNotation(null)
+        activateNotation(undefined)
     }
 
     return <>

@@ -2,30 +2,26 @@ import React from 'react'
 
 import './Exercise.scss'
 import Staff from '../lib/components/Staff'
-import { Clef, Duration, Pitch } from '../lib/core/enums'
-import { NotationModel, NoteModel } from '../lib/core/models'
+import { Clef, Notation, NotationType, Note, Pitch } from '../lib/core/models'
 
 function Exercise (): React.ReactElement {
-    const notes: NotationModel[] = [
-        new NoteModel(Pitch.A3, Duration.Eighth),
-        new NoteModel(Pitch.B3, Duration.Eighth),
-        new NoteModel(Pitch.C4, Duration.Eighth),
-        new NoteModel(Pitch.D4, Duration.Eighth),
-        new NoteModel(Pitch.E4, Duration.Sixteenth),
-        new NoteModel(Pitch.F4, Duration.Sixteenth),
-        new NoteModel(Pitch.E4, Duration.ThirtySecond),
-        new NoteModel(Pitch.F4, Duration.ThirtySecond),
-        new NoteModel(Pitch.E4, Duration.ThirtySecond),
-        new NoteModel(Pitch.F4, Duration.ThirtySecond)
+    const notes: Notation[] = [
+        new Note(NotationType.Eighth, Pitch.E3),
+        new Note(NotationType.Eighth, Pitch.F3),
+        new Note(NotationType.Eighth, Pitch.D3),
+        new Note(NotationType.Eighth, Pitch.F3),
+        new Note(NotationType.Eighth, Pitch.E3),
+        new Note(NotationType.Eighth, Pitch.D3),
+        new Note(NotationType.Eighth, Pitch.C3)
     ]
 
     return (
         <div>
             {/* <Staff clef="treble" sharps={SharpKeys.EMajor} beatsPerMeasure={4} beatDuration={0.25} /> */}
             <Staff
-                clef={Clef.Treble}
+                clef={Clef.TrebleClef}
                 beatsPerMeasure={4}
-                beatDuration={Duration.Quarter}
+                beatDuration={NotationType.Quarter}
                 beatsPerMinute={120}
                 initialNotations={notes}
             />

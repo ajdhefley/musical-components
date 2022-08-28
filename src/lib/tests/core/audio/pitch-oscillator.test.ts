@@ -1,5 +1,4 @@
-import { PitchOscillator } from '../../../core/audio/pitch-oscillator'
-import { AudioContext as StandardizedAudioContext } from 'standardized-audio-context-mock'
+import { PitchOscillator } from '../../../core/pitch-oscillator'
 
 describe('PitchOscillator', () => {
     it('should convert common pitches to frequencies', () => {

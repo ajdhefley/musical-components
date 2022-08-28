@@ -1,8 +1,7 @@
 import React from 'react'
 
 import './StaffNote.scss'
-import { NoteModel } from '../core/models'
-import { Accidental, Duration } from '../core/enums'
+import { Accidental, NotationType, Note } from '../core/models'
 
 /**
  *
@@ -11,7 +10,7 @@ interface StaffNoteProps {
     /**
      *
      **/
-    model: NoteModel
+    model: Note
 
     /**
      *
@@ -31,7 +30,7 @@ interface StaffNoteProps {
     /**
      *
      **/
-    accidental: Accidental | undefined
+    accidental?: Accidental
 }
 
 /**
@@ -47,7 +46,7 @@ function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): 
     })()
 
     const getNoteClass = () => {
-        return `note note-${Duration[model.durationType].toLowerCase()} ${model.active ? 'active' : ''}`
+        return `note note-${model.type.getCountPerMeasure()} ${model.active ? 'active' : ''}`
     }
 
     const getNoteStyle = () => {
@@ -60,25 +59,6 @@ function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): 
             // (places center of the note on position instead of top-left corner)
             left: `${left - size / 2}px`,
             bottom: `${bottom - size / 2}px`
-        }
-    }
-
-    const getStemClass = () => {
-        return `stem ${stemType}`
-    }
-
-    const getStemStyle = () => {
-        return {
-            transform: `scale(1, ${model.stemStretchFactor})`,
-            width: `${size}px`,
-            height: `${size * 2.5}px`,
-
-            // If stem faces down, position it so that the top of the stem meets the bottom of the note
-            // If stem faces up, position it so that the bottom of the stem meets the top of the note
-            top: stemType === 'down' ? `${size / 2}px` : `${-size * 2}px`,
-
-            // hack for now to fix visual bug
-            left: stemType === 'down' ? '1px' : '0'
         }
     }
 
@@ -99,33 +79,52 @@ function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): 
         }
     }
 
-    const getFlag = () => {
-        if (model.durationType === Duration.Eighth ||
-            model.durationType === Duration.Sixteenth ||
-            model.durationType === Duration.ThirtySecond) {
+    const getFlagElement = () => {
+        if (model.type === NotationType.Eighth ||
+            model.type === NotationType.Sixteenth ||
+            model.type === NotationType.ThirtySecond) {
             return <div className={getFlagClass()} style={getFlagStyle()}></div>
         }
 
         return <></>
     }
 
-    const getStem = () => {
-        if (model.durationType === Duration.Whole) {
+    const getVerticalStemClass = () => {
+        return `stem ${stemType}`
+    }
+
+    const getVerticalStemStyle = () => {
+        return {
+            transform: `scale(1, ${model.stemStretchFactor})`,
+            width: `${size}px`,
+            height: `${size * 2.5}px`,
+
+            // If stem faces down, position it so that the top of the stem meets the bottom of the note
+            // If stem faces up, position it so that the bottom of the stem meets the top of the note
+            top: stemType === 'down' ? `${size / 2}px` : `${-size * 2}px`,
+
+            // hack for now to fix visual bug
+            left: stemType === 'down' ? '1px' : '0'
+        }
+    }
+
+    const getVerticalStemElement = () => {
+        if (model.type === NotationType.Whole) {
             return <></>
         }
 
-        return <div className={getStemClass()} style={getStemStyle()}></div>
+        return <div className={getVerticalStemClass()} style={getVerticalStemStyle()}></div>
     }
 
     const getAccidentalElement = () => {
-        return <div className={`accidental ${accidental ?? ''}`} style={{ left: `${-size}px` }}></div>
+        return <div className={`accidental ${accidental?.name}`} style={{ left: `${-size}px` }}></div>
     }
 
     return (
         <div data-note={model} className={getNoteClass()} style={getNoteStyle()}>
             {getAccidentalElement()}
-            {getStem()}
-            {getFlag()}
+            {getVerticalStemElement()}
+            {false && getFlagElement()}
         </div>
     )
 }

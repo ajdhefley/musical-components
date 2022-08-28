@@ -1,4 +1,4 @@
-import { MidiAudio } from '../../../core/audio/midi-audio'
+import { MidiAudio } from '../../../core/midi-audio'
 
 describe('MidiAudio', () => {
     it('should shit', () => {

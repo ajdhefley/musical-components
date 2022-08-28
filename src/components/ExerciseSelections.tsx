@@ -8,10 +8,10 @@ import { useAppDispatch } from '../redux-hooks'
 
 function ExerciseSelections (): React.ReactElement {
     const dispatch = useAppDispatch()
-    const [exerciseTypes, setExerciseTypes] = useState([])
+    const [exerciseTypes, setExerciseTypes] = useState<any[]>()
 
     useEffect(() => {
-        const apiUrl: string = process.env.API_URL
+        const apiUrl: string = process.env.API_URL ?? ''
         fetch(`${apiUrl}/exercise/types`)
             .then(async (res) => await res.json())
             .then((data) => {
@@ -22,7 +22,7 @@ function ExerciseSelections (): React.ReactElement {
     return (
         <div className="content-wrapper">
             <p className="intro-text">Select an exercise below.</p>
-            {exerciseTypes.map((exerciseType) => (
+            {exerciseTypes?.map((exerciseType) => (
                 <Link
                     key={exerciseType.exerciseTypeId}
                     className="exercise-container"

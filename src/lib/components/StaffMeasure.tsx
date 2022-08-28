@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import './StaffMeasure.scss'
-import { NotationModel, NoteModel, RestModel } from '../core/models'
-import { NaturalNote, Clef, Pitch, Duration } from '../core/enums'
+import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '../core/models'
 import { MusicLogic } from '../core/music-logic'
 import StaffNote from './StaffNote'
 import StaffRest from './StaffRest'
@@ -20,7 +19,7 @@ interface StaffMeasureProps {
     /**
      *
      **/
-    notes: NotationModel[]
+    notes: Notation[]
 
     /**
      * The treble or bass clef, which affects note position.
@@ -42,7 +41,7 @@ interface StaffMeasureProps {
  *
  **/
 function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMeasureProps): React.ReactElement {
-    const ref = useRef(null)
+    const ref = useRef<HTMLDivElement>(null)
     const [staffSpaceHeight, setStaffSpaceHeight] = useState(0)
     const [noteSize] = useState(35)
     const [noteSpacing] = useState(35)
@@ -50,7 +49,9 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
     const [minMeasureWidth] = useState(400)
 
     useEffect(() => {
-        if (ref.current) { setStaffSpaceHeight(ref.current.clientHeight / 4) }
+        if (ref.current) {
+            setStaffSpaceHeight(ref.current.clientHeight / 4)
+        }
     }, [ref])
 
     const id = `measure ${notes?.length > 0 ? notes[0].startBeat : '0'}`
@@ -62,13 +63,16 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
 
     const getNoteAt = (beat: number) => {
         for (const note of notes) {
-            if (note instanceof NoteModel && normalizeBeat(note.startBeat) <= beat && beat < normalizeBeat(note.startBeat) + (1 / note.durationType)) {
+            const localMeasureStartBeat = normalizeBeat(note.startBeat)
+            if (note instanceof Note && localMeasureStartBeat <= beat && beat < localMeasureStartBeat + note.type.getBeatValue()) {
                 return note
             }
         }
+
+        throw Error(`Note not found at beat ${beat}`)
     }
 
-    const getNotationLeftPosition = (notation: NotationModel) => {
+    const getNotationLeftPosition = (notation: Notation) => {
         const leftOffset = 25
         const accidentalWidth = 15
 
@@ -83,16 +87,16 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
                 total += (noteSize + noteSpacing)
             }
 
-            if (MusicLogic.getAccidentalForPitch(note.pitch)) {
+            if (MusicLogic.getAccidentalForPitch(note.pitch, sharps, flats)) {
                 total += accidentalWidth
             }
         }
 
-        if (notation instanceof NoteModel && MusicLogic.getAccidentalForPitch(notation.pitch)) {
+        if (notation instanceof Note && MusicLogic.getAccidentalForPitch(notation.pitch, sharps, flats)) {
             total += accidentalWidth
         }
 
-        if (notation instanceof RestModel && notation === notes[notes.length - 1]) {
+        if (notation instanceof Rest && notation === notes[notes.length - 1]) {
             // If is rest and the final notation, center within remaining width of measure.
             const measureWidth = minMeasureWidth // TODO: can't call getMeasureWidth() - results in stack overflow
             const remainingWidth = measureWidth - total
@@ -103,9 +107,7 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
     }
 
     const getNotationBottomPosition = (pitch: Pitch) => {
-        // Filtered by isNaN because TS includes both keys and values in array of heterogeneous enum values
-        // Explanation here: https://stackoverflow.com/a/51536142/3068267
-        // We only want numeric values
+        // @ts-expect-error
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
 
         // Determine base natural, to calculate correct position on staff
@@ -129,16 +131,17 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
         // to be known ahead of time.
         let middleCPosition = 0
         switch (clef) {
-            case Clef.Treble:
+            case Clef.TrebleClef:
                 // Occupies the 3rd space from the bottom, which is the 5th index where the bottom line is 0
                 middleCPosition = 5
                 break
-            case Clef.Bass:
+            case Clef.BassClef:
                 // Occupies a whole step above the 4th line from the bottom, which is the 10th index where the bottom line is 0
                 middleCPosition = 10
                 break
         }
 
+        // @ts-expect-error
         const noteDiff = Object.values(NaturalNote).filter(isNaN).indexOf(noteValue)
         const basePitchPosition = noteDiff
         const pitchOctave = Math.floor(pitch / 12) - 1
@@ -168,9 +171,12 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
     }
 
     const getConnectingStem = (startIndex: number, endIndex: number) => {
-        const startNote = notes[startIndex] as NoteModel
-        const endNote = notes[endIndex] as NoteModel
-        const durationType = startNote.durationType
+        if (startIndex === endIndex) {
+            return
+        }
+
+        const startNote = notes[startIndex] as Note
+        const endNote = notes[endIndex] as Note
         const stemStartXPos = getNotationLeftPosition(startNote) - (noteSize / 2) + 2
         const stemStartYPos = getNotationBottomPosition(startNote.pitch) - defaultStemHeight
         const stemEndXPos = getNotationLeftPosition(endNote) - (noteSize / 2)
@@ -186,9 +192,9 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
         b.style.bottom = `${stemStartYPos}px`
         b.style.width = `${stemWidth}px`
         b.style.border = `${stemHeight}px solid #000`
-        window.setTimeout(() => window.document.getElementById(id).appendChild(b))
+        window.setTimeout(() => window.document.getElementById(id)?.appendChild(b))
 
-        if (durationType === Duration.Sixteenth || durationType === Duration.ThirtySecond) {
+        if (startNote.type === NotationType.Sixteenth || startNote.type === NotationType.ThirtySecond) {
             const b2 = window.document.createElement('div')
             b2.id = notes[endIndex].startBeat.toString()
             b2.style.position = 'absolute'
@@ -196,10 +202,10 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
             b2.style.bottom = `${stemStartYPos + (stemHeight * 3)}px`
             b2.style.width = `${stemWidth}px`
             b2.style.border = `${stemHeight}px solid #000`
-            window.setTimeout(() => window.document.getElementById(id).appendChild(b2))
+            window.setTimeout(() => window.document.getElementById(id)?.appendChild(b2))
         }
 
-        if (durationType === Duration.ThirtySecond) {
+        if (startNote.type === NotationType.ThirtySecond) {
             const b3 = window.document.createElement('div')
             b3.id = notes[endIndex].startBeat.toString()
             b3.style.position = 'absolute'
@@ -207,24 +213,24 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
             b3.style.bottom = `${stemStartYPos + (stemHeight * 3 * 2)}px`
             b3.style.width = `${stemWidth}px`
             b3.style.border = `${stemHeight}px solid #000`
-            window.setTimeout(() => window.document.getElementById(id).appendChild(b3))
+            window.setTimeout(() => window.document.getElementById(id)?.appendChild(b3))
         }
     }
 
     const drawStems = (index: number) => {
         const notationModel = notes[index]
 
-        if (notationModel instanceof NoteModel &&
-            (notationModel.durationType === Duration.ThirtySecond ||
-             notationModel.durationType === Duration.Sixteenth ||
-             notationModel.durationType === Duration.Eighth)) {
+        if (notationModel instanceof Note &&
+            (notationModel.type === NotationType.ThirtySecond ||
+             notationModel.type === NotationType.Sixteenth ||
+             notationModel.type === NotationType.Eighth)) {
             let maxConnectedNotes = beatsPerMeasure
-            if (notationModel.durationType === Duration.ThirtySecond) maxConnectedNotes *= 4
-            if (notationModel.durationType === Duration.Sixteenth) maxConnectedNotes *= 2
+            if (notationModel.type === NotationType.ThirtySecond) maxConnectedNotes *= 4
+            if (notationModel.type === NotationType.Sixteenth) maxConnectedNotes *= 2
 
             let count = 0
 
-            while (notes[index + count] instanceof NoteModel && notes[index + count].durationType === notationModel.durationType) {
+            while (notes[index + count] instanceof Note && notes[index + count].type === notationModel.type) {
                 count++
 
                 if (count === maxConnectedNotes) {
@@ -236,7 +242,7 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
 
             for (let i = index; i < index + count; i++) {
                 const nextNote = notes[i]
-                if (nextNote instanceof NoteModel && notationModel instanceof NoteModel) {
+                if (nextNote instanceof Note && notationModel instanceof Note) {
                     const stemProportion = (getNotationBottomPosition(nextNote.pitch) - getNotationBottomPosition(notationModel.pitch)) / defaultStemHeight
                     nextNote.stemStretchFactor = 1 + stemProportion
                 }
@@ -244,13 +250,15 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
 
             return index + count - 1
         }
+
+        throw Error('Not a note')
     }
 
     const getNotations = () => {
         let lastHorizontalStemIndex = -1
 
-        return notes?.map((notationModel: NotationModel, index) => {
-            if (notationModel instanceof NoteModel) {
+        return notes?.map((notationModel: Notation, index) => {
+            if (notationModel instanceof Note) {
                 if (index > lastHorizontalStemIndex) {
                     lastHorizontalStemIndex = drawStems(index)
                 }
@@ -269,7 +277,7 @@ function StaffMeasure ({ notes, clef, sharps, flats, beatsPerMeasure }: StaffMea
                         accidental={accidental}
                     />
                 )
-            } else if (notationModel instanceof RestModel) {
+            } else if (notationModel instanceof Rest) {
                 const leftPosition = getNotationLeftPosition(notationModel)
                 return (
                     <StaffRest

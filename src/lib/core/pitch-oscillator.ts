@@ -8,23 +8,25 @@ export class PitchOscillator {
     private activePitch: number
 
     /**
-     *
-     * @param context
+     * @param context Web Audio API entry used to create and control frequency oscillators.
      **/
     init (context: AudioContext) {
         this.context = context
         this.node = this.context.createOscillator()
         this.gainNode = context.createGain()
-        return this
     }
 
     /**
      * Converts MIDI pitch to frequency using standard formula.
      * Plays frequency with Web Audio oscillator.
      *
-     * @param pitch
+     * @param pitch Valid musical pitch (error will be thrown if value if not between 22 and 106.)
      **/
     generateFrequencyFromPitch (pitch: number) {
+        if (pitch < 22 || pitch > 106) {
+            throw Error('Pitch must be between 22 and 106')
+        }
+
         const frequency = this.convertPitchToFrequency(pitch)
         this.gainNode.connect(this.context.destination)
         this.node.connect(this.gainNode)
@@ -32,7 +34,6 @@ export class PitchOscillator {
         // this.node.connect(this.context.destination);
         this.node.start(0)
         this.activePitch = pitch
-        return this
     }
 
     /**
@@ -52,9 +53,13 @@ export class PitchOscillator {
 
     /**
      *
-     * @param value
+     * @param value Volume between 0 and 1.
      **/
-    setVolume (value) {
+    setVolume (value: number) {
+        if (value < 0 || value > 1) {
+            throw Error()
+        }
+
         this.gainNode.gain.setValueAtTime(value, this.context.currentTime)
     }
 

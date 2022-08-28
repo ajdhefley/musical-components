@@ -1,23 +1,23 @@
-import { AnyAction } from 'redux';
-import { AppActionTypes } from './redux-actions';
-import { ExerciseSelectionModel } from './redux-models';
+import { AnyAction } from 'redux'
+import { AppActionTypes } from './redux-actions'
+import { ExerciseSelectionModel } from './redux-models'
 
 export interface ExerciseState {
-    selectedExercise: ExerciseSelectionModel;
+    selectedExercise?: ExerciseSelectionModel
 }
 
 const initialState: ExerciseState = {
-    selectedExercise: null
+    selectedExercise: undefined
 }
 
-export default function exerciseReducer(state = initialState, action: AnyAction): ExerciseState {
-    const nextState = { ...state };
+export default function exerciseReducer (state = initialState, action: AnyAction): ExerciseState {
+    const nextState = { ...state }
 
     switch (action.type) {
         case AppActionTypes.SetExerciseId: {
-            nextState.selectedExercise = action.payload.exercise;
+            nextState.selectedExercise = action.payload.exercise
         }
     }
 
-    return nextState;
+    return nextState
 }

@@ -1,3 +1,10 @@
-export * from './notation.model'
-export * from './note.model'
-export * from './rest.model'
+export * from './accidental'
+export * from './clef'
+export * from './natural-note'
+export * from './notation'
+export * from './notation-type'
+export * from './note'
+export * from './rest'
+export * from './pitch'
+
+export * from './deleteme'

@@ -1,12 +1,4 @@
-export enum NaturalNote {
-    C = 0,
-    D = 2,
-    E = 4,
-    F = 5,
-    G = 7,
-    A = 9,
-    B = 11
-}
+import { NaturalNote } from './natural-note'
 
 // TODO: fetch from API
 export const SharpKeys = {

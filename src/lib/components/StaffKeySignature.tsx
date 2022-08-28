@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import './StaffKeySignature.scss'
-import { Clef, NaturalNote } from '../core/enums'
+import { Clef, NaturalNote } from '../core/models'
 
 /**
  *
@@ -29,7 +29,7 @@ interface StaffKeySignatureProps {
  *
  **/
 function StaffKeySignature ({ clef, sharps, flats }: StaffKeySignatureProps): React.ReactElement {
-    const ref = useRef(null)
+    const ref = useRef<HTMLDivElement>(null)
     const [accidentalSize, setAccidentalSize] = useState(0)
     const [spaceHeight, setSpaceHeight] = useState(0)
 
@@ -47,10 +47,8 @@ function StaffKeySignature ({ clef, sharps, flats }: StaffKeySignatureProps): Re
         // String value ("A", "B", "C", etc) of the note
         const noteValue = NaturalNote[note]
 
-        // Filtered by isNaN because TS includes both keys and values in array of heterogeneous enum values
-        // Explanation here: https://stackoverflow.com/a/51536142/3068267
-        // We only want numeric values
-        const totalNotes = Object.values(NaturalNote).filter(isNaN).length
+        // @ts-expect-error
+        const totalNaturalNotes = Object.values(NaturalNote).filter(isNaN).length
 
         // 4 spaces plus 5 lines on the staff is 9 total valid positions occupied by the sharps/flats
         const maxValidPosition = 9
@@ -60,11 +58,11 @@ function StaffKeySignature ({ clef, sharps, flats }: StaffKeySignatureProps): Re
         // to be known ahead of time.
         let middleCPosition = 0
         switch (clef) {
-            case Clef.Treble:
+            case Clef.TrebleClef:
                 // Occupies the 3rd space from the bottom, which is the 5th index where the bottom line is 0
                 middleCPosition = 5
                 break
-            case Clef.Bass:
+            case Clef.BassClef:
                 // Occupies a whole step above the 4th line from the bottom, which is the 10th index where the bottom line is 0
                 middleCPosition = 10
                 break
@@ -73,9 +71,7 @@ function StaffKeySignature ({ clef, sharps, flats }: StaffKeySignatureProps): Re
         // Sharps/flats for key signature should occupy visible lines and spaces only
         // If a note exceeds it, bring it down an octave
         let pitchPosition = Object.values(NaturalNote).indexOf(noteValue)
-        if (middleCPosition + pitchPosition > maxValidPosition) { pitchPosition -= totalNotes }
-
-        console.log({ note, pitchPosition })
+        if (middleCPosition + pitchPosition > maxValidPosition) { pitchPosition -= totalNaturalNotes }
 
         // One note per line and one per space equates to each note occupying a height of half each space
         const noteHeight = spaceHeight / 2

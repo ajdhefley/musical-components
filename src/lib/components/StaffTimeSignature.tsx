@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './StaffTimeSignature.scss'
-import { Duration, NaturalNote } from '../core/enums'
+import { NaturalNote, NotationType } from '../core/models'
 
 interface StaffTimeSignatureProps {
     /**
@@ -12,7 +12,7 @@ interface StaffTimeSignatureProps {
     /**
      * The value of a given beat, determining the bottom number of the time signature.
      **/
-    beatDuration: Duration
+    beatDuration: NotationType
 
     /**
      * The pitches that are sharped, determining the major key.
@@ -34,7 +34,7 @@ function StaffTimeSignature ({ beatsPerMeasure, beatDuration, sharps, flats }: S
     const getTimeSignature = () => {
         return <>
             <div className={`ts-top ts-${beatsPerMeasure}`}></div>
-            <div className={`ts-bottom ts-${beatDuration}`}></div>
+            <div className={`ts-bottom ts-${beatDuration.getCountPerMeasure()}`}></div>
         </>
     }
 
