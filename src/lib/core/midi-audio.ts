@@ -28,7 +28,7 @@ export class MidiAudio {
         this.context.resume()
         this.midiInput = midiInputs.values().next().value
         this.midiInput.open()
-        this.midiInput.onmidimessage = (e) => this.onMessage(e)
+        // this.midiInput.onmidimessage = (e) => this.onMessage(e)
     }
 
     /**

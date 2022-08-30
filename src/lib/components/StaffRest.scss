@@ -4,6 +4,11 @@
     background-repeat: no-repeat;
     background-position: top;
     position: absolute;
+    width: $rest-size;
+    height: $rest-size;
+    background-size: $rest-size $rest-size;
+    margin-left: calc(-#{$rest-size} / 2);
+    bottom: calc(#{$staff-height} / 2 - #{$rest-size} / 2 + 2px);
 
     &.rest-1 {
         background-image: url('../images/rest-1.svg');

@@ -7,3 +7,7 @@ export class ExerciseSelectionModel {
     requiresClefTypeOptions: boolean
     requiresOctaveOptions: boolean
 }
+
+export class NotePlacementModel {
+
+}

@@ -9,6 +9,7 @@ import StaffKeySignature from './StaffKeySignature'
 import StaffTimeSignature from './StaffTimeSignature'
 import StaffClef from './StaffClef'
 import StaffLines from './StaffLines'
+import { useAppSelector } from '../../redux-hooks'
 
 /**
  *
@@ -50,12 +51,18 @@ interface StaffProps {
      *
      **/
     initialNotations?: Notation[]
+
+    /**
+     * Whether the user is allowed to place notes.
+     **/
+    interactive?: boolean
 }
 
 /**
  *
  **/
-function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, flats, initialNotations }: StaffProps): React.ReactElement {
+function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, flats, initialNotations, interactive }: StaffProps): React.ReactElement {
+    const placedNote = useAppSelector((state) => state.notePlacement)
     const [midiPlayer] = useState(new MidiNotationPlayer(beatsPerMeasure, beatsPerMinute))
     const [notations, setNotations] = useState(new Array<Notation>())
 
@@ -66,6 +73,13 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
         const notes = MusicLogic.addNotations(notations, initialNotations, beatsPerMeasure)
         setNotations(notations.concat(notes))
     }, [])
+
+    useEffect(() => {
+        if (placedNote?.note) {
+            const notes = MusicLogic.addNotations(notations, [placedNote.note as any], beatsPerMeasure)
+            setNotations(notations.concat(notes))
+        }
+    }, [placedNote])
 
     const activateNotation = (notation?: Notation) => {
         const newNotes = notations.map((iteratedNotation) => {
@@ -81,14 +95,14 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
         setNotations(newNotes)
     }
 
-    const play = async () => {
+    const togglePlayback = async () => {
         // Deactivate all notes
         activateNotation(undefined)
 
         if (midiPlayer.running()) {
             midiPlayer.stop()
         } else {
-            midiPlayer.play(notations, true)
+            midiPlayer.play(notations, false)
                 .on('message', (note) => activateNotation(note))
                 .on('stop', () => activateNotation(undefined))
         }
@@ -97,13 +111,12 @@ function Staff ({ clef, beatsPerMeasure, beatDuration, beatsPerMinute, sharps, f
     const getMeasureElements = () => {
         const measures = MusicLogic.splitIntoMeasures(notations, beatsPerMeasure, beatDuration)
         return measures.map((measureNotes) => <>
-            <StaffMeasure staffId={id} clef={clef} sharps={sharps} flats={flats} notations={measureNotes} beatsPerMeasure={beatsPerMeasure} beatDuration={beatDuration} />
+            <StaffMeasure staffId={id} clef={clef} sharps={sharps} flats={flats} notations={measureNotes} beatsPerMeasure={beatsPerMeasure} beatDuration={beatDuration} interactive={interactive} />
         </>)
     }
 
     return <>
-        {/* <button onClick={play} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button> */}
-        <br /><br /><br /><br /><br /><br /><br />
+        <button onClick={togglePlayback} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button>
         <div className="staff" id={id}>
             <div className="staff-intro">
                 <StaffLines />

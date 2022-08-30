@@ -7,6 +7,8 @@ import StaffNote from './StaffNote'
 import StaffRest from './StaffRest'
 import StaffLines from './StaffLines'
 import StaffNoteBeam from './StaffNoteBeam'
+import { useAppDispatch } from '../../redux-hooks'
+import { placeNote } from '../../redux-actions'
 
 /**
  *
@@ -46,22 +48,49 @@ interface StaffMeasureProps {
      * Notes that should be implicitly flatted (by key) without being denoted by an explicit accidental.
      **/
     flats?: NaturalNote[]
+
+    /**
+     *
+     */
+    interactive?: boolean
 }
 
 /**
  *
  **/
-function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasure, beatDuration }: StaffMeasureProps): React.ReactElement {
+function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasure, beatDuration, interactive }: StaffMeasureProps): React.ReactElement {
+    const dispatch = useAppDispatch()
     const ref = useRef<HTMLDivElement>(null)
     const [staffSpaceHeight, setStaffSpaceHeight] = useState(0)
     const [noteSize] = useState(35)
     const [noteSpacing] = useState(35)
     const [defaultStemHeight] = useState(noteSize * 3 - (noteSize / 2))
     const [stems, setStems] = useState(new Array<{ left: number, bottom: number, width: number}>())
+    const [mousePosition, setMousePosition] = useState<{x: number, y: number}>(({ x: 0, y: 0 }))
 
     useEffect(() => {
         if (ref.current) {
-            setStaffSpaceHeight(ref.current.clientHeight / 4)
+            const refCurrent = ref.current
+
+            setStaffSpaceHeight(refCurrent.clientHeight / 4)
+
+            if (interactive) {
+                const mousemove = (e: any) => {
+                    const bounds = refCurrent.getBoundingClientRect()
+                    const relativeX = e.clientX - bounds.left
+                    const relativeY = e.clientY - bounds.top
+                    setMousePosition({ x: relativeX, y: refCurrent.offsetHeight - relativeY })
+                }
+
+                refCurrent.addEventListener('mouseenter', () => {
+                    refCurrent.addEventListener('mousemove', mousemove)
+                })
+
+                refCurrent.addEventListener('mouseleave', () => {
+                    refCurrent.removeEventListener('mousemove', mousemove)
+                    setMousePosition({ x: 0, y: 0 })
+                })
+            }
         }
     }, [ref])
 
@@ -81,6 +110,68 @@ function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasur
         }
 
         throw Error(`Notation not found at beat ${beat}`)
+    }
+
+    const getHoveredNote = () => {
+        if (mousePosition.x === 0 && mousePosition.y === 0) {
+            return null
+        }
+
+        const noteIndex = Math.floor(mousePosition.y / (staffSpaceHeight / 2))
+
+        let pitch = clef === Clef.TrebleClef ? 55 : 49
+
+        switch (noteIndex) {
+            case 0:
+                pitch -= clef === Clef.TrebleClef ? 3 : 4
+                break
+            case 1:
+                pitch -= clef === Clef.TrebleClef ? 2 : 2
+                break
+            case 2:
+                pitch += clef === Clef.TrebleClef ? 0 : 0
+                break
+            case 3:
+                pitch += clef === Clef.TrebleClef ? 2 : 1
+                break
+            case 4:
+                pitch += clef === Clef.TrebleClef ? 4 : 3
+                break
+            case 5:
+                pitch += clef === Clef.TrebleClef ? 5 : 4
+                break
+            case 6:
+                pitch += clef === Clef.TrebleClef ? 7 : 7
+                break
+            case 7:
+                pitch += clef === Clef.TrebleClef ? 9 : 9
+                break
+            case 8:
+                pitch += clef === Clef.TrebleClef ? 10 : 10
+                break
+        }
+
+        return new Note(NotationType.Quarter, pitch)
+    }
+
+    const getHoveredNoteElement = () => {
+        const note = getHoveredNote()
+
+        if (!note) {
+            return <></>
+        }
+
+        const leftPosition = mousePosition.x
+        const bottomPosition = getNotationBottomPosition(note.pitch)
+
+        return (
+            <StaffNote
+                model={note}
+                left={leftPosition}
+                bottom={bottomPosition}
+                size={noteSize}
+            />
+        )
     }
 
     const getNotationLeftPosition = (notation: Notation) => {
@@ -122,14 +213,7 @@ function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasur
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
 
         // Determine base natural, to calculate correct position on staff
-        let naturalPitch = pitch
-        if (!naturalNoteValues.includes(NaturalNote[pitch % 12])) {
-            if ((sharps?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
-                naturalPitch = pitch - 1
-            } else if ((flats?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
-                naturalPitch = pitch + 1
-            }
-        }
+        const naturalPitch = MusicLogic.determineNaturalPitch(pitch, sharps, flats)
 
         // String value ("A", "B", "C", etc) of the note
         const noteValue = NaturalNote[naturalPitch % 12]
@@ -200,11 +284,11 @@ function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasur
         beams.push({ left: beamStartXPos, bottom: beamStartYPos, width: beamWidth })
 
         if (startNote.type === NotationType.Sixteenth || startNote.type === NotationType.ThirtySecond) {
-            beams.push({ left: beamStartXPos, bottom: beamStartYPos + 9, width: beamWidth })
+            beams.push({ left: beamStartXPos, bottom: beamStartYPos + 12, width: beamWidth })
         }
 
         if (startNote.type === NotationType.ThirtySecond) {
-            beams.push({ left: beamStartXPos, bottom: beamStartYPos + 18, width: beamWidth })
+            beams.push({ left: beamStartXPos, bottom: beamStartYPos + 24, width: beamWidth })
         }
 
         return beams.map((beam, index) => (
@@ -318,12 +402,20 @@ function StaffMeasure ({ staffId, notations, clef, sharps, flats, beatsPerMeasur
         })
     }
 
+    const onClick = () => {
+        const note = getHoveredNote()
+        if (note) {
+            dispatch(placeNote(note))
+        }
+    }
+
     return (
-        <div id={id} ref={ref} className="staff-measure" style={getStaffStyle()}>
+        <div id={id} ref={ref} className="staff-measure" style={getStaffStyle()} onClick={onClick}>
             <StaffLines />
             <div className="notation-container">
                 {getNotations()}
                 {getHorizontalBeams()}
+                {getHoveredNoteElement()}
             </div>
         </div>
     )

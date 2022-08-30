@@ -1,11 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
-import exerciseReducer from './redux-reducers';
+import { configureStore } from '@reduxjs/toolkit'
+import { exerciseReducer, notePlacementReducer } from './redux-reducers'
 
 export const store = configureStore({
     reducer: {
-        exercises: exerciseReducer
+        exercises: exerciseReducer,
+        notePlacement: notePlacementReducer
     }
-});
+})
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

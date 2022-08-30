@@ -1,31 +1,62 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import './Exercise.scss'
 import Staff from '../lib/components/Staff'
-import { Clef, FlatKeys, Notation, NotationType, Note, Pitch } from '../lib/core/models'
+import { Clef, FlatKeys, NotationType, Note } from '../lib/core/models'
+import { useAppSelector } from '../redux-hooks'
 
 function Exercise (): React.ReactElement {
-    const notes: Notation[] = [
-        new Note(NotationType.Eighth, Pitch.E3),
-        new Note(NotationType.Eighth, Pitch.F3),
-        new Note(NotationType.Eighth, Pitch.D3),
-        new Note(NotationType.Eighth, Pitch.F3),
-        new Note(NotationType.Eighth, Pitch.E3),
-        new Note(NotationType.Eighth, Pitch.D3),
-        new Note(NotationType.Eighth, Pitch.C3)
-    ]
+    const exercises = useAppSelector(state => state.exercises)
+    const [selectedExerciseId, setSelectedExerciseId] = useState<number>()
+    const [exerciseData, setExerciseData] = useState<any>()
+
+    useEffect(() => {
+        setSelectedExerciseId(exercises.selectedExercise?.exerciseTypeId)
+    }, [])
+
+    useEffect(() => {
+        // if (selectedExerciseId) {
+        const apiUrl: string = process.env.API_URL ?? ''
+        fetch(`${apiUrl}/exercise/${4}`)
+            .then(async (res) => await res.json())
+            .then((data) => {
+                setExerciseData({
+                    clef: data[0].clef.name === 'treble' ? Clef.TrebleClef : Clef.BassClef,
+                    notes: data[0].notes.map((n: any) => new Note(getNoteTypeFromDuration(n.type.duration), n.pitch)),
+                    bpm: data[0].bpm,
+                    sharps: data[0].key.sharps,
+                    flats: data[0].key.flats
+                })
+            })
+        // }
+    }, [selectedExerciseId])
+
+    const getNoteTypeFromDuration = (duration: number) => {
+        switch (duration) {
+            case 1: return NotationType.Whole
+            case 0.5: return NotationType.Half
+            case 0.25: return NotationType.Quarter
+            case 0.125: return NotationType.Eighth
+            case 0.0625: return NotationType.Sixteenth
+            case 0.03125: return NotationType.ThirtySecond
+            default: throw Error(`Unrecognized duration: ${duration}`)
+        }
+    }
 
     return (
         <div>
-            {/* <Staff clef="treble" sharps={SharpKeys.EMajor} beatsPerMeasure={4} beatDuration={0.25} /> */}
-            <Staff
-                clef={Clef.TrebleClef}
-                beatsPerMeasure={4}
-                beatDuration={NotationType.Quarter}
-                beatsPerMinute={120}
-                initialNotations={notes}
-                flats={FlatKeys.FMajor}
-            />
+            {exerciseData && <>
+                <Staff
+                    clef={exerciseData.clef}
+                    beatsPerMeasure={4}
+                    beatDuration={NotationType.Quarter}
+                    beatsPerMinute={exerciseData.bpm}
+                    initialNotations={exerciseData.notes}
+                    sharps={exerciseData.sharps}
+                    flats={exerciseData.flats}
+                    interactive={true}
+                />
+            </>}
         </div>
     )
 }

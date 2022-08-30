@@ -135,4 +135,22 @@ export abstract class MusicLogic {
 
         return noteCollectionArray
     }
+
+    static determineNaturalPitch (pitch: Pitch, sharps?: NaturalNote[], flats?: NaturalNote[]) {
+        // @ts-expect-error
+        const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
+
+        // Determine base natural, to calculate correct position on staff
+        let naturalPitch = pitch
+
+        if (!naturalNoteValues.includes(NaturalNote[pitch % 12])) {
+            if ((sharps?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
+                naturalPitch = pitch - 1
+            } else if ((flats?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
+                naturalPitch = pitch + 1
+            }
+        }
+
+        return naturalPitch
+    }
 }

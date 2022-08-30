@@ -127,7 +127,11 @@ function StaffKeySignature ({ clef, sharps, flats }: StaffKeySignatureProps): Re
         }
     }
 
-    return <div ref={ref} className="key-signature-container" style={getKeySignatureStyle()}>{getKeySignatureAccidentals()}</div>
+    return <>
+        <div ref={ref} className="key-signature-container" style={getKeySignatureStyle()}>
+            {getKeySignatureAccidentals()}
+        </div>
+    </>
 }
 
 export default StaffKeySignature

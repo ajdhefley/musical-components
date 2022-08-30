@@ -55,6 +55,7 @@ export class MidiNotationPlayerResponse {
                 break
             }
 
+            // Simultaneously fire all notes at this tick, but wait for them all to complete.
             await Promise.all(
                 notations
                     .filter(n => n instanceof Note)
