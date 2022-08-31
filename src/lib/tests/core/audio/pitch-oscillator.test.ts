@@ -1,4 +1,4 @@
-import { PitchOscillator } from '../../../core/pitch-oscillator'
+import { PitchOscillator } from '@lib/core/pitch-oscillator'
 
 describe('PitchOscillator', () => {
     it('should convert common pitches to frequencies', () => {

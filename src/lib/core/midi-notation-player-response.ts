@@ -1,5 +1,5 @@
-import { MidiRelay } from './midi-relay'
-import { Notation, Note } from './models'
+import { MidiRelay } from '@lib/core/midi-relay'
+import { Notation, Note } from '@lib/core/models'
 
 /**
  * Response controlling MIDI playback. Exposes playback events and the ability to cancel the current playback.

@@ -1,6 +1,4 @@
-import { NotationType } from './notation-type'
-import { Notation } from './notation'
-import { Pitch } from './pitch'
+import { Pitch, Notation, NotationType } from '@lib/core/models'
 
 export class Note extends Notation {
     pitch: Pitch

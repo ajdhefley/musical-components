@@ -1,4 +1,4 @@
-import { NotationType } from './notation-type'
+import { NotationType } from '@lib/core/models'
 
 export abstract class Notation {
     type: NotationType

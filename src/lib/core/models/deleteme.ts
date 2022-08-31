@@ -1,4 +1,4 @@
-import { NaturalNote } from './natural-note'
+import { NaturalNote } from '@lib/core/models'
 
 // TODO: fetch from API
 export const SharpKeys = {

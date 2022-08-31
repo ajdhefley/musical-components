@@ -1,7 +1,7 @@
 import React from 'react'
 
-import './StaffTimeSignature.scss'
-import { NotationType } from '../core/models'
+import '@lib/components/StaffTimeSignature.scss'
+import { NotationType } from '@lib/core/models'
 
 interface StaffTimeSignatureProps {
     /**

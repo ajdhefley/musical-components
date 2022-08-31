@@ -1,7 +1,7 @@
 import React from 'react'
 
-import './StaffClef.scss'
-import { Clef } from '../core/models'
+import '@lib/components/StaffClef.scss'
+import { Clef } from '@lib/core/models'
 
 /**
  *

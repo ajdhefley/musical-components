@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import './StaffKeySignature.scss'
-import { Clef, NaturalNote } from '../core/models'
+import '@lib/components/StaffKeySignature.scss'
+import { Clef, NaturalNote } from '@lib/core/models'
 
 /**
  *

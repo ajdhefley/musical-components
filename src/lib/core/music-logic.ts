@@ -1,4 +1,4 @@
-import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from './models'
+import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from '@lib/core/models'
 
 export abstract class MusicLogic {
     /**

@@ -1,4 +1,4 @@
-import { PitchOscillator } from './pitch-oscillator'
+import { PitchOscillator } from '@lib/core/pitch-oscillator'
 
 /**
  * Binds to MIDI input port, listens for MIDI messages, and generates

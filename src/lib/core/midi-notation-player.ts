@@ -1,8 +1,8 @@
-import { Metronome } from './metronome'
-import { MidiAudio } from './midi-audio'
-import { MidiNotationPlayerResponse } from './midi-notation-player-response'
-import { MidiRelay } from './midi-relay'
-import { Notation } from './models'
+import { Metronome } from '@lib/core/metronome'
+import { MidiAudio } from '@lib/core/midi-audio'
+import { MidiNotationPlayerResponse } from '@lib/core/midi-notation-player-response'
+import { MidiRelay } from '@lib/core/midi-relay'
+import { Notation } from '@lib/core/models'
 
 /**
  * Executes MIDI playback. Exposes playback events and the ability to stop the current playback.

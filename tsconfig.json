@@ -19,12 +19,12 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "paths": {
+        "@lib/*": ["./src/lib/*"]
+    }
   },
   "include": [
     "src"
-  ],
-  "exclude": [
-    "src/lib/test"
   ]
 }

@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import './StaffMeasure.scss'
-import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '../core/models'
-import { MusicLogic } from '../core/music-logic'
-import StaffNote from './StaffNote'
-import StaffRest from './StaffRest'
-import StaffLines from './StaffLines'
-import StaffNoteBeam from './StaffNoteBeam'
+import '@lib/components/StaffMeasure.scss'
+import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '@lib/core/models'
+import { MusicLogic } from '@lib/core/music-logic'
+import StaffNote from '@lib/components/StaffNote'
+import StaffRest from '@lib/components/StaffRest'
+import StaffLines from '@lib/components/StaffLines'
+import StaffNoteBeam from '@lib/components/StaffNoteBeam'
+
+// TODO: decouple from outer Redux
 import { useAppDispatch } from '../../redux-hooks'
 import { placeNote } from '../../redux-actions'
 

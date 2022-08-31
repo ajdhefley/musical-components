@@ -1,5 +1,5 @@
-import audio_MetronomeStart from '../audio/metronome_click_start.mp3'
-import audio_MetronomeBeat from '../audio/metronome_click_beat.mp3'
+import audio_MetronomeStart from '@lib/audio/metronome_click_start.mp3'
+import audio_MetronomeBeat from '@lib/audio/metronome_click_beat.mp3'
 
 /**
  *

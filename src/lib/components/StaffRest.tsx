@@ -1,7 +1,7 @@
 import React from 'react'
 
-import './StaffRest.scss'
-import { Rest } from '../core/models'
+import '@lib/components/StaffRest.scss'
+import { Rest } from '@lib/core/models'
 
 /**
  *
