@@ -1,9 +1,9 @@
 import React from 'react'
 
-import '@lib/components/StaffTimeSignature.scss'
+import '@lib/components/StaffTimeSignature/StaffTimeSignature.scss'
 import { NotationType } from '@lib/core/models'
 
-interface StaffTimeSignatureProps {
+export interface StaffTimeSignatureProps {
     /**
      * Number of beats per measure, determining the top number of the time signature.
      **/
@@ -15,7 +15,7 @@ interface StaffTimeSignatureProps {
     beatDuration: NotationType
 }
 
-function StaffTimeSignature ({ beatsPerMeasure, beatDuration }: StaffTimeSignatureProps): React.ReactElement {
+export function StaffTimeSignature ({ beatsPerMeasure, beatDuration }: StaffTimeSignatureProps): React.ReactElement {
     return <>
         <div className="ts-container">
             <div className={`ts-top ts-${beatsPerMeasure}`}></div>
@@ -23,5 +23,3 @@ function StaffTimeSignature ({ beatsPerMeasure, beatDuration }: StaffTimeSignatu
         </div>
     </>
 }
-
-export default StaffTimeSignature

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import './Exercise.scss'
-import Staff from '../lib/components/Staff'
+import { Staff } from '../lib/components/Staff/Staff'
 import { Clef, FlatKeys, NotationType, Note } from '../lib/core/models'
 import { useAppSelector } from '../redux-hooks'
 
@@ -51,7 +51,7 @@ function Exercise (): React.ReactElement {
                     beatsPerMeasure={4}
                     beatDuration={NotationType.Quarter}
                     beatsPerMinute={exerciseData.bpm}
-                    initialNotations={exerciseData.notes}
+                    initialNotes={exerciseData.notes}
                     sharps={exerciseData.sharps}
                     flats={exerciseData.flats}
                     interactive={true}

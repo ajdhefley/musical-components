@@ -1,5 +1,5 @@
-@import "../styles/mixins";
-@import "../styles/variables";
+@import "@lib/styles/mixins";
+@import "@lib/styles/variables";
 
 .staff {
     border-left: $staff-border;
@@ -7,7 +7,7 @@
     position: relative;
     display: inline-block;
     height: $staff-height;
-    cursor: none;
+    cursor: pointer;
 }
 
 .staff-intro {

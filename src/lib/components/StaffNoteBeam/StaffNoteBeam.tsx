@@ -1,11 +1,11 @@
 import React from 'react'
 
-import '@lib/components/StaffNoteBeam.scss'
+import '@lib/components/StaffNoteBeam/StaffNoteBeam.scss'
 
 /**
  *
  **/
-interface StaffNoteBeamProps {
+export interface StaffNoteBeamProps {
     /**
      *
      **/
@@ -25,8 +25,6 @@ interface StaffNoteBeamProps {
 /**
  *
  **/
-function StaffNoteBeam ({ left, bottom, width }: StaffNoteBeamProps): React.ReactElement {
+export function StaffNoteBeam ({ left, bottom, width }: StaffNoteBeamProps): React.ReactElement {
     return <div className="note-beam" style={{ left: `${left}px`, bottom: `${bottom}px`, width: `${width}px` }}></div>
 }
-
-export default StaffNoteBeam

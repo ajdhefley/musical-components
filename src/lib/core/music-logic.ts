@@ -44,9 +44,7 @@ export abstract class MusicLogic {
      * @param itemstoAdd
      * @returns A full list of notations, including calculated rests.
      **/
-    static addNotations (items: Notation[], itemstoAdd: Notation[], beatsPerMeasure: number): Notation[] {
-        const totalMeasureBeatValue = beatsPerMeasure / 4
-
+    static addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
         let nextTime = 0
         if (items.length > 0) {
             const lastNote = items[items.length - 1]
@@ -136,6 +134,33 @@ export abstract class MusicLogic {
         return noteCollectionArray
     }
 
+    /**
+     * Converts the starting time of a note within a song into the starting time of the note's measure.
+     *
+     * For traditional 4/4 time, for example, 1.25 would be converted to 0.25,
+     * as the 6th beat of the entire song is the 2nd beat of its measure.
+     *
+     * @param globalBeat The beat position within the context of the entire song.
+     * @returns The beat position relative to the measure.
+     **/
+    static normalizeBeat (globalBeat: number, beatsPerMeasure: number, beatDuration: NotationType) {
+        return globalBeat % ((beatsPerMeasure / 4) * (beatDuration.beatValue / 0.25))
+    }
+
+    /**
+     * Returns the base natural pitch of a sharped/flatted notes.
+     *
+     * If D is flatted in the key signature, for example, and the pitch is 37 (Cs2), the natural pitch resolves to D,
+     * because the pitch will render as D-flat (D with an accidental) on the staff.
+     *
+     * On the other hand, if C is sharped in the key signature, that same pitch of 37 (Cs2) will resolve to a natural pitch of C,
+     * because the pitch will render as C-sharp (C with an accidental) on the staff.
+     *
+     * @param pitch
+     * @param sharps
+     * @param flats
+     * @returns
+     **/
     static determineNaturalPitch (pitch: Pitch, sharps?: NaturalNote[], flats?: NaturalNote[]) {
         // @ts-expect-error
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)

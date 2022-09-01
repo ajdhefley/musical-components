@@ -1,7 +1,7 @@
 import React from 'react'
-import '@lib/components/StaffLines.scss'
+import '@lib/components/StaffLines/StaffLines.scss'
 
-function StaffLines (): React.ReactElement {
+export function StaffLines (): React.ReactElement {
     return <>
         <div className="staff-space-container">
             <div className="staff-space"></div>
@@ -11,5 +11,3 @@ function StaffLines (): React.ReactElement {
         </div>
     </>
 }
-
-export default StaffLines

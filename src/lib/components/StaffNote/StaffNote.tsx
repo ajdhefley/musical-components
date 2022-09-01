@@ -1,12 +1,12 @@
 import React from 'react'
 
-import '@lib/components/StaffNote.scss'
+import '@lib/components/StaffNote/StaffNote.scss'
 import { Accidental, NotationType, Note } from '@lib/core/models'
 
 /**
  *
  **/
-interface StaffNoteProps {
+export interface StaffNoteProps {
     /**
      *
      **/
@@ -36,7 +36,7 @@ interface StaffNoteProps {
 /**
  *
  **/
-function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): React.ReactElement {
+export function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): React.ReactElement {
     const stemType: 'up' | 'down' = (() => {
         const numPitches = 7
         const numOctaves = 6
@@ -128,5 +128,3 @@ function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): 
         </div>
     )
 }
-
-export default StaffNote
