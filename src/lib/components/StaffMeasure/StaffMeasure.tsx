@@ -8,10 +8,6 @@ import { StaffRest } from '@lib/components/StaffRest/StaffRest'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
 import { StaffNoteBeam } from '@lib/components/StaffNoteBeam/StaffNoteBeam'
 
-// TODO: decouple from outer Redux
-import { useAppDispatch } from '../../../redux-hooks'
-import { placeNote } from '../../../redux-actions'
-
 /**
  *
  **/
@@ -84,7 +80,6 @@ export interface StaffMeasureProps {
  *
  **/
 export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
-    const dispatch = useAppDispatch()
     const ref = useRef<HTMLDivElement>(null)
     const [mousePosition, setMousePosition] = useState<{x: number, y: number}>(({ x: 0, y: 0 }))
 
@@ -116,13 +111,6 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
 
     const id = `${props.staffId}-${props.notations?.length > 0 ? props.notations[0].startBeat : '0'}`
 
-    const onClick = () => {
-        const note = controller.getHoveredNote(mousePosition)
-        if (note) {
-            dispatch(placeNote(note))
-        }
-    }
-
     const getHoveredNoteElement = () => {
         const note = controller.getHoveredNote(mousePosition)
 
@@ -140,7 +128,6 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         <div
             id={id}
             ref={ref}
-            onClick={onClick}
             className="staff-measure"
             style={{
                 width: `${controller.getMeasureWidth()}px`
