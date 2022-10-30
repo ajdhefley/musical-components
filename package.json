@@ -1,10 +1,15 @@
 {
-  "name": "music",
+  "name": "musical-components",
+  "description": "Library for rendering musical notation in the browser and generating MIDI playback.",
   "author": "Ashton Hefley",
+  "license": "MIT license",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ajdhefley/musical-components"
+  },
+  "homepage": "https://github.com/ajdhefley/musical-components#readme",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
-    "@reduxjs/toolkit": "^1.6.2",
     "d": "^1.0.1",
     "jzz": "^1.4.6",
     "lodash": "^4.17.21",
@@ -12,15 +17,14 @@
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
-    "ts-jest": "^28.0.8",
-    "ts-loader": "^9.3.1"
+    "react-scripts": "4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-react": "^7.18.6",
     "@jest/types": "^29.0.1",
+    "@reduxjs/toolkit": "^1.6.2",
     "@types/jest": "^28.1.8",
     "@types/lodash": "^4.14.177",
     "@types/node": "^12.20.37",
@@ -47,14 +51,15 @@
     "sass-loader": "^13.0.2",
     "standardized-audio-context-mock": "^9.6.0",
     "style-loader": "^3.3.1",
+    "ts-jest": "^28.0.8",
+    "ts-loader": "^9.3.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.7"
   },
   "scripts": {
-    "dev": "vite",
+    "prepare": "npm run build",
     "build": "tsc && vite build",
-    "preview": "vite preview",
     "test": "jest",
     "lint": "./node_modules/.bin/eslint --fix src/**/*.{ts,tsx}"
   }
