@@ -1,7 +1,9 @@
 .git/
 .github/
 .gitignore
+.eslintrc.json
+jest.config.ts
+tsconfig.json
 docs/
 examples/
 tests/
-tsconfig.json
