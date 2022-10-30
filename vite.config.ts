@@ -16,7 +16,7 @@ export default defineConfig({
             entry: resolve(__dirname, 'src/index.ts'),
             name: 'musical-components',
             // the proper extensions will be added
-            fileName: 'main'
+            fileName: 'index'
         },
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
