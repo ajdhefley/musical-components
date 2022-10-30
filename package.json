@@ -9,6 +9,7 @@
   },
   "homepage": "https://github.com/ajdhefley/musical-components#readme",
   "version": "0.1.0",
+  "type": "module",
   "main": "build/index.js",
   "dependencies": {
     "d": "^1.0.1",
