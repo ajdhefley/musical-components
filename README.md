@@ -21,93 +21,9 @@ The primary React component is `<Staff />`, with the following props:
 
 *optional
 
-### Examples
+## Examples
 
-<b>Dynamically renders clefs, key signatures, time signatures, and notes according to their beat value and pitch.</b> The eighth notes are not tied, under this time signature, because they each count as a whole beat. The notes also do not have sharps written next to them, because the key signature already contains C#.
-
-<b>Code:</b>
-
-```
-const notes = [
-    new Note(NotationType.Eighth, Pitch.Cs4),
-    new Note(NotationType.Eighth, Pitch.Cs4),
-    new Note(NotationType.Eighth, Pitch.Cs4),
-    new Note(NotationType.Eighth, Pitch.Cs4),
-    new Note(NotationType.Eighth, Pitch.Cs4)
-]
-
-...
-
-<Staff
-    initialNotations={notes}
-    clef={Clef.TrebleClef}
-    beatsPerMeasure={5}
-    beatDuration={NotationType.Eighth}
-    sharps={SharpKeys.DMajor}
-/>
-```
-
-<b>Result:</b>
-
-<p align="center">
-  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/doc_example.png" height="200" />
-<p>
-
----
-
-<b>Dynamically ties notes together via beams.</b> Notice the 3/4 and 6/8 staffs have the same number of notes per measure, but they are grouped differently, according to the time signature.
-
-<b>Code:</b>
-
-```
-const props = {
-    clef: Clef.TrebleClef,
-    beatDuration: NotationType.Quarter,
-    sharps: SharpKeys.EMajor,
-    initialNotations: notes
-}
-
-...
-
-<Staff {...props} beatsPerMeasure={4} />
-<Staff {...props} beatsPerMeasure={3} />
-<Staff {...props} beatsPerMeasure={6} beatDuration={NotationType.Eighth} />
-```
-
-<b>Result:</b>
-
-<p align="center">
-  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/doc_stems_timesignature.png" height="300" />
-<p>
-
-
----
-
-<b>Dynamically renders accidentals, corresponding to key signature.</b> Notice the same notes appear differently in the following staffs.
-
-<b>Code:</b>
-
-```
-const notes = [
-    new Note(NotationType.Eighth, Pitch.C4),
-    new Note(NotationType.Eighth, Pitch.As3),
-    new Note(NotationType.Eighth, Pitch.G3),
-    new Note(NotationType.Eighth, Pitch.B3),
-    new Note(NotationType.Quarter, Pitch.Fs3),
-    new Note(NotationType.Quarter, Pitch.F3)
-]
-    
-...
-    
-<Staff initialNotations={notes} beatsPerMeasure={4} beatDuration={NotationType.Quarter} clef={Clef.TrebleClef} />
-<Staff initialNotations={notes} beatsPerMeasure={4} beatDuration={NotationType.Quarter} clef={Clef.TrebleClef} flats={FlatKeys.FMajor} />
-```
-
-<b>Result:</b>
-
-<p align="center">
-  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/doc_accidentals.png" height="300" />
-<p>
+See examples [here](https://github.com/ajdhefley/musical-components/tree/main/examples).
 
 ## Setup
 
