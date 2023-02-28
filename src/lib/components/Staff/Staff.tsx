@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import '@lib/components/Staff/Staff.scss'
-import { Clef, NaturalNote, NotationType, Note } from '@lib/core/models'
-import { StaffController } from '@lib/components/Staff/StaffController'
+import { Clef, NaturalNote, Notation, NotationType, Note } from '@lib/core/models'
 import { StaffMeasure } from '@lib/components/StaffMeasure/StaffMeasure'
 import { StaffKeySignature } from '@lib/components/StaffKeySignature/StaffKeySignature'
 import { StaffTimeSignature } from '@lib/components/StaffTimeSignature/StaffTimeSignature'
 import { StaffClef } from '@lib/components/StaffClef/StaffClef'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
 import { StaffPlayback } from '../../core/StaffPlayback'
+import { MusicLogic } from '../../..'
 
 /**
  *
@@ -80,11 +80,25 @@ export function Staff (props: StaffProps): React.ReactElement {
     const spaceHeight = 0
     const defaultStemHeight = 0
 
-    const controller = new StaffController(props)
+    const [notations, setNotations] = useState<Notation[]>([])
 
     useEffect(() => {
-        props.initialNotes?.forEach((note) => controller.addNote(note))
+        if (props.initialNotes) {
+            addNotes(props.initialNotes)
+        }
     }, [])
+
+    function addNotes(notes: Note[]) {
+        const allNotes = MusicLogic.addNotations(notes, notes)
+        setNotations((prevNotations) => {
+            return prevNotations.concat(allNotes)
+        })
+        props.playback.setNotations(notations)
+    }
+
+    function getMeasures() {
+        return MusicLogic.splitIntoMeasures(notations, props.beatsPerMeasure, props.beatDuration)
+    }
 
     return <>
         <div className="staff" id={id}>
@@ -94,7 +108,7 @@ export function Staff (props: StaffProps): React.ReactElement {
                 <StaffKeySignature {...props} accidentalSize={accidentalSize} spaceHeight={spaceHeight} />
                 <StaffTimeSignature {...props} />
             </div>
-            {controller.getMeasures().map((measureNotes) => <>
+            {getMeasures().map((measureNotes) => <>
                 <StaffMeasure
                     {...props}
                     staffId={id}
