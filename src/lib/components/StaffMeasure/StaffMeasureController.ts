@@ -1,5 +1,5 @@
 import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '@lib/core/models'
-import { MusicLogic } from '@lib/core/music-logic'
+import { MusicLogic } from '@lib/core/MusicLogic'
 import { StaffMeasureProps } from '@lib/components/StaffMeasure/StaffMeasure'
 
 export class StaffMeasureController {

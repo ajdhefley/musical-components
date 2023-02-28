@@ -1,4 +1,4 @@
-import { MidiRelay } from '@lib/core/midi-relay'
+import { MidiRelay } from '@lib/core/MidiRelay'
 import { Notation, Note } from '@lib/core/models'
 
 /**

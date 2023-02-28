@@ -8,6 +8,7 @@ import { StaffKeySignature } from '@lib/components/StaffKeySignature/StaffKeySig
 import { StaffTimeSignature } from '@lib/components/StaffTimeSignature/StaffTimeSignature'
 import { StaffClef } from '@lib/components/StaffClef/StaffClef'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
+import { StaffPlayback } from '../../core/StaffPlayback'
 
 /**
  *
@@ -54,6 +55,11 @@ export interface StaffProps {
      * Whether the user is allowed to place notes.
      **/
     interactive?: boolean
+
+    /**
+     * 
+     **/
+    playback: StaffPlayback
 }
 
 /**
@@ -81,7 +87,6 @@ export function Staff (props: StaffProps): React.ReactElement {
     }, [])
 
     return <>
-        <button onClick={controller.togglePlayback} style={{ display: 'block', marginBottom: '10px', padding: '5px 20px' }}>Play</button>
         <div className="staff" id={id}>
             <div className="staff-intro">
                 <StaffLines />

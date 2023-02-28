@@ -1,7 +1,7 @@
-import { Metronome } from '@lib/core/metronome'
-import { MidiAudio } from '@lib/core/midi-audio'
-import { MidiNotationPlayerResponse } from '@lib/core/midi-notation-player-response'
-import { MidiRelay } from '@lib/core/midi-relay'
+import { Metronome } from '@lib/core/Metronome'
+import { MidiAudio } from '@lib/core/MidiAudio'
+import { MidiNotationPlayerResponse } from '@lib/core/MidiNotationPlayerResponse'
+import { MidiRelay } from '@lib/core/MidiRelay'
 import { Notation } from '@lib/core/models'
 
 /**
