@@ -1,6 +1,6 @@
 import React from 'react'
 
-import '@lib/components/StaffRest/StaffRest.scss'
+import './StaffRest.scss'
 import { Rest } from '@lib/core/models'
 
 /**

@@ -1,10 +1,10 @@
 import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from '@lib/core/models'
 
 export class MusicLogic {
-    constructor(private readonly config: {
-        sharps?: NaturalNote[],
-        flats?: NaturalNote[],
-        beatsPerMeasure: number,
+    constructor (private readonly config: {
+        sharps?: NaturalNote[]
+        flats?: NaturalNote[]
+        beatsPerMeasure: number
         beatDuration: NotationType
     }) {
 

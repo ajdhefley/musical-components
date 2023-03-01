@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import '@lib/components/StaffMeasure/StaffMeasure.scss'
-import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '@lib/core/models'
-import { MusicLogic } from '@lib/core/MusicLogic'
+import './StaffMeasure.scss'
+import { Clef, NaturalNote, Notation, NotationType, Note } from '@lib/core/models'
 import { StaffNote } from '@lib/components/StaffNote/StaffNote'
 import { StaffRest } from '@lib/components/StaffRest/StaffRest'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
@@ -87,6 +86,7 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
     const id = `${props.staffId}-${props.notations?.length > 0 ? props.notations[0].startBeat : '0'}`
 
     const staffPlacement = new MusicStaffPlacementLogic({
+        accidentalSize: 0,
         noteSize: props.noteSize,
         noteSpacing: props.noteSpacing,
         spaceHeight: props.spaceHeight,
@@ -98,7 +98,7 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         beatDuration: props.beatDuration
     })
 
-    const getHoveredNoteElement = function() {
+    const getHoveredNoteElement = function () {
         const note = getHoveredNote(mousePosition)
 
         if (!note) {
@@ -106,12 +106,12 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         }
 
         const leftPosition = mousePosition.x
-        const bottomPosition = staffPlacement.getNotationBottomPosition(note.pitch)
+        const bottomPosition = staffPlacement.getNoteBottomPosition(note.pitch)
 
         return <StaffNote model={note} size={props.noteSize} left={leftPosition} bottom={bottomPosition} />
     }
 
-    const getHoveredNote = function(mousePosition: { x: number, y: number }) {
+    const getHoveredNote = function (mousePosition: { x: number, y: number }) {
         if (mousePosition.x === 0 && mousePosition.y === 0) {
             return null
         }

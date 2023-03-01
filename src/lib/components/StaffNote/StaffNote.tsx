@@ -1,6 +1,6 @@
 import React from 'react'
 
-import '@lib/components/StaffNote/StaffNote.scss'
+import './StaffNote.scss'
 import { Accidental, NotationType, Note } from '@lib/core/models'
 
 /**

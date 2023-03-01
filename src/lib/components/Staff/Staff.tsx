@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import '@lib/components/Staff/Staff.scss'
+import './Staff.scss'
 import { Clef, NaturalNote, Notation, NotationType, Note } from '@lib/core/models'
 import { StaffMeasure } from '@lib/components/StaffMeasure/StaffMeasure'
 import { StaffKeySignature } from '@lib/components/StaffKeySignature/StaffKeySignature'
@@ -57,9 +57,9 @@ export interface StaffProps {
     interactive?: boolean
 
     /**
-     * 
+     *
      **/
-    playback: StaffPlayback
+    playback?: StaffPlayback
 }
 
 /**
@@ -89,10 +89,10 @@ export function Staff (props: StaffProps): React.ReactElement {
         }
     }, [])
 
-    const addNotes = function(notes: Note[]) {
+    const addNotes = function (notes: Note[]) {
         const allNotesFlattened = musicLogic.addNotations(measures.flat(), notes)
         setMeasures(musicLogic.splitIntoMeasures(allNotesFlattened))
-        props.playback.setNotations(measures.flat())
+        if (props.playback) props.playback.setNotations(measures.flat())
     }
 
     return <>
@@ -103,7 +103,7 @@ export function Staff (props: StaffProps): React.ReactElement {
                 <StaffKeySignature {...props} accidentalSize={accidentalSize} spaceHeight={spaceHeight} />
                 <StaffTimeSignature {...props} />
             </div>
-            {measures.map((measureNotes) => <>
+            {measures.map((measureNotes: Notation[]) => <>
                 <StaffMeasure
                     {...props}
                     staffId={id}

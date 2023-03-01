@@ -4,15 +4,16 @@ import { MusicLogic } from '@lib/core/MusicLogic'
 export class MusicStaffPlacementLogic {
     private readonly musicLogic: MusicLogic
 
-    constructor(private readonly config: {
-        noteSize: number,
-        noteSpacing: number,
-        spaceHeight: number,
-        defaultStemHeight: number,
-        clef: Clef,
-        sharps?: NaturalNote[],
-        flats?: NaturalNote[],
-        beatsPerMeasure: number,
+    constructor (private readonly config: {
+        accidentalSize: number
+        noteSize: number
+        noteSpacing: number
+        spaceHeight: number
+        defaultStemHeight: number
+        clef: Clef
+        sharps?: NaturalNote[]
+        flats?: NaturalNote[]
+        beatsPerMeasure: number
         beatDuration: NotationType
     }) {
         this.musicLogic = new MusicLogic({ ...config })
@@ -20,39 +21,39 @@ export class MusicStaffPlacementLogic {
 
     /**
      * Filters rests out of the list, with notes remaining.
-     * 
-     * @param notations 
+     *
+     * @param notations
      * @returns notes with calculated positions and accidentals.
      */
-    public extractNotes(notations: Notation[]) {
+    public extractNotes (notations: Notation[]) {
         return notations?.filter((notation: Notation) => notation instanceof Note)
             .map((note: any) => {
                 return {
                     model: note,
                     accidental: this.musicLogic.getAccidentalForPitch(note.pitch),
-                    left: this.getNotationLeftPosition(notations, note),
-                    bottom: this.getNotationBottomPosition(note.pitch)
+                    left: this.getNoteLeftPosition(notations, note),
+                    bottom: this.getNoteBottomPosition(note.pitch)
                 }
             })
     }
 
     /**
      * Filters note out of the list, with rests remaining.
-     * 
-     * @param notations 
+     *
+     * @param notations
      * @returns rests with calculated positions.
      */
-    public extractRests(notations: Notation[]) {
+    public extractRests (notations: Notation[]) {
         return notations?.filter((notation: Notation) => notation instanceof Rest)
             .map((rest: any) => {
                 return {
                     model: rest,
-                    left: this.getNotationLeftPosition(notations, rest)
+                    left: this.getNoteLeftPosition(notations, rest)
                 }
             })
     }
 
-    public getNotationLeftPosition(notations: Notation[], notation: Notation) {
+    public getNoteLeftPosition (notations: Notation[], notation: Notation) {
         const leftOffset = 25
         const accidentalWidth = 25
         const normalizedStartBeat = this.musicLogic.normalizeBeat(notation.startBeat)
@@ -87,7 +88,7 @@ export class MusicStaffPlacementLogic {
         return total + leftOffset
     }
 
-    public getNotationBottomPosition(pitch: Pitch) {
+    public getNoteBottomPosition (pitch: Pitch) {
         // @ts-expect-error
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
 
@@ -128,17 +129,61 @@ export class MusicStaffPlacementLogic {
         return (middleCPosition + pitchPosition) * noteHeight
     }
 
-    public getMeasureWidth(notations: Notation[]) {
+    public getAccidentalLeftPosition (index: number) {
+        return index * this.config.accidentalSize
+    }
+
+    public getAccidentalBottomPosition (note: NaturalNote) {
+        // String value ("A", "B", "C", etc) of the note
+        const noteValue = NaturalNote[note]
+
+        // @ts-expect-error
+        const totalNaturalNotes = Object.values(NaturalNote).filter(isNaN).length
+
+        // The position of Middle C on the staff is different depending on the clef.
+        // We calculate the position of each note relative to Middle C, so this needs
+        // to be known ahead of time.
+
+        let maxValidPosition = 0
+        let middleCPosition = 0
+
+        switch (this.config.clef) {
+            case Clef.TrebleClef:
+                // Occupies the 3rd space from the bottom, which is the 5th index where the bottom line is 0
+                middleCPosition = 5
+                maxValidPosition = 11
+                break
+            case Clef.BassClef:
+                // Occupies a whole step above the 4th line from the bottom, which is the 10th index where the bottom line is 0
+                middleCPosition = 10
+                maxValidPosition = 9
+                break
+        }
+
+        // Sharps/flats for key signature should occupy visible lines and spaces only
+        // If a note exceeds it, bring it down an octave (total number of natural notes in terms of position)
+        let pitchPosition = Object.values(NaturalNote).indexOf(noteValue)
+        while (middleCPosition + pitchPosition >= maxValidPosition) {
+            pitchPosition -= totalNaturalNotes
+        }
+
+        // One note per line and one per space equates to each note occupying a height of half each space
+        const noteHeight = this.config.spaceHeight / 2
+
+        return (middleCPosition + pitchPosition) * noteHeight - 4
+    }
+
+    public getMeasureWidth (notations: Notation[]) {
         if (notations.length === 0) {
             return 100
         }
 
         const lastNote = notations[notations.length - 1]
         const rightOffset = 30
-        return this.getNotationLeftPosition(notations, lastNote) + rightOffset
+        return this.getNoteLeftPosition(notations, lastNote) + rightOffset
     }
 
-    public getHorizontalBeams(notations: Notation[]) {
+    public getHorizontalBeams (notations: Notation[]) {
         let lastHorizontalBeamIndex = -1
 
         const beams = new Array<{ left: number, bottom: number, width: number }>()
@@ -179,7 +224,7 @@ export class MusicStaffPlacementLogic {
         return beams
     }
 
-    public determineBeamsAtIndex(notations: Notation[], index: number, maxConnectedNotes: number) {
+    public determineBeamsAtIndex (notations: Notation[], index: number, maxConnectedNotes: number) {
         // Credit here for information on writing beams and stems: http://vickyjohnson.altervista.org/Notation%20Basics.pdf
 
         const notationModel = notations[index]
@@ -203,7 +248,7 @@ export class MusicStaffPlacementLogic {
             for (let i = index; i < index + count; i++) {
                 const nextNote = notations[i]
                 if (nextNote instanceof Note && notationModel instanceof Note) {
-                    const verticalStemProportion = (this.getNotationBottomPosition(nextNote.pitch) - this.getNotationBottomPosition(notationModel.pitch)) / this.config.defaultStemHeight
+                    const verticalStemProportion = (this.getNoteBottomPosition(nextNote.pitch) - this.getNoteBottomPosition(notationModel.pitch)) / this.config.defaultStemHeight
                     nextNote.stemStretchFactor = 1 + verticalStemProportion
                 }
             }
@@ -214,16 +259,16 @@ export class MusicStaffPlacementLogic {
         return undefined
     }
 
-    public createBeamsBetweenIndexes(notations: Notation[], startIndex: number, endIndex: number) {
+    public createBeamsBetweenIndexes (notations: Notation[], startIndex: number, endIndex: number) {
         if (startIndex === endIndex) {
             return
         }
 
         const startNote = notations[startIndex] as Note
         const endNote = notations[endIndex] as Note
-        const beamStartXPos = this.getNotationLeftPosition(notations, startNote) - (this.config.noteSize / 2) + 2
-        const beamStartYPos = this.getNotationBottomPosition(startNote.pitch) - this.config.defaultStemHeight
-        const beamEndXPos = this.getNotationLeftPosition(notations, endNote) - (this.config.noteSize / 2)
+        const beamStartXPos = this.getNoteLeftPosition(notations, startNote) - (this.config.noteSize / 2) + 2
+        const beamStartYPos = this.getNoteBottomPosition(startNote.pitch) - this.config.defaultStemHeight
+        const beamEndXPos = this.getNoteLeftPosition(notations, endNote) - (this.config.noteSize / 2)
         // const stemEndYPos = getNotationBottomPosition(endNote.pitch) - defaultStemHeight
         const beamWidth = beamEndXPos - beamStartXPos - 1
         // const degrees = Math.atan2(stemEndYPos - stemStartYPos, stemEndXPos - stemStartXPos) * 180 / Math.PI;
@@ -243,7 +288,7 @@ export class MusicStaffPlacementLogic {
         return beams
     }
 
-    public getNotationAt(notations: Notation[], beat: number) {
+    public getNotationAt (notations: Notation[], beat: number) {
         for (const note of notations) {
             const localMeasureStartBeat = this.musicLogic.normalizeBeat(note.startBeat)
             if (localMeasureStartBeat <= beat && beat < localMeasureStartBeat + note.type.beatValue) {

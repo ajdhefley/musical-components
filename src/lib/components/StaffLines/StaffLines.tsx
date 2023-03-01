@@ -1,5 +1,5 @@
 import React from 'react'
-import '@lib/components/StaffLines/StaffLines.scss'
+import './StaffLines.scss'
 
 export function StaffLines (): React.ReactElement {
     return <>

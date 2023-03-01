@@ -1,6 +1,6 @@
 import React from 'react'
 
-import '@lib/components/StaffClef/StaffClef.scss'
+import './StaffClef.scss'
 import { Clef } from '@lib/core/models'
 
 /**

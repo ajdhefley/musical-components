@@ -1,6 +1,6 @@
 import React from 'react'
 
-import '@lib/components/StaffNoteBeam/StaffNoteBeam.scss'
+import './StaffNoteBeam.scss'
 
 /**
  *
