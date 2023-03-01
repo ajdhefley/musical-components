@@ -80,7 +80,7 @@ export function Staff (props: StaffProps): React.ReactElement {
     const spaceHeight = 0
     const defaultStemHeight = 0
 
-    const [notations, setNotations] = useState<Notation[]>([])
+    const [measures, setMeasures] = useState<Notation[][]>([])
 
     useEffect(() => {
         if (props.initialNotes) {
@@ -88,16 +88,10 @@ export function Staff (props: StaffProps): React.ReactElement {
         }
     }, [])
 
-    function addNotes(notes: Note[]) {
-        const allNotes = MusicLogic.addNotations(notes, notes)
-        setNotations((prevNotations) => {
-            return prevNotations.concat(allNotes)
-        })
-        props.playback.setNotations(notations)
-    }
-
-    function getMeasures() {
-        return MusicLogic.splitIntoMeasures(notations, props.beatsPerMeasure, props.beatDuration)
+    const addNotes = function(notes: Note[]) {
+        const allNotesFlattened = MusicLogic.addNotations(measures.flat(), notes)
+        setMeasures(MusicLogic.splitIntoMeasures(allNotesFlattened, props.beatsPerMeasure, props.beatDuration))
+        props.playback.setNotations(measures.flat())
     }
 
     return <>
@@ -108,7 +102,7 @@ export function Staff (props: StaffProps): React.ReactElement {
                 <StaffKeySignature {...props} accidentalSize={accidentalSize} spaceHeight={spaceHeight} />
                 <StaffTimeSignature {...props} />
             </div>
-            {getMeasures().map((measureNotes) => <>
+            {measures.map((measureNotes) => <>
                 <StaffMeasure
                     {...props}
                     staffId={id}
