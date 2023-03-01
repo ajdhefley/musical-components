@@ -1,6 +1,15 @@
 import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from '@lib/core/models'
 
-export abstract class MusicLogic {
+export class MusicLogic {
+    constructor(private readonly config: {
+        sharps?: NaturalNote[],
+        flats?: NaturalNote[],
+        beatsPerMeasure: number,
+        beatDuration: NotationType
+    }) {
+
+    }
+
     /**
      * Determines which accidental (sharp, flat, natural, or none) should be displayed
      * next to note, based on whether the note is sharped or flatted by key signature.
@@ -10,12 +19,12 @@ export abstract class MusicLogic {
      * @param defaultFlattedPitches The natural notes flatted by key. For example, in F major, B is flatted.
      * @returns undefined if note is not sharped/flatted, or is not a natural of a note sharped/flatted in the key signature.
      **/
-    static getAccidentalForPitch (pitch: Pitch, defaultSharpedPitches?: NaturalNote[], defaultFlattedPitches?: NaturalNote[]): Accidental | undefined {
+    public getAccidentalForPitch (pitch: Pitch): Accidental | undefined {
         const noteFromPitch = pitch % 12 as NaturalNote
-        const sharpedInKey = defaultSharpedPitches?.includes(noteFromPitch) ?? false
-        const flattedInKey = defaultFlattedPitches?.includes(noteFromPitch) ?? false
-        const prevNoteSharpedInKey = defaultSharpedPitches?.includes(noteFromPitch - 1) ?? false
-        const nextNoteFlattedInKey = defaultFlattedPitches?.includes(noteFromPitch + 1) ?? false
+        const sharpedInKey = this.config.sharps?.includes(noteFromPitch) ?? false
+        const flattedInKey = this.config.flats?.includes(noteFromPitch) ?? false
+        const prevNoteSharpedInKey = this.config.sharps?.includes(noteFromPitch - 1) ?? false
+        const nextNoteFlattedInKey = this.config.flats?.includes(noteFromPitch + 1) ?? false
         const isNatural = Object.values(NaturalNote).includes(noteFromPitch)
 
         let accidental
@@ -24,11 +33,11 @@ export abstract class MusicLogic {
             // For example, key is D (sharp F by default) but note is natural F
             // means explicit natural accidental should be written next to note
             accidental = Accidental.Natural
-        } else if (!isNatural && !prevNoteSharpedInKey && !defaultFlattedPitches?.length) {
+        } else if (!isNatural && !prevNoteSharpedInKey && !this.config.flats?.length) {
             // For example: note if F# (not natural) and key is C (previous note F is not sharped)
             // means explicit sharp should be written next to note
             accidental = Accidental.Sharp
-        } else if (!isNatural && !nextNoteFlattedInKey && !defaultSharpedPitches?.length) {
+        } else if (!isNatural && !nextNoteFlattedInKey && !this.config.sharps?.length) {
             // For example: note is Bb (not natural) and key is C (next note B is not flatted)
             // means explicit flat should be written next to note
             accidental = Accidental.Flat
@@ -44,7 +53,7 @@ export abstract class MusicLogic {
      * @param itemstoAdd
      * @returns A full list of notations, including calculated rests.
      **/
-    static addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
+    public addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
         let nextTime = 0
         if (items.length > 0) {
             const lastNote = items[items.length - 1]
@@ -99,7 +108,7 @@ export abstract class MusicLogic {
      * @param beatDuration The type of note that counts as a single beat.
      * @returns Converts an array of notes/rests into a two-dimensional array, each element an array of notes corresponding to a measure.
      **/
-    static splitIntoMeasures (notations: Notation[], beatsPerMeasure: number, beatDuration: NotationType): Notation[][] {
+    public splitIntoMeasures (notations: Notation[]): Notation[][] {
         if (notations.length === 0) {
             return [[]]
         }
@@ -107,7 +116,7 @@ export abstract class MusicLogic {
         const minStep = 1 / 32
         const noteCollectionArray = Array<Notation[]>()
         const lastNote = notations[notations.length - 1]
-        const measureBeatValue = beatsPerMeasure * (beatDuration.beatValue / 0.25)
+        const measureBeatValue = this.config.beatsPerMeasure * (this.config.beatDuration.beatValue / 0.25)
 
         let stepCounter = 1
         let currentStep = 0
@@ -143,8 +152,8 @@ export abstract class MusicLogic {
      * @param globalBeat The beat position within the context of the entire song.
      * @returns The beat position relative to the measure.
      **/
-    static normalizeBeat (globalBeat: number, beatsPerMeasure: number, beatDuration: NotationType) {
-        return globalBeat % ((beatsPerMeasure / 4) * (beatDuration.beatValue / 0.25))
+    public normalizeBeat (globalBeat: number) {
+        return globalBeat % ((this.config.beatsPerMeasure / 4) * (this.config.beatDuration.beatValue / 0.25))
     }
 
     /**
@@ -161,7 +170,7 @@ export abstract class MusicLogic {
      * @param flats
      * @returns
      **/
-    static determineNaturalPitch (pitch: Pitch, sharps?: NaturalNote[], flats?: NaturalNote[]) {
+    public determineNaturalPitch (pitch: Pitch) {
         // @ts-expect-error
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
 
@@ -169,9 +178,9 @@ export abstract class MusicLogic {
         let naturalPitch = pitch
 
         if (!naturalNoteValues.includes(NaturalNote[pitch % 12])) {
-            if ((sharps?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
+            if ((this.config.sharps?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
                 naturalPitch = pitch - 1
-            } else if ((flats?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
+            } else if ((this.config.flats?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
                 naturalPitch = pitch + 1
             }
         }

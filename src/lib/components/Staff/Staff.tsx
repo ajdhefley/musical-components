@@ -79,6 +79,7 @@ export function Staff (props: StaffProps): React.ReactElement {
     const noteSpacing = 0
     const spaceHeight = 0
     const defaultStemHeight = 0
+    const musicLogic = new MusicLogic({ ...props })
 
     const [measures, setMeasures] = useState<Notation[][]>([])
 
@@ -89,8 +90,8 @@ export function Staff (props: StaffProps): React.ReactElement {
     }, [])
 
     const addNotes = function(notes: Note[]) {
-        const allNotesFlattened = MusicLogic.addNotations(measures.flat(), notes)
-        setMeasures(MusicLogic.splitIntoMeasures(allNotesFlattened, props.beatsPerMeasure, props.beatDuration))
+        const allNotesFlattened = musicLogic.addNotations(measures.flat(), notes)
+        setMeasures(musicLogic.splitIntoMeasures(allNotesFlattened))
         props.playback.setNotations(measures.flat())
     }
 

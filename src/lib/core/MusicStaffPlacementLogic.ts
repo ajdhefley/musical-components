@@ -1,58 +1,79 @@
 import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '@lib/core/models'
 import { MusicLogic } from '@lib/core/MusicLogic'
-import { StaffMeasureProps } from '@lib/components/StaffMeasure/StaffMeasure'
 
-export class StaffMeasureController {
-    constructor (private readonly props: StaffMeasureProps) {
+export class MusicStaffPlacementLogic {
+    private readonly musicLogic: MusicLogic
 
+    constructor(private readonly config: {
+        noteSize: number,
+        noteSpacing: number,
+        spaceHeight: number,
+        defaultStemHeight: number,
+        clef: Clef,
+        sharps?: NaturalNote[],
+        flats?: NaturalNote[],
+        beatsPerMeasure: number,
+        beatDuration: NotationType
+    }) {
+        this.musicLogic = new MusicLogic({ ...config })
     }
 
-    public getNotes () {
-        return this.props.notations?.filter((notation: Notation) => notation instanceof Note)
+    /**
+     * Filters rests out of the list, with notes remaining.
+     * 
+     * @param notations 
+     * @returns notes with calculated positions and accidentals.
+     */
+    public extractNotes(notations: Notation[]) {
+        return notations?.filter((notation: Notation) => notation instanceof Note)
             .map((note: any) => {
                 return {
                     model: note,
-                    size: this.props.noteSize,
-                    accidental: MusicLogic.getAccidentalForPitch(note.pitch, this.props.sharps, this.props.flats),
-                    left: this.getNotationLeftPosition(note),
+                    accidental: this.musicLogic.getAccidentalForPitch(note.pitch),
+                    left: this.getNotationLeftPosition(notations, note),
                     bottom: this.getNotationBottomPosition(note.pitch)
                 }
             })
     }
 
-    public getRests () {
-        return this.props.notations?.filter((notation: Notation) => notation instanceof Rest)
+    /**
+     * Filters note out of the list, with rests remaining.
+     * 
+     * @param notations 
+     * @returns rests with calculated positions.
+     */
+    public extractRests(notations: Notation[]) {
+        return notations?.filter((notation: Notation) => notation instanceof Rest)
             .map((rest: any) => {
                 return {
                     model: rest,
-                    size: this.props.noteSize,
-                    left: this.getNotationLeftPosition(rest)
+                    left: this.getNotationLeftPosition(notations, rest)
                 }
             })
     }
 
-    public getNotationLeftPosition (notation: Notation) {
+    public getNotationLeftPosition(notations: Notation[], notation: Notation) {
         const leftOffset = 25
         const accidentalWidth = 25
-        const normalizedStartBeat = MusicLogic.normalizeBeat(notation.startBeat, this.props.beatsPerMeasure, this.props.beatDuration)
+        const normalizedStartBeat = this.musicLogic.normalizeBeat(notation.startBeat)
 
         let total = 0
         let lastNote = null
 
         for (let i = 0; i < normalizedStartBeat; i += 1 / 32) {
-            const iteratedNotation = this.getNotationAt(i)
+            const iteratedNotation = this.getNotationAt(notations, i)
 
             if (iteratedNotation.startBeat !== lastNote?.startBeat) {
                 lastNote = iteratedNotation
-                total += (this.props.noteSize + this.props.noteSpacing)
+                total += (this.config.noteSize + this.config.noteSpacing)
             }
 
-            if (iteratedNotation instanceof Note && MusicLogic.getAccidentalForPitch(iteratedNotation.pitch, this.props.sharps, this.props.flats)) {
+            if (iteratedNotation instanceof Note && this.musicLogic.getAccidentalForPitch(iteratedNotation.pitch)) {
                 total += accidentalWidth / 5
             }
         }
 
-        if (notation instanceof Note && MusicLogic.getAccidentalForPitch(notation.pitch, this.props.sharps, this.props.flats)) {
+        if (notation instanceof Note && this.musicLogic.getAccidentalForPitch(notation.pitch)) {
             total += accidentalWidth
         }
 
@@ -66,12 +87,12 @@ export class StaffMeasureController {
         return total + leftOffset
     }
 
-    public readonly getNotationBottomPosition = (pitch: Pitch) => {
+    public getNotationBottomPosition(pitch: Pitch) {
         // @ts-expect-error
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
 
         // Determine base natural, to calculate correct position on staff
-        const naturalPitch = MusicLogic.determineNaturalPitch(pitch, this.props.sharps, this.props.flats)
+        const naturalPitch = this.musicLogic.determineNaturalPitch(pitch)
 
         // String value ("A", "B", "C", etc) of the note
         const noteValue = NaturalNote[naturalPitch % 12]
@@ -80,10 +101,10 @@ export class StaffMeasureController {
         const totalNotes = naturalNoteValues.length
 
         // The position of Middle C on the staff is different depending on the clef.
-        // We calculate the position of each note relative to Middle C, so this needs
+        // We calculate the position of each note relative to Middle C, so needs
         // to be known ahead of time.
         let middleCPosition = 0
-        switch (this.props.clef) {
+        switch (this.config.clef) {
             case Clef.TrebleClef:
                 // Occupies the 3rd space from the bottom, which is the 5th index where the bottom line is 0
                 middleCPosition = 5
@@ -102,95 +123,53 @@ export class StaffMeasureController {
         const pitchPosition = basePitchPosition + totalNotes * octaveDiff
 
         // One note per line and one per space equates to each note occupying a height of half each space
-        const noteHeight = this.props.spaceHeight / 2
+        const noteHeight = this.config.spaceHeight / 2
 
         return (middleCPosition + pitchPosition) * noteHeight
     }
 
-    public getMeasureWidth () {
-        if (this.props.notations.length === 0) {
+    public getMeasureWidth(notations: Notation[]) {
+        if (notations.length === 0) {
             return 100
         }
 
-        const lastNote = this.props.notations[this.props.notations.length - 1]
+        const lastNote = notations[notations.length - 1]
         const rightOffset = 30
-        return this.getNotationLeftPosition(lastNote) + rightOffset
+        return this.getNotationLeftPosition(notations, lastNote) + rightOffset
     }
 
-    public getHoveredNote (mousePosition: { x: number, y: number }) {
-        if (mousePosition.x === 0 && mousePosition.y === 0) {
-            return null
-        }
-
-        const noteIndex = Math.floor(mousePosition.y / (this.props.spaceHeight / 2))
-
-        let pitch = this.props.clef === Clef.TrebleClef ? 55 : 49
-
-        switch (noteIndex) {
-            case 0:
-                pitch -= this.props.clef === Clef.TrebleClef ? 3 : 4
-                break
-            case 1:
-                pitch -= this.props.clef === Clef.TrebleClef ? 2 : 2
-                break
-            case 2:
-                pitch += this.props.clef === Clef.TrebleClef ? 0 : 0
-                break
-            case 3:
-                pitch += this.props.clef === Clef.TrebleClef ? 2 : 1
-                break
-            case 4:
-                pitch += this.props.clef === Clef.TrebleClef ? 4 : 3
-                break
-            case 5:
-                pitch += this.props.clef === Clef.TrebleClef ? 5 : 4
-                break
-            case 6:
-                pitch += this.props.clef === Clef.TrebleClef ? 7 : 7
-                break
-            case 7:
-                pitch += this.props.clef === Clef.TrebleClef ? 9 : 9
-                break
-            case 8:
-                pitch += this.props.clef === Clef.TrebleClef ? 10 : 10
-                break
-        }
-
-        return new Note(NotationType.Quarter, pitch)
-    }
-
-    public getHorizontalBeams = () => {
+    public getHorizontalBeams(notations: Notation[]) {
         let lastHorizontalBeamIndex = -1
 
         const beams = new Array<{ left: number, bottom: number, width: number }>()
 
-        this.props.notations?.filter((notation) => notation instanceof Note)
+        notations?.filter((notation) => notation instanceof Note)
             .forEach((notationModel: any, index: number) => {
                 if (index > lastHorizontalBeamIndex) {
                     lastHorizontalBeamIndex = index
 
                     // Time signature is 3/8, 6/8, 9/8, or 12/8
-                    const isCompoundTime = (this.props.beatDuration === NotationType.Eighth && this.props.beatsPerMeasure % 3 === 0)
+                    const isCompoundTime = (this.config.beatDuration === NotationType.Eighth && this.config.beatsPerMeasure % 3 === 0)
 
                     // Time signature is 2/4, 4/4, or 6/4
-                    const count4 = notationModel.type.getCountsPerMeasure(this.props.beatsPerMeasure, this.props.beatDuration) % 4 === 0
+                    const count4 = notationModel.type.getCountsPerMeasure(this.config.beatsPerMeasure, this.config.beatDuration) % 4 === 0
 
                     // Time signature is 3/4, 5/4, 7/4, or 9/4
-                    const count2 = notationModel.type.getCountsPerMeasure(this.props.beatsPerMeasure, this.props.beatDuration) % 2 === 0
+                    const count2 = notationModel.type.getCountsPerMeasure(this.config.beatsPerMeasure, this.config.beatDuration) % 2 === 0
 
                     let maxConnectedNotes = isCompoundTime ? 3 : count4 ? 4 : count2 ? 2 : 1
                     if (notationModel.type === NotationType.ThirtySecond) maxConnectedNotes *= 4
                     if (notationModel.type === NotationType.Sixteenth) maxConnectedNotes *= 2
 
                     let count = 1
-                    while (this.props.notations[index + count] && this.props.notations[index + count].type === notationModel.type) {
+                    while (notations[index + count] && notations[index + count].type === notationModel.type) {
                         lastHorizontalBeamIndex++
                         if (++count === maxConnectedNotes) {
                             break
                         }
                     }
 
-                    const newBeams = this.determineBeamsAtIndex(index, maxConnectedNotes)
+                    const newBeams = this.determineBeamsAtIndex(notations, index, maxConnectedNotes)
                     if (newBeams) {
                         beams.concat(newBeams)
                     }
@@ -200,10 +179,10 @@ export class StaffMeasureController {
         return beams
     }
 
-    private determineBeamsAtIndex (index: number, maxConnectedNotes: number) {
+    public determineBeamsAtIndex(notations: Notation[], index: number, maxConnectedNotes: number) {
         // Credit here for information on writing beams and stems: http://vickyjohnson.altervista.org/Notation%20Basics.pdf
 
-        const notationModel = this.props.notations[index]
+        const notationModel = notations[index]
         const usesBeam = (
             notationModel.type === NotationType.ThirtySecond ||
             notationModel.type === NotationType.Sixteenth ||
@@ -213,7 +192,7 @@ export class StaffMeasureController {
         if (notationModel instanceof Note && usesBeam) {
             let count = 0
 
-            while (this.props.notations[index + count] instanceof Note && this.props.notations[index + count].type === notationModel.type) {
+            while (notations[index + count] instanceof Note && notations[index + count].type === notationModel.type) {
                 count++
 
                 if (count === maxConnectedNotes) {
@@ -222,29 +201,29 @@ export class StaffMeasureController {
             }
 
             for (let i = index; i < index + count; i++) {
-                const nextNote = this.props.notations[i]
+                const nextNote = notations[i]
                 if (nextNote instanceof Note && notationModel instanceof Note) {
-                    const verticalStemProportion = (this.getNotationBottomPosition(nextNote.pitch) - this.getNotationBottomPosition(notationModel.pitch)) / this.props.defaultStemHeight
+                    const verticalStemProportion = (this.getNotationBottomPosition(nextNote.pitch) - this.getNotationBottomPosition(notationModel.pitch)) / this.config.defaultStemHeight
                     nextNote.stemStretchFactor = 1 + verticalStemProportion
                 }
             }
 
-            return this.createBeamsBetweenIndexes(index, index + count - 1)
+            return this.createBeamsBetweenIndexes(notations, index, index + count - 1)
         }
 
         return undefined
     }
 
-    private createBeamsBetweenIndexes (startIndex: number, endIndex: number) {
+    public createBeamsBetweenIndexes(notations: Notation[], startIndex: number, endIndex: number) {
         if (startIndex === endIndex) {
             return
         }
 
-        const startNote = this.props.notations[startIndex] as Note
-        const endNote = this.props.notations[endIndex] as Note
-        const beamStartXPos = this.getNotationLeftPosition(startNote) - (this.props.noteSize / 2) + 2
-        const beamStartYPos = this.getNotationBottomPosition(startNote.pitch) - this.props.defaultStemHeight
-        const beamEndXPos = this.getNotationLeftPosition(endNote) - (this.props.noteSize / 2)
+        const startNote = notations[startIndex] as Note
+        const endNote = notations[endIndex] as Note
+        const beamStartXPos = this.getNotationLeftPosition(notations, startNote) - (this.config.noteSize / 2) + 2
+        const beamStartYPos = this.getNotationBottomPosition(startNote.pitch) - this.config.defaultStemHeight
+        const beamEndXPos = this.getNotationLeftPosition(notations, endNote) - (this.config.noteSize / 2)
         // const stemEndYPos = getNotationBottomPosition(endNote.pitch) - defaultStemHeight
         const beamWidth = beamEndXPos - beamStartXPos - 1
         // const degrees = Math.atan2(stemEndYPos - stemStartYPos, stemEndXPos - stemStartXPos) * 180 / Math.PI;
@@ -264,9 +243,9 @@ export class StaffMeasureController {
         return beams
     }
 
-    private getNotationAt (beat: number) {
-        for (const note of this.props.notations) {
-            const localMeasureStartBeat = MusicLogic.normalizeBeat(note.startBeat, this.props.beatsPerMeasure, this.props.beatDuration)
+    public getNotationAt(notations: Notation[], beat: number) {
+        for (const note of notations) {
+            const localMeasureStartBeat = this.musicLogic.normalizeBeat(note.startBeat)
             if (localMeasureStartBeat <= beat && beat < localMeasureStartBeat + note.type.beatValue) {
                 return note
             }
