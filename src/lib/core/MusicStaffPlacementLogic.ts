@@ -130,7 +130,7 @@ export class MusicStaffPlacementLogic {
     }
 
     public getAccidentalLeftPosition (index: number) {
-        return index * this.config.accidentalSize
+        return index * (this.config.accidentalSize / 2)
     }
 
     public getAccidentalBottomPosition (note: NaturalNote) {

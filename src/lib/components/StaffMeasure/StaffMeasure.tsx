@@ -2,16 +2,16 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import './StaffMeasure.scss'
 import { Clef, NaturalNote, Notation, NotationType, Note } from '@lib/core/models'
+import { MusicStaffPlacementLogic } from '@lib/core/MusicStaffPlacementLogic'
 import { StaffNote } from '@lib/components/StaffNote/StaffNote'
 import { StaffRest } from '@lib/components/StaffRest/StaffRest'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
 import { StaffNoteBeam } from '@lib/components/StaffNoteBeam/StaffNoteBeam'
-import { MusicStaffPlacementLogic } from '@lib/core/MusicStaffPlacementLogic'
 
 /**
  *
  **/
-export interface StaffMeasureProps {
+interface StaffMeasureProps {
     /**
      *
      **/
@@ -46,6 +46,11 @@ export interface StaffMeasureProps {
      * Notes that should be implicitly flatted (by key) without being denoted by an explicit accidental.
      **/
     flats?: NaturalNote[]
+
+    /**
+     *
+     **/
+    accidentalSize: number
 
     /**
      *
@@ -86,7 +91,7 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
     const id = `${props.staffId}-${props.notations?.length > 0 ? props.notations[0].startBeat : '0'}`
 
     const staffPlacement = new MusicStaffPlacementLogic({
-        accidentalSize: 0,
+        accidentalSize: props.accidentalSize,
         noteSize: props.noteSize,
         noteSpacing: props.noteSpacing,
         spaceHeight: props.spaceHeight,
@@ -108,7 +113,7 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         const leftPosition = mousePosition.x
         const bottomPosition = staffPlacement.getNoteBottomPosition(note.pitch)
 
-        return <StaffNote model={note} size={props.noteSize} left={leftPosition} bottom={bottomPosition} />
+        return <StaffNote model={note} accidentalSize={props.accidentalSize} size={props.noteSize} left={leftPosition} bottom={bottomPosition} />
     }
 
     const getHoveredNote = function (mousePosition: { x: number, y: number }) {
@@ -189,7 +194,7 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
             <StaffLines />
             <div className="notation-container">
                 {staffPlacement.extractNotes(props.notations).map((note, index) => (
-                    <StaffNote key={index} {...note} size={props.noteSize} />
+                    <StaffNote key={index} {...note} size={props.noteSize} accidentalSize={props.accidentalSize} />
                 ))}
 
                 {staffPlacement.extractRests(props.notations).map((rest, index) => (

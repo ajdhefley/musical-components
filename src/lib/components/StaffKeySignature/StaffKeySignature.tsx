@@ -7,7 +7,7 @@ import { MusicStaffPlacementLogic } from '@lib/core/MusicStaffPlacementLogic'
 /**
  *
  **/
-export interface StaffKeySignatureProps {
+interface StaffKeySignatureProps {
     /**
      *
      **/

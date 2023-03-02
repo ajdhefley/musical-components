@@ -6,7 +6,7 @@ import { Accidental, NotationType, Note } from '@lib/core/models'
 /**
  *
  **/
-export interface StaffNoteProps {
+interface StaffNoteProps {
     /**
      *
      **/
@@ -30,13 +30,18 @@ export interface StaffNoteProps {
     /**
      *
      **/
+    accidentalSize: number
+
+    /**
+     *
+     **/
     accidental?: Accidental
 }
 
 /**
  *
  **/
-export function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteProps): React.ReactElement {
+export function StaffNote ({ model, left, bottom, size, accidentalSize, accidental }: StaffNoteProps): React.ReactElement {
     const stemType: 'up' | 'down' = (() => {
         const numPitches = 7
         const numOctaves = 6
@@ -117,7 +122,7 @@ export function StaffNote ({ model, left, bottom, size, accidental }: StaffNoteP
     }
 
     const getAccidentalElement = () => {
-        return <div className={`accidental ${accidental?.name}`} style={{ left: `${-size}px` }}></div>
+        return <div className={`accidental ${accidental?.name}`} style={{ left: `${-size}px`, width: `${accidentalSize}px`, height: `${accidentalSize}px` }}></div>
     }
 
     return (

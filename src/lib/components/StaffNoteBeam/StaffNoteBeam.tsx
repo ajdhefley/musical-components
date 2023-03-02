@@ -5,7 +5,7 @@ import './StaffNoteBeam.scss'
 /**
  *
  **/
-export interface StaffNoteBeamProps {
+interface StaffNoteBeamProps {
     /**
      *
      **/

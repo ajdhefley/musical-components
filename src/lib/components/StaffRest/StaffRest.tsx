@@ -6,7 +6,7 @@ import { Rest } from '@lib/core/models'
 /**
  *
  **/
-export interface StaffRestProps {
+interface StaffRestProps {
     /**
      *
      **/

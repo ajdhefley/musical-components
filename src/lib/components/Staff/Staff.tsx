@@ -13,7 +13,7 @@ import { MusicLogic } from '../../..'
 /**
  *
  **/
-export interface StaffProps {
+interface StaffProps {
     /**
      * The treble or bass clef.
      **/
@@ -49,7 +49,7 @@ export interface StaffProps {
     /**
      *
      **/
-    initialNotes?: Note[]
+    initialNotations?: Notation[]
 
     /**
      * Whether the user is allowed to place notes.
@@ -74,24 +74,24 @@ export function Staff (props: StaffProps): React.ReactElement {
     // }, [placedNote])
 
     const id = Date.now().toString()
-    const accidentalSize = 0
-    const noteSize = 0
-    const noteSpacing = 0
-    const spaceHeight = 0
-    const defaultStemHeight = 0
+    const accidentalSize = 50
+    const noteSize = 35
+    const noteSpacing = 30
+    const spaceHeight = 26
+    const defaultStemHeight = 120
     const musicLogic = new MusicLogic({ ...props })
 
     const [measures, setMeasures] = useState<Notation[][]>([])
 
     useEffect(() => {
-        if (props.initialNotes) {
-            addNotes(props.initialNotes)
+        if (props.initialNotations) {
+            addNotes(props.initialNotations)
         }
     }, [])
 
-    const addNotes = function (notes: Note[]) {
-        const allNotesFlattened = musicLogic.addNotations(measures.flat(), notes)
-        setMeasures(musicLogic.splitIntoMeasures(allNotesFlattened))
+    const addNotes = function (notations: Notation[]) {
+        const allNotationsFlattened = musicLogic.addNotations(measures.flat(), notations)
+        setMeasures(musicLogic.splitIntoMeasures(allNotationsFlattened))
         if (props.playback) props.playback.setNotations(measures.flat())
     }
 
@@ -108,6 +108,7 @@ export function Staff (props: StaffProps): React.ReactElement {
                     {...props}
                     staffId={id}
                     notations={measureNotes}
+                    accidentalSize={accidentalSize}
                     noteSize={noteSize}
                     noteSpacing={noteSpacing}
                     spaceHeight={spaceHeight}

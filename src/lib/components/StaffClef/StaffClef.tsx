@@ -6,7 +6,7 @@ import { Clef } from '@lib/core/models'
 /**
  *
  **/
-export interface StaffClefProps {
+interface StaffClefProps {
     /**
      *
      **/
