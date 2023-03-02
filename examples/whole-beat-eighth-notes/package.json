@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-      "musical-components": "^0.1.4",
+      "musical-components": "file:../..",
       "react": "^17.0.2",
       "react-dom": "^17.0.2"
     },
