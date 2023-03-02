@@ -1,6 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Note, NotationType, Pitch, Clef, FlatKeys, Staff } from 'musical-components'
+import { Note, NotationType, Pitch, Clef, Staff, NaturalNote } from 'musical-components'
+
+export const FlatKeys = {
+    FMajor: [NaturalNote.B],
+    BFlatMajor: [NaturalNote.B, NaturalNote.E],
+    EFlatMajor: [NaturalNote.B, NaturalNote.E, NaturalNote.A],
+    AFlatMajor: [NaturalNote.B, NaturalNote.E, NaturalNote.A, NaturalNote.D],
+    DFlatMajor: [NaturalNote.B, NaturalNote.E, NaturalNote.A, NaturalNote.D, NaturalNote.G],
+    GFlatMajor: [NaturalNote.B, NaturalNote.E, NaturalNote.A, NaturalNote.D, NaturalNote.G, NaturalNote.C],
+    CFlatMajor: [NaturalNote.B, NaturalNote.E, NaturalNote.A, NaturalNote.D, NaturalNote.G, NaturalNote.C, NaturalNote.F]
+}
 
 const notes = [
     new Note(NotationType.Eighth, Pitch.C4),

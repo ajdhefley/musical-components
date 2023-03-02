@@ -6,5 +6,3 @@ export * from './NotationType'
 export * from './Note'
 export * from './Rest'
 export * from './Pitch'
-
-export * from './deleteme'
