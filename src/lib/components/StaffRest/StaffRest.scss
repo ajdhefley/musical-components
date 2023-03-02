@@ -11,26 +11,26 @@
     bottom: calc(#{$staff-height} / 2 - #{$rest-size} / 2 + 2px);
 
     &.rest-1 {
-        background-image: url('../images/rest-1.svg');
+        background-image: url('@lib/images/rest-1.svg');
     }
 
     &.rest-2 {
-        background-image: url('../images/rest-2.svg');
+        background-image: url('@lib/images/rest-2.svg');
     }
 
     &.rest-4 {
-        background-image: url('../images/rest-4.svg');
+        background-image: url('@lib/images/rest-4.svg');
     }
 
     &.rest-8 {
-        background-image: url('../images/rest-8.svg');
+        background-image: url('@lib/images/rest-8.svg');
     }
 
     &.rest-16 {
-        background-image: url('../images/rest-16.svg');
+        background-image: url('@lib/images/rest-16.svg');
     }
 
     &.rest-32 {
-        background-image: url('../images/rest-16.svg');
+        background-image: url('@lib/images/rest-16.svg');
     }
 }

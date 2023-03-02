@@ -1,8 +1,6 @@
 @import "@lib/styles/mixins";
 @import "@lib/styles/variables";
 
-$accidental-size: 40px;
-
 .note {
     background-repeat: no-repeat;
     background-position: center;
@@ -13,15 +11,15 @@ $accidental-size: 40px;
     }
 
     &.note-1 {
-        background-image: url('../images/note-whole.svg');
+        background-image: url('@lib/images/note-whole.svg');
     }
 
     &.note-2 {
-        background-image: url('../images/note-half.svg');
+        background-image: url('@lib/images/note-half.svg');
     }
 
     &.note-4, &.note-8, &.note-16, &.note-32 {
-        background-image: url('../images/note.svg');
+        background-image: url('@lib/images/note.svg');
     }
 }
 
@@ -30,7 +28,7 @@ $accidental-size: 40px;
     position: absolute;
     background-repeat: no-repeat;
     background-position: right center;
-    background-image: url('../images/note-stem.svg');
+    background-image: url('@lib/images/note-stem.svg');
 
     &.down {
         background-position: left center;
@@ -50,19 +48,19 @@ $accidental-size: 40px;
 
 .note-8 {
     .stem-flag {
-        background-image: url('../images/flag-8.svg');
+        background-image: url('@lib/images/flag-8.svg');
     }
 }
 
 .note-16 {
     .stem-flag {
-        background-image: url('../images/flag-16.svg');
+        background-image: url('@lib/images/flag-16.svg');
     }
 }
 
 .note-32 {
     .stem-flag {
-        background-image: url('../images/flag-32.svg');
+        background-image: url('@lib/images/flag-32.svg');
     }
 }
 
@@ -71,22 +69,20 @@ $accidental-size: 40px;
 }
 
 .key-symbol {
-    width: $accidental-size;
-    height: $accidental-size;
     position: absolute;
 }
 
 .sharp {
     @extend .key-symbol;
-    @include background-image('sharp.svg');
+    @include background-image('@lib/images/sharp.svg');
 }
 
 .flat {
     @extend .key-symbol;
-    @include background-image('flat.svg');
+    @include background-image('@lib/images/flat.svg');
 }
 
 .natural {
     @extend .key-symbol;
-    @include background-image('natural.svg');
+    @include background-image('@lib/images/natural.svg');
 }

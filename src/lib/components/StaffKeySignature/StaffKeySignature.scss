@@ -16,10 +16,10 @@
 
 .sharp {
     @extend .key-symbol;
-    @include background-image('sharp.svg');
+    @include background-image('@lib/images/sharp.svg');
 }
 
 .flat {
     @extend .key-symbol;
-    @include background-image('flat.svg');
+    @include background-image('@lib/images/flat.svg');
 }

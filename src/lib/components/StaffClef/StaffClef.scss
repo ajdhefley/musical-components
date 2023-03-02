@@ -8,14 +8,14 @@
 
 .treble {
     @extend .clef-symbol;
-    @include background-image('clef-treble.svg');
+    @include background-image('@lib/images/clef-treble.svg');
     height: $clef-treble-height;
     max-height: $staff-height;
 }
 
 .bass {
     @extend .clef-symbol;
-    @include background-image('clef-bass.svg');
+    @include background-image('@lib/images/clef-bass.svg');
     height: $clef-bass-height;
     max-height: $staff-height;
 }

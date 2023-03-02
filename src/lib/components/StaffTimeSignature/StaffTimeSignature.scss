@@ -19,42 +19,42 @@
 
 .ts-2 {
     @extend .ts-symbol;
-    @include background-image('2.svg');
+    @include background-image('@lib/images/2.svg');
 }
 
 .ts-3 {
     @extend .ts-symbol;
-    @include background-image('3.svg');
+    @include background-image('@lib/images/3.svg');
 }
 
 .ts-4 {
     @extend .ts-symbol;
-    @include background-image('4.svg');
+    @include background-image('@lib/images/4.svg');
 }
 
 .ts-5 {
     @extend .ts-symbol;
-    @include background-image('5.svg');
+    @include background-image('@lib/images/5.svg');
 }
 
 .ts-6 {
     @extend .ts-symbol;
-    @include background-image('6.svg');
+    @include background-image('@lib/images/6.svg');
 }
 
 .ts-7 {
     @extend .ts-symbol;
-   @include background-image('7.svg');
+   @include background-image('@lib/images/7.svg');
 }
 
 .ts-8 {
     @extend .ts-symbol;
-    @include background-image('8.svg');
+    @include background-image('@lib/images/8.svg');
 }
 
 .ts-9 {
     @extend .ts-symbol;
-    @include background-image('9.svg');
+    @include background-image('@lib/images/9.svg');
 }
 
 .ts-container {
@@ -63,5 +63,5 @@
     bottom: 0;
     width: $ts-container-width;
     height: 100%;
-    top: calc($staff-height / 2) - $ts-digit-height;
+    top: 0;
 }
