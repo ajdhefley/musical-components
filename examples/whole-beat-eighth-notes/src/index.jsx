@@ -1,6 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Note, NotationType, Pitch, Clef, FlatKeys, Staff } from 'musical-components';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Note, NotationType, Pitch, Clef, SharpKeys, Staff } from 'musical-components'
 
 const notes = [
     new Note(NotationType.Eighth, Pitch.Cs4),
@@ -21,4 +21,4 @@ ReactDOM.render(
         />
     </React.StrictMode>,
     document.getElementById('root')
-);
+)
