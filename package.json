@@ -17,7 +17,8 @@
     "jzz": "^1.4.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "vite-plugin-css-injected-by-js": "^3.0.1"
   },
   "devDependencies": {
     "@jest/types": "^29.0.1",
@@ -43,6 +44,10 @@
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
     "vite-plugin-dts": "^1.6.6"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "scripts": {
     "prepare": "npm run build",
