@@ -2,7 +2,7 @@
   "name": "musical-components",
   "description": "Library for rendering musical notation in the browser using React and generating MIDI playback.",
   "author": "Ashton Hefley",
-  "license": "MIT license",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ajdhefley/musical-components"
