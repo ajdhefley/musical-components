@@ -92,7 +92,7 @@ export function Staff (props: StaffProps): React.ReactElement {
     const addNotes = function (notations: Notation[]) {
         const allNotationsFlattened = musicLogic.addNotations(measures.flat(), notations)
         setMeasures(musicLogic.splitIntoMeasures(allNotationsFlattened))
-        if (props.playback) props.playback.setNotations(measures.flat())
+        if (props.playback) props.playback.setNotations(allNotationsFlattened)
     }
 
     return <>

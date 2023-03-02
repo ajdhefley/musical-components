@@ -47,6 +47,8 @@ export class MidiNotationPlayerResponse {
      * @param notations The array of notations (notes and rests.)
      **/
     private async execute (notations: Notation[]) {
+        if (notations.length === 0) return
+
         const lastNote = notations[notations.length - 1]
         const lastTick = lastNote.startBeat + lastNote.type.beatValue
 
@@ -55,7 +57,8 @@ export class MidiNotationPlayerResponse {
                 break
             }
 
-            // Simultaneously fire all notes at this tick, but wait for them all to complete.
+            // Simultaneously fire all notes at this tick.
+            // Wait for them all to complete before moving onto next tick.
             await Promise.all(
                 notations
                     .filter(n => n instanceof Note)

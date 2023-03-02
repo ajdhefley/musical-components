@@ -1,16 +1,11 @@
 @import "@lib/styles/mixins";
 @import "@lib/styles/variables";
 
-$staff-line-height: 1px;
-$staff-border: $staff-line-height solid #000;
-$staff-space-height: 20px;
-
 div.staff-measure {
-    border-left: $staff-border;
-    border-right: $staff-border;
     position: relative;
     display: inline-block;
     height: 100%;
+    margin-top: $staff-space-height * 2;
 }
 
 .notation-container {
