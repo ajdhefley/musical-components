@@ -16,11 +16,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Install Dependencies
+      run: |
+        npm ci
+
     - name: Generate docs
       run: |
         npm run docs
 
-    - name: Pushes docs
+    - name: Push docs
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
