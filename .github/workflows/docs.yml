@@ -30,8 +30,8 @@ jobs:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         source_file: 'docs/'
-        destination_repo: 'dmnemec/release-test'
-        destination_folder: 'test-dir'
+        destination_repo: 'ajdhefley/musical-components-docs'
+        destination_folder: 'docs'
         user_email: 'ajdhefley@gmail.com'
         user_name: 'ajdhefley'
         commit_message: 'Update docs (auto-generated commit)'
