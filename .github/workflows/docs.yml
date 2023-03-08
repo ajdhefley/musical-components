@@ -29,14 +29,8 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'docs/'
+        source_file: 'docs/*'
         destination_repo: 'ajdhefley/musical-components-docs'
         user_email: 'ajdhefley@gmail.com'
         user_name: 'ajdhefley'
         commit_message: 'Update docs (auto-generated commit)'
-
-    - name: Removes doc artifacts
-      run: |
-        rm -r docs/scripts/
-        rm -r docs/styles/
-        rm -r docs/**/*.html
