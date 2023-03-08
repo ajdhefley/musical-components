@@ -2,20 +2,20 @@
 
 React/MIDI library that renders and plays musical notation in all major browsers.
 
-## Install
+## Getting Started
+
+### Install
 
 ```bash
 $ npm install musical-components --save
 ```
 
-## Usage
+### Usage
 
 Instantiate notes (as well as rests), specifying the duration and pitch.
 
 ```
 import { Note, NotationType, Pitch } from 'musical-components'
-
-...
 
 const notes = [
     new Note(NotationType.Eighth, Pitch.A3),
@@ -24,7 +24,7 @@ const notes = [
 ]
 ```
 
-Pass your note array into the Staff element's *initialNotations* prop within your React app, providing the clef, key signature, and time signature as additional props.
+To render your music in the browser, add a Staff component to your React appllication and pass the note array into the *initialNotations* prop, also providing the clef, key signature, and time signature as additional props.
 
 ```
 import { NotationType, Clef, Staff } from 'musical-components'
@@ -50,25 +50,16 @@ const EMajor = [NaturalNote.F, NaturalNote.C, NaturalNote.G, NaturalNote.D]
 <Staff ... sharps={EMajor} />
 ```
 
-See example including key signature usage [here](https://github.com/ajdhefley/musical-components/tree/main/examples/beats-per-measure).
-
-## Core Library
-
-The library contains React components for rendering musical notation and the core logic required, such as determining whether to write an sharp, flat, or natural next to a note based on its pitch and the staff's key signature. It also converts musical pitches into audio frequencies and sends / listens to MIDI messages. The React UI optionally highlights the notes as they are played by intercepting these MIDI messages.
-
-The primary React component is `<Staff />`, with the following props:
-
-| Name | Description |
-| :--- | :--- |
-| `clef` | Either `TrebleClef` or `BassClef` |
-| `beatsPerMeasure` | Number of beats per measure (top of time signature) |
-| `beatDuration` | Inherent beat value (bottom of time signature) |
-| `beatsPerMinute`* | Determines speed of audio playback |
-| `sharps`* | Notes that are sharped in the key signature |
-| `flats`* | Notes that are flatted in the key signature |
-
-*optional
+You can see an example setting a key signature [here](https://github.com/ajdhefley/musical-components/tree/main/examples/beats-per-measure).
 
 ## Examples
 
-See examples [here](https://github.com/ajdhefley/musical-components/tree/main/examples).
+All examples can be found [here](https://github.com/ajdhefley/musical-components/tree/main/examples).
+
+## Documentation
+
+In-depth documentation can be found [here](https://ajdhefley.github.io/musical-components-docs/).
+
+## License
+
+This project is protected under the [MIT License](https://github.com/ajdhefley/musical-components/blob/main/LICENSE).
