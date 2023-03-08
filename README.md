@@ -35,7 +35,7 @@ import { NotationType, Clef, Staff } from 'musical-components'
 Result:
 
 <p align="center">
-  <img src="https://github.com/ajdhefley/musical-components/blob/main/docs/doc_main_example.png" height="200" />
+  <img src="https://github.com/ajdhefley/musical-components/blob/main/docs/images/doc_main_example.png" height="200" />
 <p>
 
 ### Specifying Key Signature
