@@ -20,5 +20,5 @@ const props = {
 <b>Result:</b>
 
 <p align="center">
-  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/doc_stems_timesignature.png" height="300" />
+  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/images/doc_stems_timesignature.png" height="300" />
 <p>

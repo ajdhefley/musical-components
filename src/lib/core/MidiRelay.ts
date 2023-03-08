@@ -7,7 +7,7 @@ export class MidiRelay {
     /**
      * Gains and returns access to MIDI ports.
      *
-     * @returns A promise containing the WebMidi object if access successful.
+     * @returns {Promise} A promise containing the WebMidi object if access successful.
      **/
     async openAccess () {
         return await new Promise<WebMidi.MIDIAccess>((resolve, reject) => {

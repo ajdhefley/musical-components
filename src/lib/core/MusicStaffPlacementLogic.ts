@@ -23,7 +23,7 @@ export class MusicStaffPlacementLogic {
      * Filters rests out of the list, with notes remaining.
      *
      * @param notations
-     * @returns notes with calculated positions and accidentals.
+     * @returns {Notation[]} Notes with calculated positions and accidentals.
      */
     public extractNotes (notations: Notation[]) {
         return notations?.filter((notation: Notation) => notation instanceof Note)
@@ -41,7 +41,7 @@ export class MusicStaffPlacementLogic {
      * Filters note out of the list, with rests remaining.
      *
      * @param notations
-     * @returns rests with calculated positions.
+     * @returns {Notation[]} Rests with calculated positions.
      */
     public extractRests (notations: Notation[]) {
         return notations?.filter((notation: Notation) => notation instanceof Rest)

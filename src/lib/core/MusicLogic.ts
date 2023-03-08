@@ -17,7 +17,7 @@ export class MusicLogic {
      * @param pitch The pitch (numerical representation of note plus octave).
      * @param defaultSharpedPitches The natural notes sharped by key. For example, in D Major, C and F are sharped.
      * @param defaultFlattedPitches The natural notes flatted by key. For example, in F major, B is flatted.
-     * @returns undefined if note is not sharped/flatted, or is not a natural of a note sharped/flatted in the key signature.
+     * @returns {Accidental} undefined if note is not sharped/flatted, or is not a natural of a note sharped/flatted in the key signature.
      **/
     public getAccidentalForPitch (pitch: Pitch): Accidental | undefined {
         const noteFromPitch = pitch % 12 as NaturalNote
@@ -51,7 +51,7 @@ export class MusicLogic {
      *
      * @param items
      * @param itemstoAdd
-     * @returns A full list of notations, including calculated rests.
+     * @returns {Notation[]} A full list of notations, including calculated rests.
      **/
     public addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
         let nextTime = 0
@@ -106,7 +106,7 @@ export class MusicLogic {
      * @param notations All of the notes/rests in a given sequence.
      * @param beatsPerMeasure Determines how notes/rests will be divided into measures according to their beat values.
      * @param beatDuration The type of note that counts as a single beat.
-     * @returns Converts an array of notes/rests into a two-dimensional array, each element an array of notes corresponding to a measure.
+     * @returns {Notation[][]} Converts an array of notes/rests into a two-dimensional array, each element an array of notes corresponding to a measure.
      **/
     public splitIntoMeasures (notations: Notation[]): Notation[][] {
         if (notations.length === 0) {
@@ -150,7 +150,7 @@ export class MusicLogic {
      * as the 6th beat of the entire song is the 2nd beat of its measure.
      *
      * @param globalBeat The beat position within the context of the entire song.
-     * @returns The beat position relative to the measure.
+     * @returns {number} The beat position relative to the measure.
      **/
     public normalizeBeat (globalBeat: number) {
         return globalBeat % ((this.config.beatsPerMeasure / 4) * (this.config.beatDuration.beatValue / 0.25))
@@ -168,7 +168,7 @@ export class MusicLogic {
      * @param pitch
      * @param sharps
      * @param flats
-     * @returns
+     * @returns {Pitch} A, B, C, D, E, F, or G (no sharps or flats)
      **/
     public determineNaturalPitch (pitch: Pitch) {
         // @ts-expect-error

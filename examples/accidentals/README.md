@@ -21,5 +21,5 @@ const notes = [
 <b>Result:</b>
 
 <p align="center">
-  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/doc_accidentals.png" height="300" />
+  <img src="https://github.com/ajdhefley/music-exercises-client/blob/master/docs/images/doc_accidentals.png" height="300" />
 <p>

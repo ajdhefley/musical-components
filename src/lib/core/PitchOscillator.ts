@@ -45,7 +45,7 @@ export class PitchOscillator {
 
     /**
      *
-     * @returns
+     * @returns {number}
      **/
     getActivePitch () {
         return this.activePitch
@@ -68,7 +68,7 @@ export class PitchOscillator {
      * https://newt.phys.unsw.edu.au/jw/notes.html
      *
      * @param pitch
-     * @returns Numeric audio frequency from pitch.
+     * @returns {number} Numeric audio frequency from pitch.
      **/
     private convertPitchToFrequency (pitch: number) {
         const value = Math.pow(2, (pitch - 69) / 12) * 440

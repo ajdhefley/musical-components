@@ -25,7 +25,7 @@ export class MidiNotationPlayerResponse {
      *
      * @param event The event identifier.
      * @param callback The callback bound to the event, invoked when it fires.
-     * @returns
+     * @returns {MidiNotationPlayerResponse} Self.
      **/
     on (event: string, callback: (value: any) => void) {
         this.eventCallbacks[event] = this.eventCallbacks[event] || new Array<any>()

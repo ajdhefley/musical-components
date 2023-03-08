@@ -27,7 +27,7 @@ export class MidiNotationPlayer {
      *
      * @param notations Models containing musical data such as pitch and time.
      * @param useMetronome Whether metronome audio should play in timing with MIDI playback.
-     * @returns Player response, which exposes an event listener.
+     * @returns {MidiNotationPlayerResponse} Player response, which exposes an event listener.
      **/
     play (notations: Notation[], useMetronome: boolean) {
         this.currentPlayback = new MidiNotationPlayerResponse(notations, this.beatsPerMinute, this.midiRelay)
@@ -56,7 +56,7 @@ export class MidiNotationPlayer {
     /**
      * If currently playback is executing, returns true.
      *
-     * @returns Whether this player currently contains playback in memory.
+     * @returns {boolean} Whether this player currently contains playback in memory.
      **/
     running () {
         return typeof (this.currentPlayback) !== 'undefined'
