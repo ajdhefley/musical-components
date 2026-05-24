@@ -1,4 +1,4 @@
-@import "@lib/styles/variables";
+@use "@lib/styles/variables" as *;
 
 .rest {
     background-repeat: no-repeat;
@@ -33,4 +33,13 @@
     &.rest-32 {
         background-image: url('@lib/images/rest-16.svg');
     }
+}
+
+.duration-dot {
+    position: absolute;
+    top: 22px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #000;
 }

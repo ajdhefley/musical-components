@@ -1,28 +1,29 @@
 import React, { useEffect, useState } from 'react'
 
 import './Staff.scss'
-import { Clef, NaturalNote, Notation, NotationType, Note } from '@lib/core/models'
+import { Notation, NotationType } from '@lib/core/models'
+import { ScoreStaff } from '@lib/core/Score'
 import { StaffMeasure } from '@lib/components/StaffMeasure/StaffMeasure'
 import { StaffKeySignature } from '@lib/components/StaffKeySignature/StaffKeySignature'
 import { StaffTimeSignature } from '@lib/components/StaffTimeSignature/StaffTimeSignature'
 import { StaffClef } from '@lib/components/StaffClef/StaffClef'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
-import { StaffPlayback } from '../../core/StaffPlayback'
-import { MusicLogic } from '../../..'
+import { MusicLogic, MusicLogicConfig } from '@lib/core/MusicLogic'
+import { MusicStaffPlacementLogicConfig } from '@lib/core/MusicStaffPlacementLogic'
 
 /**
  *
  **/
 interface StaffProps {
     /**
-     * The treble or bass clef.
+     * The staff data: clef, key signature, and optional id.
      **/
-    clef: Clef
+    staff: ScoreStaff
 
     /**
      * Number of beats per measure, determining the top number of the time signature.
      **/
-    beatsPerMeasure: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+    beatsPerMeasure: number
 
     /**
      * The value of a given beat, determining the bottom number of the time signature.
@@ -30,91 +31,71 @@ interface StaffProps {
     beatDuration: NotationType
 
     /**
-     * The intended tempo of the music.
+     * All notations for this staff, pre-processed from the score voice(s).
      **/
-    beatsPerMinute: number
-
-    /**
-     * The pitches that are sharped, determining the major key.
-     * If both sharps and flats have values, flats will be ignored.
-     **/
-    sharps?: NaturalNote[]
-
-    /**
-     * The pitches that are flatted, determining the major key.
-     * If both sharps and flats have values, flats will be ignored.
-     **/
-    flats?: NaturalNote[]
-
-    /**
-     *
-     **/
-    initialNotations?: Notation[]
+    notations: Notation[]
 
     /**
      * Whether the user is allowed to place notes.
      **/
     interactive?: boolean
-
-    /**
-     *
-     **/
-    playback?: StaffPlayback
 }
 
 /**
  *
  **/
 export function Staff (props: StaffProps): React.ReactElement {
-    // const placedNote = useAppSelector((state) => state.notePlacement)
-    // useEffect(() => {
-    //     if (placedNote?.note) {
-    //         controller.addNote(placedNote.note as Note)
-    //     }
-    // }, [placedNote])
-
     const id = Date.now().toString()
     const accidentalSize = 50
     const noteSize = 35
     const noteSpacing = 30
     const spaceHeight = 26
-    const defaultStemHeight = 120
-    const musicLogic = new MusicLogic({ ...props })
+    const defaultStemHeight = noteSize * 2.5
+
+    const renderConfig: MusicStaffPlacementLogicConfig = {
+        accidentalSize,
+        noteSize,
+        noteSpacing,
+        spaceHeight,
+        defaultStemHeight,
+        clef: props.staff.clef,
+        sharps: props.staff.sharps,
+        flats: props.staff.flats,
+        beatsPerMeasure: props.beatsPerMeasure,
+        beatDuration: props.beatDuration
+    }
+
+    const musicConfig: MusicLogicConfig = {
+        sharps: props.staff.sharps,
+        flats: props.staff.flats,
+        beatsPerMeasure: props.beatsPerMeasure,
+        beatDuration: props.beatDuration
+    }
 
     const [measures, setMeasures] = useState<Notation[][]>([])
 
     useEffect(() => {
-        if (props.initialNotations) {
-            addNotes(props.initialNotations)
-        }
-    }, [])
-
-    const addNotes = function (notations: Notation[]) {
-        const allNotationsFlattened = musicLogic.addNotations(measures.flat(), notations)
-        setMeasures(musicLogic.splitIntoMeasures(allNotationsFlattened))
-        if (props.playback) props.playback.setNotations(allNotationsFlattened)
-    }
+        setMeasures(MusicLogic.splitIntoMeasures(props.notations, musicConfig))
+    }, [props.notations])
 
     return <>
         <div className="staff" id={id}>
             <div className="staff-intro">
                 <StaffLines />
-                <StaffClef {...props} />
-                <StaffKeySignature {...props} accidentalSize={accidentalSize} spaceHeight={spaceHeight} />
-                <StaffTimeSignature {...props} />
+                <StaffClef clef={props.staff.clef} />
+                <StaffKeySignature renderConfig={renderConfig} />
+                <StaffTimeSignature beatsPerMeasure={props.beatsPerMeasure} beatDuration={props.beatDuration} />
             </div>
-            {measures.map((measureNotes: Notation[]) => <>
+            {measures.map((measureNotes: Notation[], index) => (
                 <StaffMeasure
-                    {...props}
+                    key={index}
                     staffId={id}
                     notations={measureNotes}
-                    accidentalSize={accidentalSize}
-                    noteSize={noteSize}
-                    noteSpacing={noteSpacing}
-                    spaceHeight={spaceHeight}
-                    defaultStemHeight={defaultStemHeight}
+                    renderConfig={renderConfig}
+                    interactive={props.interactive}
                 />
-            </>)}
+            ))}
         </div>
     </>
 }
+

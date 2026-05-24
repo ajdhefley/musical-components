@@ -1,13 +1,37 @@
 import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from '@lib/core/models'
 
-export class MusicLogic {
-    constructor (private readonly config: {
-        sharps?: NaturalNote[]
-        flats?: NaturalNote[]
-        beatsPerMeasure: number
-        beatDuration: NotationType
-    }) {
+export type MusicLogicConfig = {
+    sharps?: NaturalNote[]
+    flats?: NaturalNote[]
+    beatsPerMeasure: number
+    beatDuration: NotationType
+}
 
+export class MusicLogic {
+    private static readonly BaseNotationTypes = [
+        NotationType.ThirtySecond,
+        NotationType.Sixteenth,
+        NotationType.Eighth,
+        NotationType.Quarter,
+        NotationType.Half,
+        NotationType.Whole
+    ]
+
+    /**
+     * Returns the NotationType singleton matching the given exact beat value.
+     *
+     * @param notationDuration Numerical representation of notation's duration.
+     * @returns {NotationType} The matching singleton, or throws if not found.
+     **/
+    public static getNotationTypeFromDuration (notationDuration: number) {
+        const match = MusicLogic.BaseNotationTypes
+            .find((t) => MusicLogic.areDurationsEqual(t.beatValue, notationDuration))
+
+        if (!match) {
+            throw Error(`Unsupported notation duration: ${notationDuration}`)
+        }
+
+        return match
     }
 
     /**
@@ -19,27 +43,21 @@ export class MusicLogic {
      * @param defaultFlattedPitches The natural notes flatted by key. For example, in F major, B is flatted.
      * @returns {Accidental} undefined if note is not sharped/flatted, or is not a natural of a note sharped/flatted in the key signature.
      **/
-    public getAccidentalForPitch (pitch: Pitch): Accidental | undefined {
+    public static getAccidentalForPitch (pitch: Pitch, config: MusicLogicConfig): Accidental | undefined {
         const noteFromPitch = pitch % 12 as NaturalNote
-        const sharpedInKey = this.config.sharps?.includes(noteFromPitch) ?? false
-        const flattedInKey = this.config.flats?.includes(noteFromPitch) ?? false
-        const prevNoteSharpedInKey = this.config.sharps?.includes(noteFromPitch - 1) ?? false
-        const nextNoteFlattedInKey = this.config.flats?.includes(noteFromPitch + 1) ?? false
+        const sharpedInKey = config.sharps?.includes(noteFromPitch) ?? false
+        const flattedInKey = config.flats?.includes(noteFromPitch) ?? false
+        const prevNoteSharpedInKey = config.sharps?.includes(noteFromPitch - 1) ?? false
+        const nextNoteFlattedInKey = config.flats?.includes(noteFromPitch + 1) ?? false
         const isNatural = Object.values(NaturalNote).includes(noteFromPitch)
 
         let accidental
 
         if (isNatural && (sharpedInKey || flattedInKey)) {
-            // For example, key is D (sharp F by default) but note is natural F
-            // means explicit natural accidental should be written next to note
             accidental = Accidental.Natural
-        } else if (!isNatural && !prevNoteSharpedInKey && !this.config.flats?.length) {
-            // For example: note if F# (not natural) and key is C (previous note F is not sharped)
-            // means explicit sharp should be written next to note
+        } else if (!isNatural && !prevNoteSharpedInKey && !config.flats?.length) {
             accidental = Accidental.Sharp
-        } else if (!isNatural && !nextNoteFlattedInKey && !this.config.sharps?.length) {
-            // For example: note is Bb (not natural) and key is C (next note B is not flatted)
-            // means explicit flat should be written next to note
+        } else if (!isNatural && !nextNoteFlattedInKey && !config.sharps?.length) {
             accidental = Accidental.Flat
         }
 
@@ -47,18 +65,59 @@ export class MusicLogic {
     }
 
     /**
-     * Automatically calculates and inserts rests into gaps between notes.
+     * Decomposes a duration into the fewest rests, allowing up to one dot per rest.
+     * For example, a gap of 3/8 starting at beat 0 becomes [dotted-quarter Rest at beat 0].
      *
-     * @param items
-     * @param itemstoAdd
-     * @returns {Notation[]} A full list of notations, including calculated rests.
+     * @param notationDuration The total duration to fill.
+     * @param startBeat The beat position of the first rest.
      **/
-    public addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
+    public static decomposeIntoRests (notationDuration: number, startBeat: number = 0): Rest[] {
+        if (notationDuration < 0) {
+            throw Error(`Notation duration must be non-negative: ${notationDuration}`)
+        }
+
+        if (MusicLogic.areDurationsEqual(notationDuration, 0)) {
+            return []
+        }
+
+        const candidates = MusicLogic.BaseNotationTypes
+            .flatMap((notationType) => [
+            { type: notationType, dotCount: 1, beatValue: notationType.beatValue * 1.5 },
+            { type: notationType, dotCount: 0, beatValue: notationType.beatValue }
+        ]).sort((a, b) => b.beatValue - a.beatValue)
+
+        const result: Rest[] = []
+        let remainingDuration = notationDuration
+        let currentBeat = startBeat
+
+        while (!MusicLogic.areDurationsEqual(remainingDuration, 0) && remainingDuration > 0) {
+            const next = candidates.find((c) => c.beatValue <= remainingDuration + 1e-9)
+
+            if (!next) {
+                throw Error(`Cannot decompose notation duration: ${notationDuration}`)
+            }
+
+            const rest = new Rest(next.type, currentBeat, next.dotCount)
+            result.push(rest)
+            currentBeat += rest.totalBeatValue
+            remainingDuration -= next.beatValue
+        }
+
+        return result
+    }
+
+    private static areDurationsEqual (left: number, right: number) {
+        return Math.abs(left - right) < 1e-9
+    }
+
+    public static addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
         let nextTime = 0
         if (items.length > 0) {
             const lastNote = items[items.length - 1]
-            nextTime = lastNote.startBeat + lastNote.type.beatValue
+            nextTime = lastNote.startBeat + lastNote.totalBeatValue
         }
+
+        const normalizedItemsToAdd: Notation[] = []
 
         itemstoAdd.forEach((itemToAdd, itemToAddIndex) => {
             // Rests are calculated/added automatically when gaps between notes are encountered.
@@ -73,19 +132,17 @@ export class MusicLogic {
 
                 const timediff = itemToAdd.startBeat - nextTime
 
-                // TODO: find largest possible rest in time diff, keep repeating until time filled
-                // TODO: handle dotted rests
-
                 if (timediff > 0) {
-                    const rest = new Rest(NotationType.getNotationTypeFromDuration(timediff), nextTime)
-                    nextTime = rest.startBeat + rest.type.beatValue
-                    itemstoAdd.splice(itemToAddIndex, 0, rest)
+                    const rests = MusicLogic.decomposeIntoRests(timediff, nextTime)
+                    normalizedItemsToAdd.push(...rests)
+                    nextTime = rests[rests.length - 1].startBeat + rests[rests.length - 1].totalBeatValue
                 }
             }
 
             itemToAdd.startBeat = nextTime
             itemToAdd.active = false
-            nextTime = itemToAdd.startBeat + itemToAdd.type.beatValue
+            normalizedItemsToAdd.push(itemToAdd)
+            nextTime = itemToAdd.startBeat + itemToAdd.totalBeatValue
         })
 
         // if (nextTime % totalMeasureBeatValue > 0 && nextTime % totalMeasureBeatValue < totalMeasureBeatValue) {
@@ -95,7 +152,7 @@ export class MusicLogic {
         //     itemstoAdd.push(new Rest(remainingDurationValue, nextTime + lastNote.type.getBeatValue()))
         // }
 
-        items = items.concat(itemstoAdd)
+        items = items.concat(normalizedItemsToAdd)
 
         return items
     }
@@ -108,7 +165,7 @@ export class MusicLogic {
      * @param beatDuration The type of note that counts as a single beat.
      * @returns {Notation[][]} Converts an array of notes/rests into a two-dimensional array, each element an array of notes corresponding to a measure.
      **/
-    public splitIntoMeasures (notations: Notation[]): Notation[][] {
+    public static splitIntoMeasures (notations: Notation[], config: MusicLogicConfig): Notation[][] {
         if (notations.length === 0) {
             return [[]]
         }
@@ -116,14 +173,14 @@ export class MusicLogic {
         const minStep = 1 / 32
         const noteCollectionArray = Array<Notation[]>()
         const lastNote = notations[notations.length - 1]
-        const measureBeatValue = this.config.beatsPerMeasure * (this.config.beatDuration.beatValue / 0.25)
+        const measureBeatValue = config.beatsPerMeasure * (config.beatDuration.beatValue / 0.25)
 
         let stepCounter = 1
         let currentStep = 0
         let currentNote = null
 
-        while (currentStep < lastNote.startBeat + lastNote.type.beatValue) {
-            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.type.beatValue)
+        while (currentStep < lastNote.startBeat + lastNote.totalBeatValue) {
+            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.totalBeatValue)
 
             if (steppedNote && steppedNote !== currentNote) {
                 currentNote = steppedNote
@@ -152,8 +209,8 @@ export class MusicLogic {
      * @param globalBeat The beat position within the context of the entire song.
      * @returns {number} The beat position relative to the measure.
      **/
-    public normalizeBeat (globalBeat: number) {
-        return globalBeat % ((this.config.beatsPerMeasure / 4) * (this.config.beatDuration.beatValue / 0.25))
+    public static normalizeBeat (globalBeat: number, config: MusicLogicConfig): number {
+        return globalBeat % ((config.beatsPerMeasure / 4) * (config.beatDuration.beatValue / 0.25))
     }
 
     /**
@@ -170,21 +227,20 @@ export class MusicLogic {
      * @param flats
      * @returns {Pitch} A, B, C, D, E, F, or G (no sharps or flats)
      **/
-    public determineNaturalPitch (pitch: Pitch) {
+    public static determineNaturalPitch (pitch: Pitch, config: MusicLogicConfig): Pitch {
         // @ts-expect-error
         const naturalNoteValues = Object.values(NaturalNote).filter(isNaN)
 
-        // Determine base natural, to calculate correct position on staff
         let naturalPitch = pitch
 
         if (!naturalNoteValues.includes(NaturalNote[pitch % 12])) {
-            if ((this.config.sharps?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
+            if ((config.sharps?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch - 1) % 12])) {
                 naturalPitch = pitch - 1
-            } else if ((this.config.flats?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
+            } else if ((config.flats?.length ?? 0) > 0 && naturalNoteValues.includes(NaturalNote[(pitch + 1) % 12])) {
                 naturalPitch = pitch + 1
             }
         }
 
-        return naturalPitch
+        return naturalPitch as Pitch
     }
 }

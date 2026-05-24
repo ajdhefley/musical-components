@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './StaffNote.scss'
-import { Accidental, NotationType, Note } from '@lib/core/models'
+import { Accidental, Note } from '@lib/core/models'
 
 /**
  *
@@ -51,7 +51,7 @@ export function StaffNote ({ model, left, bottom, size, accidentalSize, accident
     })()
 
     const getNoteClass = () => {
-        return `note note-${model.type.getCountsPerMeasure()} ${model.active ? 'active' : ''}`
+        return `note note-${model.type.getPerMeasureCount()} ${model.active ? 'active' : ''}`
     }
 
     const getNoteStyle = () => {
@@ -85,9 +85,7 @@ export function StaffNote ({ model, left, bottom, size, accidentalSize, accident
     }
 
     const getFlagElement = () => {
-        if (model.type === NotationType.Eighth ||
-            model.type === NotationType.Sixteenth ||
-            model.type === NotationType.ThirtySecond) {
+        if (model.type.getFlagCount() > 0 && !model.isBeamed) {
             return <div className={getFlagClass()} style={getFlagStyle()}></div>
         }
 
@@ -114,7 +112,7 @@ export function StaffNote ({ model, left, bottom, size, accidentalSize, accident
     }
 
     const getVerticalStemElement = () => {
-        if (model.type === NotationType.Whole) {
+        if (!model.type.usesStem()) {
             return <></>
         }
 
@@ -125,11 +123,27 @@ export function StaffNote ({ model, left, bottom, size, accidentalSize, accident
         return <div className={`accidental ${accidental?.name}`} style={{ left: `${-size}px`, width: `${accidentalSize}px`, height: `${accidentalSize}px` }}></div>
     }
 
+    const getDotElements = () => {
+        return Array.from({ length: model.dotCount }, (_, index) => (
+            <div
+                key={index}
+                className="duration-dot"
+                style={{
+                    width: `${size * 0.22}px`,
+                    height: `${size * 0.22}px`,
+                    left: `${size * 0.82 + (index * size * 0.3)}px`,
+                    top: `${size * 0.38}px`
+                }}
+            ></div>
+        ))
+    }
+
     return (
         <div data-note={model} className={getNoteClass()} style={getNoteStyle()}>
             {getAccidentalElement()}
             {getVerticalStemElement()}
-            {false && getFlagElement()}
+            {getDotElements()}
+            {getFlagElement()}
         </div>
     )
 }

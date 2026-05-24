@@ -1,5 +1,6 @@
 import { MidiRelay } from '@lib/core/MidiRelay'
 import { Notation, Note } from '@lib/core/models'
+import { Logger } from '../..'
 
 /**
  * Response controlling MIDI playback. Exposes playback events and the ability to cancel the current playback.
@@ -50,7 +51,7 @@ export class MidiNotationPlayerResponse {
         if (notations.length === 0) return
 
         const lastNote = notations[notations.length - 1]
-        const lastTick = lastNote.startBeat + lastNote.type.beatValue
+        const lastTick = lastNote.startBeat + lastNote.totalBeatValue
 
         for (let i = 0; i < lastTick; i += 1 / 32) {
             if (this.cancelled) {
@@ -67,8 +68,15 @@ export class MidiNotationPlayerResponse {
                         const baseBpm = 60
                         const baseCountDuration = 1000
                         const countDuration = (baseBpm / this.beatsPerMinute) * baseCountDuration
-                        const noteDuration = note.type.beatValue * 4 * countDuration
-                        this.midiRelay.sendMidi(note.pitch, noteDuration)
+                        const noteDuration = note.totalBeatValue * 4 * countDuration
+
+                        try {
+                            this.midiRelay.sendMidi(note.pitch, noteDuration)
+                        } catch (e) {
+                            Logger.instance.warn('MIDI notes could not be played. See error for more details.')
+                            Logger.instance.error(e)
+                        }
+
                         this.invokeEvent('message', note)
                         return await new Promise<void>((resolve) => setTimeout(resolve, noteDuration))
                     })

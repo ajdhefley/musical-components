@@ -1,5 +1,5 @@
-@import "@lib/styles/mixins";
-@import "@lib/styles/variables";
+@use "@lib/styles/mixins" as *;
+@use "@lib/styles/variables" as *;
 
 .note {
     background-repeat: no-repeat;
@@ -66,6 +66,12 @@
 
 .accidental {
     position: absolute;
+}
+
+.duration-dot {
+    position: absolute;
+    border-radius: 50%;
+    background-color: #000;
 }
 
 .key-symbol {

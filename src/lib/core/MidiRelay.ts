@@ -2,7 +2,8 @@
  * Opens MIDI output port and sends MIDI messages to it.
  **/
 export class MidiRelay {
-    private midi: WebMidi.MIDIAccess
+    private midi?: WebMidi.MIDIAccess
+    private warnedNoOutput = false
 
     /**
      * Gains and returns access to MIDI ports.
@@ -29,6 +30,18 @@ export class MidiRelay {
     sendMidi (pitch: number, duration: number) {
         if (pitch < 22 || pitch > 106) {
             throw Error('Pitch must be between 22 and 106')
+        }
+
+        if (!this.midi) {
+            return
+        }
+
+        if (this.midi.outputs.size === 0) {
+            if (!this.warnedNoOutput) {
+                this.warnedNoOutput = true
+                throw new Error('No MIDI output devices found')
+            }
+            return
         }
 
         this.midi.outputs.forEach((output) => {

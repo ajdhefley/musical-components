@@ -7,7 +7,7 @@ interface StaffTimeSignatureProps {
     /**
      * Number of beats per measure, determining the top number of the time signature.
      **/
-    beatsPerMeasure: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+    beatsPerMeasure: number
 
     /**
      * The value of a given beat, determining the bottom number of the time signature.
