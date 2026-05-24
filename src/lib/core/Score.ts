@@ -1,13 +1,22 @@
 import { Chord, Clef, NaturalNote, NotationType, Note, Pitch, Rest } from '@lib/core/models'
 import { SerializedNotationTypeName, SerializedClefName } from '@lib/core/ScoreDocument'
 
+/**
+ * Supported notation objects inside a full score.
+ */
 export type ScoreNotation = Note | Rest | Chord
 
+/**
+ * A single rhythmic lane on a staff.
+ */
 export interface ScoreVoice {
     id?: string
     notations: ScoreNotation[]
 }
 
+/**
+ * A staff within a score, including its clef, key signature, and one or more voices.
+ */
 export interface ScoreStaff {
     id?: string
     clef: Clef
@@ -16,12 +25,18 @@ export interface ScoreStaff {
     voices: ScoreVoice[]
 }
 
+/**
+ * In-memory representation of a multi-staff score.
+ */
 export interface Score {
     beatsPerMeasure: number
     beatDuration: NotationType
     staves: ScoreStaff[]
 }
 
+/**
+ * JSON-safe representation of a notation object inside a serialized score.
+ */
 export type SerializedScoreNotation =
     | {
         kind: 'note'
@@ -45,11 +60,17 @@ export type SerializedScoreNotation =
         pitches: number[]
     }
 
+/**
+ * JSON-safe representation of a voice inside a serialized score.
+ */
 export interface SerializedScoreVoice {
     id?: string
     notations: SerializedScoreNotation[]
 }
 
+/**
+ * JSON-safe representation of a staff inside a serialized score.
+ */
 export interface SerializedScoreStaff {
     id?: string
     clef: SerializedClefName
@@ -58,6 +79,9 @@ export interface SerializedScoreStaff {
     voices: SerializedScoreVoice[]
 }
 
+/**
+ * Versioned JSON schema for a full multi-staff score.
+ */
 export interface SerializedScore {
     version: 1
     beatsPerMeasure: number
@@ -65,15 +89,24 @@ export interface SerializedScore {
     staves: SerializedScoreStaff[]
 }
 
+/**
+ * Converts a full in-memory score into a JSON string.
+ */
 export function serializeScore (score: Score): string {
     return JSON.stringify(toSerializedScore(score))
 }
 
+/**
+ * Parses a JSON string produced by serializeScore back into model instances.
+ */
 export function deserializeScore (json: string): Score {
     const parsed = JSON.parse(json) as SerializedScore
     return fromSerializedScore(parsed)
 }
 
+/**
+ * Converts a full score into its versioned JSON-safe shape.
+ */
 export function toSerializedScore (score: Score): SerializedScore {
     return {
         version: 1,
@@ -124,6 +157,9 @@ export function toSerializedScore (score: Score): SerializedScore {
     }
 }
 
+/**
+ * Converts a parsed JSON-safe score into note, rest, and chord model instances.
+ */
 export function fromSerializedScore (score: SerializedScore): Score {
     if (score.version !== 1) {
         throw new Error(`Unsupported score version: ${score.version}`)

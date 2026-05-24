@@ -1,4 +1,5 @@
 import { PitchOscillator } from '@lib/core/PitchOscillator'
+import { Logger } from '@lib/Logger'
 
 /**
  * Binds to MIDI input port, listens for MIDI messages, and generates
@@ -13,7 +14,7 @@ export class MidiAudio {
     private static readonly COMMAND_NOTE_ON = 0x90
     private static readonly COMMAND_NOTE_OFF = 0x80
 
-    private context: AudioContext
+    private context?: AudioContext
     private midiInput: WebMidi.MIDIInput
     private pitchOscillators: PitchOscillator[]
 
@@ -24,11 +25,15 @@ export class MidiAudio {
      */
     listen (midiInputs: WebMidi.MIDIInputMap) {
         this.pitchOscillators = new Array<PitchOscillator>()
-        this.context = new AudioContext()
-        this.context.resume()
         this.midiInput = midiInputs.values().next().value
+
+        if (!this.midiInput) {
+            Logger.instance.warn('No MIDI input devices found. Connect a MIDI device and refresh the page to enable audio playback.')
+            return
+        }
+
         this.midiInput.open()
-        this.midiInput.onmidimessage = (e) => this.onMessage(e)
+        this.midiInput.onmidimessage = (e: WebMidi.MIDIMessageEvent) => this.onMessage(e)
     }
 
     /**
@@ -41,7 +46,6 @@ export class MidiAudio {
         switch (e.data[0]) {
             case MidiAudio.COMMAND_NOTE_ON:
                 this.handleMessageNoteOn(e)
-                this.normalizeOscillatorVolume()
                 break
             case MidiAudio.COMMAND_NOTE_OFF:
                 this.handleMessageNoteOff(e)
@@ -56,10 +60,25 @@ export class MidiAudio {
      * @param e
      **/
     private handleMessageNoteOn (e: WebMidi.MIDIMessageEvent) {
-        const oscillator = new PitchOscillator()
-        oscillator.init(this.context)
-        oscillator.generateFrequencyFromPitch(e.data[1])
-        this.pitchOscillators.push(oscillator)
+        const context = this.ensureAudioContext()
+        const startOscillator = () => {
+            const oscillator = new PitchOscillator()
+            oscillator.init(context)
+            oscillator.generateFrequencyFromPitch(e.data[1])
+            this.pitchOscillators.push(oscillator)
+            this.normalizeOscillatorVolume()
+        }
+
+        if (context.state === 'running') {
+            startOscillator()
+            return
+        }
+
+        void context.resume().then(() => {
+            startOscillator()
+        }).catch(() => {
+            Logger.instance.warn('Audio playback is blocked until a user interacts with the page.')
+        })
     }
 
     /**
@@ -86,5 +105,16 @@ export class MidiAudio {
         this.pitchOscillators.forEach(o => {
             o.setVolume(1 / this.pitchOscillators.length)
         })
+    }
+
+    /**
+     * Lazily creates Web Audio context to avoid autoplay policy warnings on page load.
+     */
+    private ensureAudioContext () {
+        if (!this.context || this.context.state === 'closed') {
+            this.context = new AudioContext()
+        }
+
+        return this.context
     }
 }

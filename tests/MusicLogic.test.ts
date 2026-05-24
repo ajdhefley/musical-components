@@ -31,12 +31,7 @@ describe('MusicLogic.decomposeIntoRests', () => {
 
 describe('MusicLogic.addNotations', () => {
     it('fills a gap with a dotted rest when possible', () => {
-        const musicLogic = MusicLogic.instance.configure({
-            beatsPerMeasure: 4,
-            beatDuration: NotationType.Quarter
-        })
-
-        const notations = musicLogic.addNotations([], [
+        const notations = MusicLogic.addNotations([], [
             new Note(NotationType.Quarter, Pitch.C4, 0),
             new Note(NotationType.Quarter, Pitch.G4, 5 / 8)
         ])
@@ -51,12 +46,7 @@ describe('MusicLogic.addNotations', () => {
     })
 
     it('decomposes larger gaps into multiple rests', () => {
-        const musicLogic = MusicLogic.instance.configure({
-            beatsPerMeasure: 4,
-            beatDuration: NotationType.Quarter
-        })
-
-        const notations = musicLogic.addNotations([], [
+        const notations = MusicLogic.addNotations([], [
             new Note(NotationType.Quarter, Pitch.C4, 0),
             new Note(NotationType.Quarter, Pitch.G4, 15 / 16)
         ])

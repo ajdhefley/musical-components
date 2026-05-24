@@ -3,6 +3,7 @@ import { MidiAudio } from '@lib/core/MidiAudio'
 import { MidiNotationPlayerResponse } from '@lib/core/MidiNotationPlayerResponse'
 import { MidiRelay } from '@lib/core/MidiRelay'
 import { Notation } from '@lib/core/models'
+import { Logger } from '@lib/Logger'
 
 /**
  * Executes MIDI playback. Exposes playback events and the ability to stop the current playback.
@@ -19,7 +20,11 @@ export class MidiNotationPlayer {
     ) {
         this.metronome = new Metronome(this.beatsPerMeasure, this.beatsPerMinute)
         this.midiRelay = new MidiRelay()
-        this.midiRelay.openAccess().then((midi) => new MidiAudio().listen(midi.inputs))
+        this.midiRelay.openAccess()
+            .then((midi) => new MidiAudio().listen(midi.inputs))
+            .catch((e) => {
+                Logger.instance.warn('MIDI pipeline could not be opened: ', e)
+            })
     }
 
     /**

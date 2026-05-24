@@ -24,12 +24,23 @@ const notes = [
 ]
 ```
 
-To render your music in the browser, add a Staff component to your React appllication and pass the note array into the *initialNotations* prop, also providing the clef, key signature, and time signature as additional props.
+To render your music in the browser, create a `Score` and pass it to `ScoreView`.
 
 ```
-import { NotationType, Clef, Staff } from 'musical-components'
+import { NotationType, Clef, ScoreView } from 'musical-components'
 
-<Staff initialNotations={notes} beatsPerMeasure={4} beatDuration={NotationType.Quarter} clef={Clef.TrebleClef} />
+const score = {
+  beatsPerMeasure: 4,
+  beatDuration: NotationType.Quarter,
+  staves: [
+    {
+      clef: Clef.TrebleClef,
+      voices: [{ notations: notes }]
+    }
+  ]
+}
+
+<ScoreView score={score} />
 ```
 
 Result:
@@ -40,17 +51,111 @@ Result:
 
 ### Specifying Key Signature
 
-The Staff component allows you to specify your own sharps or flats for the key signature. To create a staff in E Major, for example, pass an array of the the four sharped notes into the *sharps* prop:
+To create a staff in E Major, set `sharps` on the staff inside your score:
 
 ```
-import { NaturalNote, Staff } from 'musical-components'
+import { NaturalNote } from 'musical-components'
 
 const EMajor = [NaturalNote.F, NaturalNote.C, NaturalNote.G, NaturalNote.D]
 
-<Staff ... sharps={EMajor} />
+const score = {
+  ...,
+  staves: [{ clef: Clef.TrebleClef, sharps: EMajor, voices: [{ notations: notes }] }]
+}
 ```
 
 You can see an example setting a key signature [here](https://github.com/ajdhefley/musical-components/tree/main/examples/beats-per-measure).
+
+## Score JSON
+
+The library exposes a versioned score schema for persistence and interchange.
+
+Use `Score` as the canonical model for both single-staff and multi-staff content:
+
+```ts
+import {
+  Clef,
+  Note,
+  NotationType,
+  Pitch,
+  serializeScore,
+  deserializeScore,
+  type Score
+} from 'musical-components'
+
+const score: Score = {
+  beatsPerMeasure: 4,
+  beatDuration: NotationType.Quarter,
+  staves: [
+    {
+      id: 'treble',
+      clef: Clef.TrebleClef,
+      voices: [
+        {
+          id: 'melody',
+          notations: [
+            new Note(NotationType.Eighth, Pitch.C4, 0, 1, true),
+            new Note(NotationType.Eighth, Pitch.C4, 3 / 16)
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+const json = serializeScore(score)
+const restored = deserializeScore(json)
+```
+
+Playback also flows through score-level APIs:
+
+```ts
+import { ScorePlayback } from 'musical-components'
+
+const playback = new ScorePlayback(score.beatsPerMeasure, 80)
+playback.setScore(score)
+```
+
+`ScoreDocument` remains available as a legacy single-staff compatibility format:
+
+```ts
+import {
+  Clef,
+  Note,
+  NotationType,
+  Pitch,
+  serializeScoreDocument,
+  deserializeScoreDocument,
+  type ScoreDocument
+} from 'musical-components'
+
+const document: ScoreDocument = {
+  beatsPerMeasure: 4,
+  beatDuration: NotationType.Quarter,
+  clef: Clef.TrebleClef,
+  notations: [
+    new Note(NotationType.Eighth, Pitch.C4, 0, 1, true),
+    new Note(NotationType.Eighth, Pitch.C4, 3 / 16)
+  ]
+}
+
+const json = serializeScoreDocument(document)
+const restored = deserializeScoreDocument(json)
+```
+
+The serialized JSON is versioned (`version: 1`) so the schema can evolve without silently breaking stored data.
+
+For MusicXML interchange on single-staff documents, use the adapter helpers:
+
+```ts
+import {
+  exportScoreDocumentToMusicXml,
+  importScoreDocumentFromMusicXml
+} from 'musical-components'
+
+const xml = exportScoreDocumentToMusicXml(document)
+const imported = importScoreDocumentFromMusicXml(xml)
+```
 
 ## Examples
 

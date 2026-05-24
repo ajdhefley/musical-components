@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import './StaffMeasure.scss'
-import { Clef, NaturalNote, Notation, NotationType, Note } from '@lib/core/models'
-import { MusicStaffPlacementLogic } from '@lib/core/MusicStaffPlacementLogic'
+import { Clef, Notation, NotationType, Note } from '@lib/core/models'
+import { MusicStaffPlacementLogic, MusicStaffPlacementLogicConfig } from '@lib/core/MusicStaffPlacementLogic'
 import { StaffNote } from '@lib/components/StaffNote/StaffNote'
 import { StaffRest } from '@lib/components/StaffRest/StaffRest'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
@@ -21,65 +21,17 @@ interface StaffMeasureProps {
     /**
      *
      **/
-    beatsPerMeasure: number
-
-    /**
-     *
-     **/
-    beatDuration: NotationType
-
-    /**
-     *
-     **/
     notations: Notation[]
 
     /**
-     * The treble or bass clef, which affects note position.
+     * All render layout and key/time context for this staff.
      **/
-    clef: Clef
-
-    /**
-     * Notes that should be implicitly sharped (by key) without being denoted by an explicit accidental.
-     **/
-    sharps?: NaturalNote[]
-
-    /**
-     * Notes that should be implicitly flatted (by key) without being denoted by an explicit accidental.
-     **/
-    flats?: NaturalNote[]
-
-    /**
-     *
-     **/
-    accidentalSize: number
-
-    /**
-     *
-     **/
-    noteSize: number
-
-    /**
-     *
-     **/
-    noteSpacing: number
-
-    /**
-     *
-     **/
-    spaceHeight: number
+    renderConfig: MusicStaffPlacementLogicConfig
 
     /**
      *
      **/
     interactive?: boolean
-
-    /**
-     *
-     **/
-    // get defaultStemHeight() {
-    // return noteSize * 3 - (noteSize / 2);
-    // }
-    defaultStemHeight: number
 }
 
 /**
@@ -99,9 +51,9 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         }
 
         const leftPosition = mousePosition.x
-        const bottomPosition = MusicStaffPlacementLogic.instance.getNoteBottomPosition(note.pitch)
+        const bottomPosition = MusicStaffPlacementLogic.getNoteBottomPosition(note.pitch, props.renderConfig)
 
-        return <StaffNote model={note} accidentalSize={props.accidentalSize} size={props.noteSize} left={leftPosition} bottom={bottomPosition} />
+        return <StaffNote model={note} accidentalSize={props.renderConfig.accidentalSize} size={props.renderConfig.noteSize} left={leftPosition} bottom={bottomPosition} />
     }
 
     const getHoveredNote = function (mousePosition: { x: number, y: number }) {
@@ -109,37 +61,37 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
             return null
         }
 
-        const noteIndex = Math.floor(mousePosition.y / (props.spaceHeight / 2))
+        const noteIndex = Math.floor(mousePosition.y / (props.renderConfig.spaceHeight / 2))
 
-        let pitch = props.clef === Clef.TrebleClef ? 55 : 49
+        let pitch = props.renderConfig.clef === Clef.TrebleClef ? 55 : 49
 
         switch (noteIndex) {
             case 0:
-                pitch -= props.clef === Clef.TrebleClef ? 3 : 4
+                pitch -= props.renderConfig.clef === Clef.TrebleClef ? 3 : 4
                 break
             case 1:
-                pitch -= props.clef === Clef.TrebleClef ? 2 : 2
+                pitch -= props.renderConfig.clef === Clef.TrebleClef ? 2 : 2
                 break
             case 2:
-                pitch += props.clef === Clef.TrebleClef ? 0 : 0
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 0 : 0
                 break
             case 3:
-                pitch += props.clef === Clef.TrebleClef ? 2 : 1
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 2 : 1
                 break
             case 4:
-                pitch += props.clef === Clef.TrebleClef ? 4 : 3
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 4 : 3
                 break
             case 5:
-                pitch += props.clef === Clef.TrebleClef ? 5 : 4
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 5 : 4
                 break
             case 6:
-                pitch += props.clef === Clef.TrebleClef ? 7 : 7
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 7 : 7
                 break
             case 7:
-                pitch += props.clef === Clef.TrebleClef ? 9 : 9
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 9 : 9
                 break
             case 8:
-                pitch += props.clef === Clef.TrebleClef ? 10 : 10
+                pitch += props.renderConfig.clef === Clef.TrebleClef ? 10 : 10
                 break
         }
 
@@ -176,24 +128,24 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
             ref={ref}
             className="staff-measure"
             style={{
-                width: `${MusicStaffPlacementLogic.instance.getMeasureWidth(props.notations)}px`
+                width: `${MusicStaffPlacementLogic.getMeasureWidth(props.notations, props.renderConfig)}px`
             }}
         >
             <StaffLines />
             <div className="notation-container">
-                {MusicStaffPlacementLogic.instance.extractNotes(props.notations).map((note, index) => (
-                    <StaffNote key={index} {...note} size={props.noteSize} accidentalSize={props.accidentalSize} />
+                {MusicStaffPlacementLogic.extractNotes(props.notations, props.renderConfig).map((note, index) => (
+                    <StaffNote key={index} {...note} size={props.renderConfig.noteSize} accidentalSize={props.renderConfig.accidentalSize} />
                 ))}
 
-                {MusicStaffPlacementLogic.instance.extractRests(props.notations).map((rest, index) => (
+                {MusicStaffPlacementLogic.extractRests(props.notations, props.renderConfig).map((rest, index) => (
                     <StaffRest key={index} {...rest} />
                 ))}
 
-                {MusicStaffPlacementLogic.instance.getHorizontalBeams(props.notations).map((beam, index) => (
+                {MusicStaffPlacementLogic.getHorizontalBeams(props.notations, props.renderConfig).map((beam, index) => (
                     <StaffNoteBeam key={index} {...beam} />
                 ))}
 
-                {MusicStaffPlacementLogic.instance.getTies(props.notations).map((tie, index) => (
+                {MusicStaffPlacementLogic.getTies(props.notations, props.renderConfig).map((tie, index) => (
                     <StaffNoteTie key={index} {...tie} />
                 ))}
 
@@ -202,3 +154,4 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         </div>
     )
 }
+

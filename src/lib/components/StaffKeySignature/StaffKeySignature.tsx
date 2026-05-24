@@ -1,75 +1,54 @@
 import React from 'react'
 
 import './StaffKeySignature.scss'
-import { Clef, NaturalNote } from '@lib/core/models'
-import { MusicStaffPlacementLogic } from '@lib/core/MusicStaffPlacementLogic'
+import { MusicStaffPlacementLogic, MusicStaffPlacementLogicConfig } from '@lib/core/MusicStaffPlacementLogic'
 
 /**
  *
  **/
 interface StaffKeySignatureProps {
     /**
-     *
+     * All render layout and key context for this staff.
      **/
-    clef: Clef
-
-    /**
-     * The pitches that are sharped, determining the major key.
-     * If both sharps and flats have values, flats will be ignored.
-     **/
-    sharps?: NaturalNote[]
-
-    /**
-     * The pitches that are flatted, determining the major key.
-     * If both sharps and flats have values, flats will be ignored.
-     **/
-    flats?: NaturalNote[]
-
-    /**
-     *
-     **/
-    accidentalSize: number
-
-    /**
-     *
-     **/
-    spaceHeight: number
+    renderConfig: MusicStaffPlacementLogicConfig
 }
 
 /**
  *
  **/
 export function StaffKeySignature (props: StaffKeySignatureProps): React.ReactElement {
+    const { renderConfig } = props
+
     const getTotalWidth = function () {
-        return ((props.sharps?.length ?? 0) + (props.flats?.length ?? 0)) * (props.accidentalSize + 5)
+        return ((renderConfig.sharps?.length ?? 0) + (renderConfig.flats?.length ?? 0)) * (renderConfig.accidentalSize + 5)
     }
 
     const getSharpsAndFlats = function () {
-        if (props.sharps) {
-            return props.sharps.map((note, index) => {
-                const leftPosition = MusicStaffPlacementLogic.instance.getAccidentalLeftPosition(index)
-                const bottomPosition = MusicStaffPlacementLogic.instance.getAccidentalBottomPosition(note) - props.spaceHeight + 5
+        if (renderConfig.sharps) {
+            return renderConfig.sharps.map((note, index) => {
+                const leftPosition = MusicStaffPlacementLogic.getAccidentalLeftPosition(index, renderConfig)
+                const bottomPosition = MusicStaffPlacementLogic.getAccidentalBottomPosition(note, renderConfig) - renderConfig.spaceHeight + 5
                 return {
                     className: 'sharp',
                     style: {
                         left: `${leftPosition}px`,
                         bottom: `${bottomPosition}px`,
-                        width: `${props.accidentalSize}px`,
-                        height: `${props.accidentalSize}px`
+                        width: `${renderConfig.accidentalSize}px`,
+                        height: `${renderConfig.accidentalSize}px`
                     }
                 }
             })
-        } else if (props.flats) {
-            return props.flats.map((note, index) => {
-                const leftPosition = MusicStaffPlacementLogic.instance.getAccidentalLeftPosition(index)
-                const bottomPosition = MusicStaffPlacementLogic.instance.getAccidentalBottomPosition(note) - props.spaceHeight / 2 + 5
+        } else if (renderConfig.flats) {
+            return renderConfig.flats.map((note, index) => {
+                const leftPosition = MusicStaffPlacementLogic.getAccidentalLeftPosition(index, renderConfig)
+                const bottomPosition = MusicStaffPlacementLogic.getAccidentalBottomPosition(note, renderConfig) - renderConfig.spaceHeight / 2 + 5
                 return {
                     className: 'flat',
                     style: {
                         left: `${leftPosition}px`,
                         bottom: `${bottomPosition}px`,
-                        width: `${props.accidentalSize}px`,
-                        height: `${props.accidentalSize}px`
+                        width: `${renderConfig.accidentalSize}px`,
+                        height: `${renderConfig.accidentalSize}px`
                     }
                 }
             })
@@ -91,3 +70,4 @@ export function StaffKeySignature (props: StaffKeySignatureProps): React.ReactEl
         </div>
     </>
 }
+

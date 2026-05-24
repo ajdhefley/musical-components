@@ -1,8 +1,18 @@
 import { Clef, NaturalNote, Notation, NotationType, Note, Pitch, Rest } from '@lib/core/models'
 
+/**
+ * Stable string form used when serializing a notation type to JSON.
+ */
 export type SerializedNotationTypeName = 'thirty-second' | 'sixteenth' | 'eighth' | 'quarter' | 'half' | 'whole'
+
+/**
+ * Stable string form used when serializing a clef to JSON.
+ */
 export type SerializedClefName = 'treble' | 'bass'
 
+/**
+ * JSON-safe representation of a single note or rest in a score document.
+ */
 export type SerializedNotation =
     | {
         kind: 'note'
@@ -19,6 +29,12 @@ export type SerializedNotation =
         dotCount?: number
     }
 
+/**
+ * Versioned JSON schema for a single-staff score document.
+ *
+ * This is the format to persist when saving a rendered Staff value,
+ * sending notation over the network, or preparing for interchange adapters.
+ */
 export interface SerializedScoreDocument {
     version: 1
     beatsPerMeasure: number
@@ -29,6 +45,9 @@ export interface SerializedScoreDocument {
     notations: SerializedNotation[]
 }
 
+/**
+ * In-memory representation of a single rendered staff.
+ */
 export interface ScoreDocument {
     beatsPerMeasure: number
     beatDuration: NotationType
@@ -38,15 +57,24 @@ export interface ScoreDocument {
     notations: Notation[]
 }
 
+/**
+ * Converts an in-memory score document into a JSON string.
+ */
 export function serializeScoreDocument (score: ScoreDocument): string {
     return JSON.stringify(toSerializedScoreDocument(score))
 }
 
+/**
+ * Parses a JSON string produced by serializeScoreDocument back into model instances.
+ */
 export function deserializeScoreDocument (json: string): ScoreDocument {
     const parsed = JSON.parse(json) as SerializedScoreDocument
     return fromSerializedScoreDocument(parsed)
 }
 
+/**
+ * Converts an in-memory score document into its versioned JSON-safe shape.
+ */
 export function toSerializedScoreDocument (score: ScoreDocument): SerializedScoreDocument {
     const serializedNotations = score.notations.map((notation): SerializedNotation => {
         if (notation instanceof Note) {
@@ -83,6 +111,9 @@ export function toSerializedScoreDocument (score: ScoreDocument): SerializedScor
     }
 }
 
+/**
+ * Converts a parsed JSON-safe score document into note and rest model instances.
+ */
 export function fromSerializedScoreDocument (score: SerializedScoreDocument): ScoreDocument {
     if (score.version !== 1) {
         throw new Error(`Unsupported score version: ${score.version}`)
