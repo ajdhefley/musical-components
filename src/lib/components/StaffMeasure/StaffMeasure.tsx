@@ -7,6 +7,7 @@ import { StaffNote } from '@lib/components/StaffNote/StaffNote'
 import { StaffRest } from '@lib/components/StaffRest/StaffRest'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
 import { StaffNoteBeam } from '@lib/components/StaffNoteBeam/StaffNoteBeam'
+import { StaffNoteTie } from '@lib/components/StaffNoteTie/StaffNoteTie'
 
 /**
  *
@@ -90,19 +91,6 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
 
     const id = `${props.staffId}-${props.notations?.length > 0 ? props.notations[0].startBeat : '0'}`
 
-    const staffPlacement = new MusicStaffPlacementLogic({
-        accidentalSize: props.accidentalSize,
-        noteSize: props.noteSize,
-        noteSpacing: props.noteSpacing,
-        spaceHeight: props.spaceHeight,
-        defaultStemHeight: props.defaultStemHeight,
-        clef: props.clef,
-        sharps: props.sharps,
-        flats: props.flats,
-        beatsPerMeasure: props.beatsPerMeasure,
-        beatDuration: props.beatDuration
-    })
-
     const getHoveredNoteElement = function () {
         const note = getHoveredNote(mousePosition)
 
@@ -111,7 +99,7 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
         }
 
         const leftPosition = mousePosition.x
-        const bottomPosition = staffPlacement.getNoteBottomPosition(note.pitch)
+        const bottomPosition = MusicStaffPlacementLogic.instance.getNoteBottomPosition(note.pitch)
 
         return <StaffNote model={note} accidentalSize={props.accidentalSize} size={props.noteSize} left={leftPosition} bottom={bottomPosition} />
     }
@@ -188,21 +176,25 @@ export function StaffMeasure (props: StaffMeasureProps): React.ReactElement {
             ref={ref}
             className="staff-measure"
             style={{
-                width: `${staffPlacement.getMeasureWidth(props.notations)}px`
+                width: `${MusicStaffPlacementLogic.instance.getMeasureWidth(props.notations)}px`
             }}
         >
             <StaffLines />
             <div className="notation-container">
-                {staffPlacement.extractNotes(props.notations).map((note, index) => (
+                {MusicStaffPlacementLogic.instance.extractNotes(props.notations).map((note, index) => (
                     <StaffNote key={index} {...note} size={props.noteSize} accidentalSize={props.accidentalSize} />
                 ))}
 
-                {staffPlacement.extractRests(props.notations).map((rest, index) => (
+                {MusicStaffPlacementLogic.instance.extractRests(props.notations).map((rest, index) => (
                     <StaffRest key={index} {...rest} />
                 ))}
 
-                {staffPlacement.getHorizontalBeams(props.notations).map((beam, index) => (
+                {MusicStaffPlacementLogic.instance.getHorizontalBeams(props.notations).map((beam, index) => (
                     <StaffNoteBeam key={index} {...beam} />
+                ))}
+
+                {MusicStaffPlacementLogic.instance.getTies(props.notations).map((tie, index) => (
+                    <StaffNoteTie key={index} {...tie} />
                 ))}
 
                 {getHoveredNoteElement()}

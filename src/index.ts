@@ -5,6 +5,7 @@ export * from './lib/components/StaffLines/StaffLines'
 export * from './lib/components/StaffMeasure/StaffMeasure'
 export * from './lib/components/StaffNote/StaffNote'
 export * from './lib/components/StaffNoteBeam/StaffNoteBeam'
+export * from './lib/components/StaffNoteTie/StaffNoteTie'
 export * from './lib/components/StaffRest/StaffRest'
 export * from './lib/components/StaffTimeSignature/StaffTimeSignature'
 

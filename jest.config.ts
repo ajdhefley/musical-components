@@ -5,5 +5,8 @@ const config: Config.InitialOptions = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  moduleNameMapper: {
+    '^@lib/(.*)$': '<rootDir>/src/lib/$1',
+  },
 };
 export default config;

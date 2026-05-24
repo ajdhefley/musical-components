@@ -8,6 +8,7 @@ import { StaffTimeSignature } from '@lib/components/StaffTimeSignature/StaffTime
 import { StaffClef } from '@lib/components/StaffClef/StaffClef'
 import { StaffLines } from '@lib/components/StaffLines/StaffLines'
 import { StaffPlayback } from '../../core/StaffPlayback'
+import { MusicStaffPlacementLogic } from '../../core/MusicStaffPlacementLogic'
 import { MusicLogic } from '../../..'
 
 /**
@@ -79,7 +80,19 @@ export function Staff (props: StaffProps): React.ReactElement {
     const noteSpacing = 30
     const spaceHeight = 26
     const defaultStemHeight = 120
-    const musicLogic = new MusicLogic({ ...props })
+    MusicLogic.instance.configure({ ...props })
+    MusicStaffPlacementLogic.instance.configure({
+        accidentalSize,
+        noteSize,
+        noteSpacing,
+        spaceHeight,
+        defaultStemHeight,
+        clef: props.clef,
+        sharps: props.sharps,
+        flats: props.flats,
+        beatsPerMeasure: props.beatsPerMeasure,
+        beatDuration: props.beatDuration
+    })
 
     const [measures, setMeasures] = useState<Notation[][]>([])
 
@@ -90,8 +103,8 @@ export function Staff (props: StaffProps): React.ReactElement {
     }, [])
 
     const addNotes = function (notations: Notation[]) {
-        const allNotationsFlattened = musicLogic.addNotations(measures.flat(), notations)
-        setMeasures(musicLogic.splitIntoMeasures(allNotationsFlattened))
+        const allNotationsFlattened = MusicLogic.instance.addNotations(measures.flat(), notations)
+        setMeasures(MusicLogic.instance.splitIntoMeasures(allNotationsFlattened))
         if (props.playback) props.playback.setNotations(allNotationsFlattened)
     }
 
@@ -100,7 +113,11 @@ export function Staff (props: StaffProps): React.ReactElement {
             <div className="staff-intro">
                 <StaffLines />
                 <StaffClef {...props} />
-                <StaffKeySignature {...props} accidentalSize={accidentalSize} spaceHeight={spaceHeight} />
+                <StaffKeySignature
+                    {...props}
+                    accidentalSize={accidentalSize}
+                    spaceHeight={spaceHeight}
+                />
                 <StaffTimeSignature {...props} />
             </div>
             {measures.map((measureNotes: Notation[]) => <>

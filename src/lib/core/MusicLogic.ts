@@ -1,13 +1,55 @@
 import { Accidental, NaturalNote, Notation, NotationType, Pitch, Rest } from '@lib/core/models'
 
-export class MusicLogic {
-    constructor (private readonly config: {
-        sharps?: NaturalNote[]
-        flats?: NaturalNote[]
-        beatsPerMeasure: number
-        beatDuration: NotationType
-    }) {
+type MusicLogicConfig = {
+    sharps?: NaturalNote[]
+    flats?: NaturalNote[]
+    beatsPerMeasure: number
+    beatDuration: NotationType
+}
 
+export class MusicLogic {
+    private static readonly BaseNotationTypes = [
+        NotationType.ThirtySecond,
+        NotationType.Sixteenth,
+        NotationType.Eighth,
+        NotationType.Quarter,
+        NotationType.Half,
+        NotationType.Whole
+    ]
+
+    private static readonly _instance = new MusicLogic()
+
+    static get instance () {
+        return MusicLogic._instance
+    }
+
+    private config: MusicLogicConfig = {
+        beatsPerMeasure: 4,
+        beatDuration: NotationType.Quarter
+    }
+
+    configure (config: MusicLogicConfig): this {
+        this.config = config
+        return this
+    }
+
+    private constructor () {}
+
+    /**
+     * Returns the NotationType singleton matching the given exact beat value.
+     *
+     * @param notationDuration Numerical representation of notation's duration.
+     * @returns {NotationType} The matching singleton, or throws if not found.
+     **/
+    public static getNotationTypeFromDuration (notationDuration: number) {
+        const match = MusicLogic.BaseNotationTypes
+            .find((t) => MusicLogic.areDurationsEqual(t.beatValue, notationDuration))
+
+        if (!match) {
+            throw Error(`Unsupported notation duration: ${notationDuration}`)
+        }
+
+        return match
     }
 
     /**
@@ -47,18 +89,59 @@ export class MusicLogic {
     }
 
     /**
-     * Automatically calculates and inserts rests into gaps between notes.
+     * Decomposes a duration into the fewest rests, allowing up to one dot per rest.
+     * For example, a gap of 3/8 starting at beat 0 becomes [dotted-quarter Rest at beat 0].
      *
-     * @param items
-     * @param itemstoAdd
-     * @returns {Notation[]} A full list of notations, including calculated rests.
+     * @param notationDuration The total duration to fill.
+     * @param startBeat The beat position of the first rest.
      **/
+    public static decomposeIntoRests (notationDuration: number, startBeat: number = 0): Rest[] {
+        if (notationDuration < 0) {
+            throw Error(`Notation duration must be non-negative: ${notationDuration}`)
+        }
+
+        if (MusicLogic.areDurationsEqual(notationDuration, 0)) {
+            return []
+        }
+
+        const candidates = MusicLogic.BaseNotationTypes
+            .flatMap((notationType) => [
+            { type: notationType, dotCount: 1, beatValue: notationType.beatValue * 1.5 },
+            { type: notationType, dotCount: 0, beatValue: notationType.beatValue }
+        ]).sort((a, b) => b.beatValue - a.beatValue)
+
+        const result: Rest[] = []
+        let remainingDuration = notationDuration
+        let currentBeat = startBeat
+
+        while (!MusicLogic.areDurationsEqual(remainingDuration, 0) && remainingDuration > 0) {
+            const next = candidates.find((c) => c.beatValue <= remainingDuration + 1e-9)
+
+            if (!next) {
+                throw Error(`Cannot decompose notation duration: ${notationDuration}`)
+            }
+
+            const rest = new Rest(next.type, currentBeat, next.dotCount)
+            result.push(rest)
+            currentBeat += rest.totalBeatValue
+            remainingDuration -= next.beatValue
+        }
+
+        return result
+    }
+
+    private static areDurationsEqual (left: number, right: number) {
+        return Math.abs(left - right) < 1e-9
+    }
+
     public addNotations (items: Notation[], itemstoAdd: Notation[]): Notation[] {
         let nextTime = 0
         if (items.length > 0) {
             const lastNote = items[items.length - 1]
-            nextTime = lastNote.startBeat + lastNote.type.beatValue
+            nextTime = lastNote.startBeat + lastNote.totalBeatValue
         }
+
+        const normalizedItemsToAdd: Notation[] = []
 
         itemstoAdd.forEach((itemToAdd, itemToAddIndex) => {
             // Rests are calculated/added automatically when gaps between notes are encountered.
@@ -73,19 +156,17 @@ export class MusicLogic {
 
                 const timediff = itemToAdd.startBeat - nextTime
 
-                // TODO: find largest possible rest in time diff, keep repeating until time filled
-                // TODO: handle dotted rests
-
                 if (timediff > 0) {
-                    const rest = new Rest(NotationType.getNotationTypeFromDuration(timediff), nextTime)
-                    nextTime = rest.startBeat + rest.type.beatValue
-                    itemstoAdd.splice(itemToAddIndex, 0, rest)
+                    const rests = MusicLogic.decomposeIntoRests(timediff, nextTime)
+                    normalizedItemsToAdd.push(...rests)
+                    nextTime = rests[rests.length - 1].startBeat + rests[rests.length - 1].totalBeatValue
                 }
             }
 
             itemToAdd.startBeat = nextTime
             itemToAdd.active = false
-            nextTime = itemToAdd.startBeat + itemToAdd.type.beatValue
+            normalizedItemsToAdd.push(itemToAdd)
+            nextTime = itemToAdd.startBeat + itemToAdd.totalBeatValue
         })
 
         // if (nextTime % totalMeasureBeatValue > 0 && nextTime % totalMeasureBeatValue < totalMeasureBeatValue) {
@@ -95,7 +176,7 @@ export class MusicLogic {
         //     itemstoAdd.push(new Rest(remainingDurationValue, nextTime + lastNote.type.getBeatValue()))
         // }
 
-        items = items.concat(itemstoAdd)
+        items = items.concat(normalizedItemsToAdd)
 
         return items
     }
@@ -122,8 +203,8 @@ export class MusicLogic {
         let currentStep = 0
         let currentNote = null
 
-        while (currentStep < lastNote.startBeat + lastNote.type.beatValue) {
-            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.type.beatValue)
+        while (currentStep < lastNote.startBeat + lastNote.totalBeatValue) {
+            const steppedNote = notations.find(n => currentStep >= n.startBeat && currentStep < n.startBeat + n.totalBeatValue)
 
             if (steppedNote && steppedNote !== currentNote) {
                 currentNote = steppedNote

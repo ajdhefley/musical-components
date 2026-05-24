@@ -50,7 +50,7 @@ export class MidiNotationPlayerResponse {
         if (notations.length === 0) return
 
         const lastNote = notations[notations.length - 1]
-        const lastTick = lastNote.startBeat + lastNote.type.beatValue
+        const lastTick = lastNote.startBeat + lastNote.totalBeatValue
 
         for (let i = 0; i < lastTick; i += 1 / 32) {
             if (this.cancelled) {
@@ -67,7 +67,7 @@ export class MidiNotationPlayerResponse {
                         const baseBpm = 60
                         const baseCountDuration = 1000
                         const countDuration = (baseBpm / this.beatsPerMinute) * baseCountDuration
-                        const noteDuration = note.type.beatValue * 4 * countDuration
+                        const noteDuration = note.totalBeatValue * 4 * countDuration
                         this.midiRelay.sendMidi(note.pitch, noteDuration)
                         this.invokeEvent('message', note)
                         return await new Promise<void>((resolve) => setTimeout(resolve, noteDuration))

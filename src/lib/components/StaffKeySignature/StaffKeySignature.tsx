@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './StaffKeySignature.scss'
-import { Clef, NaturalNote, NotationType } from '@lib/core/models'
+import { Clef, NaturalNote } from '@lib/core/models'
 import { MusicStaffPlacementLogic } from '@lib/core/MusicStaffPlacementLogic'
 
 /**
@@ -40,19 +40,6 @@ interface StaffKeySignatureProps {
  *
  **/
 export function StaffKeySignature (props: StaffKeySignatureProps): React.ReactElement {
-    const staffPlacement = new MusicStaffPlacementLogic({
-        accidentalSize: props.accidentalSize,
-        noteSize: 0,
-        noteSpacing: 0,
-        spaceHeight: props.spaceHeight,
-        defaultStemHeight: 0,
-        clef: props.clef,
-        sharps: props.sharps,
-        flats: props.flats,
-        beatsPerMeasure: 0,
-        beatDuration: NotationType.Quarter
-    })
-
     const getTotalWidth = function () {
         return ((props.sharps?.length ?? 0) + (props.flats?.length ?? 0)) * (props.accidentalSize + 5)
     }
@@ -60,8 +47,8 @@ export function StaffKeySignature (props: StaffKeySignatureProps): React.ReactEl
     const getSharpsAndFlats = function () {
         if (props.sharps) {
             return props.sharps.map((note, index) => {
-                const leftPosition = staffPlacement.getAccidentalLeftPosition(index)
-                const bottomPosition = staffPlacement.getAccidentalBottomPosition(note) - props.spaceHeight + 5
+                const leftPosition = MusicStaffPlacementLogic.instance.getAccidentalLeftPosition(index)
+                const bottomPosition = MusicStaffPlacementLogic.instance.getAccidentalBottomPosition(note) - props.spaceHeight + 5
                 return {
                     className: 'sharp',
                     style: {
@@ -74,8 +61,8 @@ export function StaffKeySignature (props: StaffKeySignatureProps): React.ReactEl
             })
         } else if (props.flats) {
             return props.flats.map((note, index) => {
-                const leftPosition = index * props.accidentalSize
-                const bottomPosition = staffPlacement.getAccidentalBottomPosition(note) - props.spaceHeight / 2 + 5
+                const leftPosition = MusicStaffPlacementLogic.instance.getAccidentalLeftPosition(index)
+                const bottomPosition = MusicStaffPlacementLogic.instance.getAccidentalBottomPosition(note) - props.spaceHeight / 2 + 5
                 return {
                     className: 'flat',
                     style: {

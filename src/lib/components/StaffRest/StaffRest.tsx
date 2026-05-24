@@ -23,6 +23,16 @@ interface StaffRestProps {
  **/
 export function StaffRest ({ model, left }: StaffRestProps): React.ReactElement {
     return (
-        <div className={`rest rest-${model.type.getCountsPerMeasure()}`} style={{ left: `${left}px` }}></div>
+        <div className={`rest rest-${model.type.getPerMeasureCount()}`} style={{ left: `${left}px` }}>
+            {Array.from({ length: model.dotCount }, (_, index) => (
+                <div
+                    key={index}
+                    className="duration-dot"
+                    style={{
+                        left: `${34 + (index * 10)}px`
+                    }}
+                ></div>
+            ))}
+        </div>
     )
 }

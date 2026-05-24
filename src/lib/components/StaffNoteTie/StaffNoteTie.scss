@@ -1,0 +1,12 @@
+.note-tie {
+    position: absolute;
+    height: 14px;
+    border: 2px solid #000;
+    border-top: 0;
+    border-radius: 0 0 40px 40px;
+
+    &.flip {
+        transform: scaleY(-1);
+        transform-origin: center;
+    }
+}
