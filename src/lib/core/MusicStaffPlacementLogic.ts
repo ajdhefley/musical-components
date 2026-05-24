@@ -249,6 +249,42 @@ export class MusicStaffPlacementLogic {
         return this.getNoteLeftPosition(notations, lastNote) + rightOffset
     }
 
+    private getOddEighthMeterBeamGroupSize (noteStartBeat: number): number {
+        if (this.config.beatDuration !== NotationType.Eighth || this.config.beatsPerMeasure <= 3) {
+            return 1
+        }
+
+        // In odd /8 meters, default to 3 + 2 (+ 2...) groupings.
+        if (this.config.beatsPerMeasure % 2 === 0 || this.config.beatsPerMeasure % 3 === 0) {
+            return 1
+        }
+
+        const groups = new Array<number>()
+        let remainingBeats = this.config.beatsPerMeasure
+
+        groups.push(3)
+        remainingBeats -= 3
+
+        while (remainingBeats > 0) {
+            groups.push(2)
+            remainingBeats -= 2
+        }
+
+        const eighthPosition = Math.max(0, Math.round(MusicLogic.instance.normalizeBeat(noteStartBeat) * 8))
+
+        let runningIndex = 0
+        for (const groupSize of groups) {
+            const groupEnd = runningIndex + groupSize
+            if (eighthPosition < groupEnd) {
+                return groupEnd - eighthPosition
+            }
+
+            runningIndex = groupEnd
+        }
+
+        return 1
+    }
+
     public getHorizontalBeams (notations: Notation[]) {
         let lastHorizontalBeamIndex = -1
         const notes = notations.filter((notation): notation is Note => notation instanceof Note)
@@ -273,7 +309,9 @@ export class MusicStaffPlacementLogic {
                 // Time signature is 3/4, 5/4, 7/4, or 9/4
                 const count2 = notationModel.type.getCountsPerMeasure(this.config.beatsPerMeasure, this.config.beatDuration) % 2 === 0
 
-                let maxConnectedNotes = isCompoundTime ? 3 : count4 ? 4 : count2 ? 2 : 1
+                const oddEighthGroupSize = this.getOddEighthMeterBeamGroupSize(notationModel.startBeat)
+
+                let maxConnectedNotes = isCompoundTime ? 3 : oddEighthGroupSize > 1 ? oddEighthGroupSize : count4 ? 4 : count2 ? 2 : 1
                 if (notationModel.type === NotationType.ThirtySecond) maxConnectedNotes *= 4
                 if (notationModel.type === NotationType.Sixteenth) maxConnectedNotes *= 2
 

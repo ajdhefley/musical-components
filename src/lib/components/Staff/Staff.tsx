@@ -79,7 +79,7 @@ export function Staff (props: StaffProps): React.ReactElement {
     const noteSize = 35
     const noteSpacing = 30
     const spaceHeight = 26
-    const defaultStemHeight = 120
+    const defaultStemHeight = noteSize * 2.5
     MusicLogic.instance.configure({ ...props })
     MusicStaffPlacementLogic.instance.configure({
         accidentalSize,
