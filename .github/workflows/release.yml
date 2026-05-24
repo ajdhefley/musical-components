@@ -26,9 +26,17 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Generate App Token
+        id: app_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          token: ${{ steps.app_token.outputs.token }}
           fetch-depth: 0
 
       - name: Install Node.js
@@ -54,7 +62,7 @@ jobs:
       - name: Create Release Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ github.token }}
+          token: ${{ steps.app_token.outputs.token }}
           base: main
           branch: release/v${{ steps.version.outputs.version }}
           title: "[auto] Create release v${{ steps.version.outputs.version }}"
@@ -83,7 +91,7 @@ jobs:
         id: version
         run: |
           version=$(node -p 'require("./package.json").version')
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
 
       - name: Ensure Tag Exists
         env:
