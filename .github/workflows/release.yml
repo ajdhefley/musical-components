@@ -12,25 +12,23 @@ on:
           - patch
           - minor
           - major
+  push:
+    branches: [ "main" ]
+    paths:
+      - package.json
 
 jobs:
-  release:
+  prepare_release_pr:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
-      - name: Generate App Token
-        id: app_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
-          private_key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
-
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          token: ${{ steps.app_token.outputs.token }}
           fetch-depth: 0
 
       - name: Install Node.js
@@ -43,22 +41,59 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Bump Version, Commit, and Tag
+      - name: Bump Version
         run: |
-          npm version ${{ github.event.inputs.bump }} -m "chore(release): %s"
+          npm version ${{ github.event.inputs.bump }} --no-git-tag-version
 
-      - name: Push Commit and Tags
-        run: git push --force-with-lease --follow-tags
+      - name: Read Version
+        id: version
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
 
-      - name: Get Tag
-        id: get_tag
-        run: echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+      - name: Create Release Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ github.token }}
+          base: main
+          branch: release/v${{ steps.version.outputs.version }}
+          title: "[auto] Create release v${{ steps.version.outputs.version }}"
+          commit-message: "[auto] Create release v${{ steps.version.outputs.version }}"
+          body: |
+            Automated release PR.
+
+            - Bumps package version in package.json
+            - After merge to main, release workflow creates tag and GitHub Release
+          labels: release
+          delete-branch: true
+
+  publish_release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read Version
+        id: version
+        run: echo "tag=v$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure Tag Exists
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists"
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.get_tag.outputs.tag }}
+          tag_name: ${{ steps.version.outputs.tag }}
           generate_release_notes: true
