@@ -1,5 +1,6 @@
 export * from './Accidental'
 export * from './Clef'
+export * from './Chord'
 export * from './NaturalNote'
 export * from './Notation'
 export * from './NotationType'
