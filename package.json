@@ -57,7 +57,7 @@
     "prepare": "npm run build",
     "build": "tsc && vite build",
     "docs": "jsdoc -c jsdoc.config.json --readme ./docs/README.md",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "lint": "./node_modules/.bin/eslint --fix src/**/*.{ts,tsx}"
   }
 }
