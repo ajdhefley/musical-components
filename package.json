@@ -46,7 +46,7 @@
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
     "vite-plugin-css-injected-by-js": "^3.0.1",
-    "vite-plugin-dts": "^1.6.6",
+    "vite-plugin-dts": "^2.0.0",
     "vite-svg-loader": "^4.0.0"
   },
   "peerDependencies": {
@@ -55,7 +55,7 @@
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc && vite build",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "docs": "jsdoc -c jsdoc.config.json --readme ./docs/README.md",
     "test": "jest --passWithNoTests",
     "lint": "./node_modules/.bin/eslint --fix src/**/*.{ts,tsx}"

@@ -1,4 +1,4 @@
-@import "@lib/styles/variables";
+@use "@lib/styles/variables" as *;
 
 .rest {
     background-repeat: no-repeat;

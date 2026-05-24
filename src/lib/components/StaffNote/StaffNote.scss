@@ -1,5 +1,5 @@
-@import "@lib/styles/mixins";
-@import "@lib/styles/variables";
+@use "@lib/styles/mixins" as *;
+@use "@lib/styles/variables" as *;
 
 .note {
     background-repeat: no-repeat;

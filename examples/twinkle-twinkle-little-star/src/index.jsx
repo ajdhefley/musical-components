@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Note, NotationType, Pitch, Clef, Staff, StaffPlayback } from 'musical-components'
+import { Note, NotationType, Pitch, Clef, ScoreView, ScorePlayback } from 'musical-components'
 
 const notes = [
     new Note(NotationType.Eighth, Pitch.C4),
@@ -49,7 +49,19 @@ const notes = [
 
 const beatsPerMeasure = 4
 const beatsPerMinute = 70
-const playback = new StaffPlayback(beatsPerMeasure, beatsPerMinute)
+const score = {
+    beatsPerMeasure,
+    beatDuration: NotationType.Quarter,
+    staves: [
+        {
+            clef: Clef.TrebleClef,
+            voices: [{ notations: notes }]
+        }
+    ]
+}
+
+const playback = new ScorePlayback(beatsPerMeasure, beatsPerMinute)
+playback.setScore(score)
 
 function play () {
     new AudioContext().resume()
@@ -58,13 +70,7 @@ function play () {
 
 ReactDOM.render(
     <React.StrictMode>
-        <Staff
-            initialNotations={notes}
-            beatsPerMeasure={beatsPerMeasure}
-            beatDuration={NotationType.Quarter}
-            clef={Clef.TrebleClef}
-            playback={playback}
-        />
+        <ScoreView score={score} />
         <br /><br /><br /><br />
         <button onClick={play}>Click Me!</button>
     </React.StrictMode>,
