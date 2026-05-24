@@ -90,6 +90,22 @@ describe('MusicStaffPlacementLogic.getHorizontalBeams', () => {
         notations.forEach((note) => expect(note.isBeamed).toBe(true))
     })
 
+    it('groups eighth notes as 3+2 in 5/8', () => {
+        const placement = configurePlacement(5, NotationType.Eighth)
+        const notations = [
+            new Note(NotationType.Eighth, Pitch.C4, 0),
+            new Note(NotationType.Eighth, Pitch.D4, 1 / 8),
+            new Note(NotationType.Eighth, Pitch.E4, 2 / 8),
+            new Note(NotationType.Eighth, Pitch.F4, 3 / 8),
+            new Note(NotationType.Eighth, Pitch.G4, 4 / 8)
+        ]
+
+        const beams = placement.getHorizontalBeams(notations)
+
+        expect(beams).toHaveLength(2)
+        notations.forEach((note) => expect(note.isBeamed).toBe(true))
+    })
+
     it('renders double beams for sixteenth-note groups', () => {
         const placement = configurePlacement(4, NotationType.Quarter)
         const notations = [
