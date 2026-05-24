@@ -79,7 +79,9 @@ jobs:
 
       - name: Read Version
         id: version
-        run: echo "tag=v$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Ensure Tag Exists
         env:
