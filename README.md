@@ -1,4 +1,4 @@
-# musical-components &nbsp; ![GitHub Workflow Status](https://github.com/ajdhefley/musical-components/actions/workflows/main.yml/badge.svg) &nbsp; [![Node version](https://img.shields.io/npm/v/musical-components.svg?style=flat)](http://nodejs.org/download/)
+# musical-components &nbsp; ![GitHub Workflow Status](https://github.com/ajdhefley/musical-components/actions/workflows/release.yml/badge.svg) &nbsp; [![Node version](https://img.shields.io/npm/v/musical-components.svg?style=flat)](http://nodejs.org/download/)
 
 React/MIDI library that renders and plays musical notation in all major browsers.
 
